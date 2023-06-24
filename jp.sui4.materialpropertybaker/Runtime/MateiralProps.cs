@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,6 +34,7 @@ namespace sui4.MaterialPropertyBaker
             _colors.AddRange(c);
             _floats.AddRange(f);
             _ints.AddRange(i);
+            UpdateShaderID();
         }
 
         public void UpdateShaderID()

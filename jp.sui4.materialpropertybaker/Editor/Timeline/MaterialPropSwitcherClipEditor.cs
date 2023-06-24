@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using System.IO;
@@ -43,7 +43,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 EditorGUILayout.PropertyField(_presetRef, label);
 
                 if (changeCheck.changed)
+                {
+                    if (_presetRef.objectReferenceValue != null)
+                    {
+                        ((BakedProperties)_presetRef.objectReferenceValue).UpdateShaderID();
+                    }
                     serializedObject.ApplyModifiedProperties();
+                }
             }
 
             // Load Save buttons

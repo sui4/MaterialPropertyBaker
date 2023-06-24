@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
@@ -10,13 +10,13 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _materialStatusListList;
         private void OnEnable()
         {
-            _defaultProfile = serializedObject.FindProperty("defaultProfile");
+            _defaultProfile = serializedObject.FindProperty("_defaultProfile");
             _materialStatusListList = serializedObject.FindProperty("_materialStatusListList");
         }
 
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
+            // base.OnInspectorGUI();
 
             serializedObject.Update();
            

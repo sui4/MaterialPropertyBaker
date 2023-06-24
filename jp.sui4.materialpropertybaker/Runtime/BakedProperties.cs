@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -17,7 +17,12 @@ namespace sui4.MaterialPropertyBaker
             set => _shaderName = value;
         }
         public MaterialProps MaterialProps => _materialProps;
-        
+
+        private void OnEnable()
+        {
+            UpdateShaderID();
+        }
+
         public void UpdateShaderID()
         {
             _materialProps.UpdateShaderID();
@@ -50,6 +55,7 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
             _materialProps = new MaterialProps(colors, floats, ints);
+            UpdateShaderID();
         }
 
         public void GetCopyProperties(out List<MaterialPropColor> cList, out List<MaterialPropFloat> fList, out List<MaterialPropInt> iList)
