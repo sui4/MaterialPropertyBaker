@@ -1,6 +1,4 @@
-﻿using System;
 using System.Collections.Generic;
-using sui4.MaterialPropertyBaker;
 using UnityEditor;
 using UnityEngine;
 using System.IO;

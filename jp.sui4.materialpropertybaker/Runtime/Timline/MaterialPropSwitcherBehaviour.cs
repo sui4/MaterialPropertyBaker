@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.Playables;
+﻿using UnityEngine.Playables;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {
