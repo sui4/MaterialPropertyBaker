@@ -13,6 +13,8 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _floats;
         private SerializedProperty _ints;
 
+        private bool _editMode;
+
         private void OnEnable()
         {
             if (target == null)
@@ -32,6 +34,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 EditorGUILayout.LabelField("Shader" ,_shaderName.stringValue, EditorStyles.boldLabel);
                 EditorGUILayout.Separator();
+                _editMode = EditorGUILayout.Toggle("Edit Mode", _editMode);
                 
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
@@ -56,24 +59,57 @@ namespace sui4.MaterialPropertyBaker
             
         }
 
+        private SerializedProperty _property;
+        private SerializedProperty _value;
         private void PropsGUI(SerializedProperty props)
         {
-            EditorGUILayout.LabelField(props.displayName);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField(props.displayName);
+            }
             for (int pi = 0; pi < props.arraySize; pi++)
             {
                 SerializedProperty prop = props.GetArrayElementAtIndex(pi);
-                var property = prop.FindPropertyRelative("property");
-                var value = prop.FindPropertyRelative("value");
+                _property = prop.FindPropertyRelative("property");
+                _value = prop.FindPropertyRelative("value");
                 
                 using (new GUILayout.HorizontalScope())
                 {
-                    
-                    var label = Utils.UnderscoresToSpaces(property.stringValue);
-                    label = label.Length == 0 ? " " : label;
-                    // EditorGUILayout.PropertyField(property, label);
-                    EditorGUILayout.PropertyField(value, new GUIContent(label));    
+                    if (_editMode)
+                    {
+                        EditorGUILayout.PropertyField(_property, new GUIContent());
+                        EditorGUILayout.PropertyField(_value, new GUIContent());
+                        // remove button
+                        var tmp = GUI.backgroundColor;
+                        GUI.backgroundColor = Color.red;
+                        if (GUILayout.Button("-", GUILayout.Width(30)))
+                        {
+                            props.DeleteArrayElementAtIndex(pi);
+                        }
+                        GUI.backgroundColor = tmp;
+                    }
+                    else
+                    {
+                        var label = Utils.UnderscoresToSpaces(_property.stringValue);
+                        label = label.Length == 0 ? " " : label;
+                        EditorGUILayout.PropertyField(_value, new GUIContent(label));
+                    }
+ 
                 }                
             }
+
+            if (_editMode)
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.Separator();
+                    if (GUILayout.Button("+", GUILayout.Width(40)))
+                    {
+                        props.InsertArrayElementAtIndex(props.arraySize);
+                    }  
+                }
+            }
+
         }
     }
 }
