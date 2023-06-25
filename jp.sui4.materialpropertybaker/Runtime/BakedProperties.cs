@@ -64,6 +64,11 @@ namespace sui4.MaterialPropertyBaker
             UpdateShaderID();
         }
 
+        public void CraetePropsFromMaterialProps(MaterialProps matProps)
+        {
+            matProps.GetCopyProperties(out var cList, out var fList);
+            _materialProps = new MaterialProps(cList, fList);
+        }
         public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
             MaterialProps.GetCopyProperties(out cList, out fList);

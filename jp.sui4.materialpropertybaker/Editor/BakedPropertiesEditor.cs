@@ -39,6 +39,17 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUILayout.Separator();
                 _forceEditMode = EditorGUILayout.Toggle("Force Edit Mode", _forceEditMode);
                 
+                using (new EditorGUILayout.VerticalScope("box"))
+                {
+                    PropsGUI(_colors, ShaderPropertyType.Color);
+                }
+                EditorGUILayout.Separator();
+                using (new EditorGUILayout.VerticalScope("box"))
+                {
+                    PropsGUI(_floats, ShaderPropertyType.Float);
+                }
+                
+                EditorGUILayout.Separator();
                 if(_shaderProperties.objectReferenceValue != null)
                 {
                     var tmp = GUI.backgroundColor;
@@ -48,16 +59,6 @@ namespace sui4.MaterialPropertyBaker
                         ((BakedProperties)target).DeleteUnEditableProperties();
                     }
                     GUI.backgroundColor = tmp;
-                }
-                
-                using (new EditorGUILayout.VerticalScope("box"))
-                {
-                    PropsGUI(_colors, ShaderPropertyType.Color);
-                }
-                EditorGUILayout.Separator();
-                using (new EditorGUILayout.VerticalScope("box"))
-                {
-                    PropsGUI(_floats, ShaderPropertyType.Float);
                 }
                   
                 if (change.changed)

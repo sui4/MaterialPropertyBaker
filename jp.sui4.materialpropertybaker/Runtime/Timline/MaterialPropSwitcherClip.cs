@@ -10,20 +10,21 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private MaterialPropSwitcherBehaviour _template = new MaterialPropSwitcherBehaviour();
 
+        [SerializeField] private BakedProperties _bakedProperties;
+
         [SerializeField] private BakedProperties _presetRef;
-        [SerializeField] private MaterialProps _materialProps = new MaterialProps();
         [SerializeField] private bool _syncWithPreset = true;
+        
+        public BakedProperties BakedProperties
+        {
+            get => _bakedProperties;
+            set => _bakedProperties = value;
+        }
         
         public BakedProperties PresetRef
         {
             get => _presetRef;
             set => _presetRef = value;
-        }
-        
-        public MaterialProps MaterialProps
-        {
-            get => _materialProps;
-            set => _materialProps = value;
         }
         
         public bool SyncWithPreset
@@ -52,30 +53,32 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             if (_presetRef != null && _syncWithPreset)
             {
-                LoadProfile(_presetRef);
+                _bakedProperties = Instantiate(_presetRef);
             }
-            else if(_materialProps.Colors.Count == 0 && _materialProps.Floats.Count == 0)
+            else if(_bakedProperties == null)
             {
-                var profile = CreateInstance<BakedProperties>();
-                LoadProfile(profile);
+                _bakedProperties = CreateInstance<BakedProperties>();
             }
             else
             {
                 // do nothing
             }
-            _materialProps.UpdateShaderID();
+            _bakedProperties.UpdateShaderID();
         }
 
-        public void LoadProfile(BakedProperties profile)
+        public void CopyValueOfPresetRef()
         {
-            if (profile == null)
+            _bakedProperties.CraetePropsFromMaterialProps(_presetRef.MaterialProps);
+        }
+
+        public void InstantiateBakedPropertiesFromPreset()
+        {
+            if (_bakedProperties != null)
             {
-                Debug.LogWarning("preset profile is null. ");
-                return;
+                DestroyImmediate(_bakedProperties);
+                _bakedProperties = null;
             }
-            profile.GetCopyProperties(out var colors, out var floats);
-            _materialProps.Colors = colors;
-            _materialProps.Floats = floats;
+            _bakedProperties = Instantiate(_presetRef);
         }
     }
 }

@@ -10,16 +10,18 @@ namespace sui4.MaterialPropertyBaker.Timeline
     [CanEditMultipleObjects]
     public class MaterialPropSwitcherClipEditor : Editor
     {
-        private SerializedProperty _props;
+        private SerializedProperty _bakedProperties;
         private SerializedProperty _presetRef;
         private SerializedProperty _syncWithPreset;
+
+        private BakedPropertiesEditor _editor;
         private void OnEnable()
         {
             if(target == null)
                 return;
             var t = (MaterialPropSwitcherClip)target;
 
-            _props = serializedObject.FindProperty("_materialProps");
+            _bakedProperties = serializedObject.FindProperty("_bakedProperties");
             _presetRef = serializedObject.FindProperty("_presetRef");
             _syncWithPreset = serializedObject.FindProperty("_syncWithPreset");
         }
@@ -38,42 +40,48 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var clip = (MaterialPropSwitcherClip)target;
 
 
-            PresetGUI();
-            
-            EditorGUILayout.Separator();
-
-            // Export button
-            using (var h = new EditorGUILayout.HorizontalScope())
+            using (new EditorGUILayout.VerticalScope("box"))
             {
-                var tmp = GUI.backgroundColor;
-                GUI.backgroundColor = Color.cyan;
-                if(GUILayout.Button("Export"))
-                {
-                    var preset = CreatePresetFromProps(clip.MaterialProps);
-                    ExportProfile(preset);
-                }
-                GUI.backgroundColor = tmp;
+                PresetGUI();
             }
             
             EditorGUILayout.Separator();
-            EditorGUILayout.Separator();
 
-            // Property Editor
-            using (new EditorGUI.DisabledScope(_syncWithPreset.boolValue))
+            using (new EditorGUILayout.VerticalScope("box"))
             {
-                if (clip.SyncWithPreset)
+                using (new EditorGUI.DisabledScope(_syncWithPreset.boolValue))
                 {
-                    if (clip.PresetRef == null)
+                    // Property Editor
+                    if (clip.SyncWithPreset)
                     {
-                        clip.SyncWithPreset = false;
+                        if (clip.PresetRef == null)
+                        {
+                            clip.SyncWithPreset = false;
+                        }
+                        else
+                        {
+                            clip.InstantiateBakedPropertiesFromPreset();
+                        }
+                        serializedObject.Update();
                     }
-                    else
+                    BakedPropertiesGUI();
+                    
+                    EditorGUILayout.Separator();
+            
+                    // Export button
+                    using (var h = new EditorGUILayout.HorizontalScope())
                     {
-                        clip.LoadProfile(clip.PresetRef);
+                        var tmp = GUI.backgroundColor;
+                        GUI.backgroundColor = Color.cyan;
+                        if(GUILayout.Button("Export"))
+                        {
+                            var preset = CreatePresetFromProps(clip.BakedProperties.MaterialProps);
+                            ExportProfile(preset);
+                        }
+                        GUI.backgroundColor = tmp;
                     }
-                    serializedObject.Update();
                 }
-                MaterialPropsGUI(_props);
+
             }
         }
 
@@ -105,7 +113,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     var tmp = GUI.backgroundColor;
                     GUI.backgroundColor = Color.green;
                     if (GUILayout.Button("Load"))
-                        clip.LoadProfile(clip.PresetRef);
+                    {
+                        clip.InstantiateBakedPropertiesFromPreset();
+                    }
                 
                     GUI.backgroundColor = Color.red;
                     if (GUILayout.Button("Update Preset"))
@@ -121,7 +131,31 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
             }
         }
-        
+
+        private void BakedPropertiesGUI()
+        {
+            var bakedProperties = _bakedProperties.objectReferenceValue as BakedProperties;
+            if(bakedProperties == null)
+            {
+                EditorGUILayout.HelpBox("BakedProperties is null", MessageType.Error);
+                return;
+            }
+            
+            if (_editor == null)
+            {
+                _editor = (BakedPropertiesEditor)Editor.CreateEditor(bakedProperties);
+            }
+            else if(_editor.target != bakedProperties)
+            {
+                DestroyImmediate(_editor);
+                _editor = null;
+                _editor = (BakedPropertiesEditor)Editor.CreateEditor(bakedProperties);
+            }
+            
+            if(_editor != null)
+                _editor.OnInspectorGUI();
+            
+        }
         private void MaterialPropsGUI(SerializedProperty materialProps)
         {
             var colors = materialProps.FindPropertyRelative("_colors");
@@ -215,7 +249,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private void UpdatePreset()
         {
             var clip = (MaterialPropSwitcherClip)target;
-            var props = clip.MaterialProps;
+            var props = clip.BakedProperties.MaterialProps;
             // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
             // Listになってる各MaterialPropがクラスのため、参照になっちゃう
             props.GetCopyProperties(out var cList, out var fList);

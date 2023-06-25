@@ -34,8 +34,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 for(int i = 0; i < inputCount; i++) {
                     var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
                     var clip = sp.GetBehaviour().Clip;
-                    var props = clip.MaterialProps;
-                    props.UpdateShaderID();
+                    clip.BakedProperties.UpdateShaderID();
                     _isShaderIDGenerated = true;
                 }
                 if(ParentSwitcherTrack.DefaultProfile)
@@ -60,11 +59,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     else
                     {
                         // Caution: 毎フレームやると重いかも
-                        clip.LoadProfile(clip.PresetRef);
+                        clip.CopyValueOfPresetRef();
                     }
                 }
-                _matProps = clip.MaterialProps;
-
+                _matProps = clip.BakedProperties.MaterialProps;
+                if(_matProps == null) continue;
+                
                 // 各paramの重み付き和
                 if (inputWeight > 0)
                 {
