@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -11,12 +12,19 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private MaterialProps _materialProps;
         [SerializeField] private string _shaderName;
+        [SerializeField] private ShaderProperties _shaderProperties;
         public string ShaderName
         {
             get => _shaderName;
             set => _shaderName = value;
         }
         public MaterialProps MaterialProps => _materialProps;
+
+        public ShaderProperties ShaderProperties
+        {
+            get => _shaderProperties;
+            set => _shaderProperties = value;
+        }
 
         private void OnEnable()
         {
@@ -25,15 +33,15 @@ namespace sui4.MaterialPropertyBaker
 
         public void UpdateShaderID()
         {
-            _materialProps.UpdateShaderID();
+            if(_materialProps != null)
+                _materialProps.UpdateShaderID();
         }
 
         public void CreatePropsFromMaterial(in Material mat)
         {
             _shaderName = mat.shader.name;
-            var colors = new List<MaterialPropColor>();
-            var floats = new List<MaterialPropFloat>();
-            var ints = new List<MaterialPropInt>();
+            var colors = new List<MaterialProp<Color>>();
+            var floats = new List<MaterialProp<float>>();
             for (int pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
             {
                 var propType = mat.shader.GetPropertyType(pi);
@@ -42,61 +50,96 @@ namespace sui4.MaterialPropertyBaker
                 switch (propType)
                 {
                     case ShaderPropertyType.Color:
-                        colors.Add(new MaterialPropColor(propName, mat));
+                        colors.Add(new MaterialProp<Color>(propName, mat));
                         break; 
                     case ShaderPropertyType.Float:
-                        floats.Add(new MaterialPropFloat(propName, mat));
-                        break;
-                    case ShaderPropertyType.Int:
-                        ints.Add(new MaterialPropInt(propName, mat));
+                    case ShaderPropertyType.Range:
+                        floats.Add(new MaterialProp<float>(propName, mat));
                         break;
                     default:
                         break;
                 }
             }
-            _materialProps = new MaterialProps(colors, floats, ints);
+            _materialProps = new MaterialProps(colors, floats);
             UpdateShaderID();
         }
 
-        public void GetCopyProperties(out List<MaterialPropColor> cList, out List<MaterialPropFloat> fList, out List<MaterialPropInt> iList)
+        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
-            cList = new List<MaterialPropColor>();
-            fList = new List<MaterialPropFloat>();
-            iList = new List<MaterialPropInt>();
+            cList = new List<MaterialProp<Color>>();
+            fList = new List<MaterialProp<float>>();
             var mp = _materialProps;
             // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
             // Listになってる各MaterialPropがクラスのため、参照になっちゃう
             foreach (var colors in mp.Colors)
             {
-                MaterialPropColor c = new MaterialPropColor
+                MaterialProp<Color> c = new MaterialProp<Color>
                 {
-                    value = colors.value,
-                    property = colors.property,
-                    id = colors.id
+                    Value = colors.Value,
+                    Name = colors.Name,
+                    ID = colors.ID
                 };
                 cList.Add(c);
             }
             foreach (var floats in mp.Floats)
             {
-                MaterialPropFloat f = new MaterialPropFloat
+                MaterialProp<float> f = new MaterialProp<float>
                 {
-                    value = floats.value,
-                    property = floats.property,
-                    id = floats.id
+                    Value = floats.Value,
+                    Name = floats.Name,
+                    ID = floats.ID
                 };
                 fList.Add(f);
             }
-            foreach (var ints in mp.Ints)
+
+        }
+
+        // shader propertiesに含まれない, またはEditableではないプロパティを削除する
+        public void DeleteUnEditableProperties()
+        {
+            if(_shaderProperties == null) return;
+
+            var colorDeleteIndex = new List<int>();
+            var floatDeleteIndex = new List<int>();
+
+            // 含まれないプロパティを探す
+            for (int ci = 0; ci < _materialProps.Colors.Count; ci++)
             {
-                MaterialPropInt i = new MaterialPropInt
+                var colorProp = _materialProps.Colors[ci];
+                var index = _shaderProperties.PropertyNames.IndexOf(colorProp.Name);
+                if (index == -1)
                 {
-                    value = ints.value,
-                    property = ints.property,
-                    id = ints.id
-                };
-                iList.Add(i);
+                    colorDeleteIndex.Add(ci);
+                }
+                else if(_shaderProperties.Editable[index] == false)
+                {
+                    colorDeleteIndex.Add(ci);
+                }
+            }
+            
+            for (int fi = 0; fi < _materialProps.Floats.Count; fi++)
+            {
+                var floatProp = _materialProps.Floats[fi];
+                var index = _shaderProperties.PropertyNames.IndexOf(floatProp.Name);
+                if (index == -1)
+                {
+                    floatDeleteIndex.Add(fi);
+                }
+                else if(_shaderProperties.Editable[index] == false)
+                {
+                    floatDeleteIndex.Add(fi);
+                }
+            }
+            
+            // 後ろから削除
+            for(int di = colorDeleteIndex.Count - 1; di >= 0; di--)
+            {
+                _materialProps.Colors.RemoveAt(colorDeleteIndex[di]);
+            }
+            for(int di = floatDeleteIndex.Count - 1; di >= 0; di--)
+            {
+                _materialProps.Floats.RemoveAt(floatDeleteIndex[di]);
             }
         }
-        
     }
 }

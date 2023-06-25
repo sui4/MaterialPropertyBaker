@@ -126,7 +126,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             var colors = materialProps.FindPropertyRelative("_colors");
             var floats = materialProps.FindPropertyRelative("_floats");
-            var ints = materialProps.FindPropertyRelative("_ints");
             
             serializedObject.Update();
             
@@ -143,9 +142,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 EditorGUILayout.Separator();
                 EditorGUILayout.Separator();
 
-                PropGUI(ints);
-                EditorGUILayout.Separator();
-
                 if (changeCheckScope.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
@@ -155,16 +151,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
         
         private SerializedProperty _matProp;
         private SerializedProperty _propName;
-        private SerializedProperty _id;
         private SerializedProperty _value;
         private void PropGUI(SerializedProperty matProps)
         {
             for(int i = 0; i < matProps.arraySize; i++)
             {
                 _matProp = matProps.GetArrayElementAtIndex(i);
-                _propName = _matProp.FindPropertyRelative("property");
-                _id = _matProp.FindPropertyRelative("id");
-                _value = _matProp.FindPropertyRelative("value");
+                _propName = _matProp.FindPropertyRelative("_name");
+                _value = _matProp.FindPropertyRelative("_value");
                 
                 var label = new GUIContent(Utils.UnderscoresToSpaces(_propName.stringValue));
 
@@ -180,9 +174,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var preset = ScriptableObject.CreateInstance<BakedProperties>();
             preset.name = target.name;
             var materialProps = preset.MaterialProps;
-            materialProps.Colors = new List<MaterialPropColor>(props.Colors);
-            materialProps.Floats = new List<MaterialPropFloat>(props.Floats);
-            materialProps.Ints = new List<MaterialPropInt>(props.Ints);
+            materialProps.Colors = new List<MaterialProp<Color>>(props.Colors);
+            materialProps.Floats = new List<MaterialProp<float>>(props.Floats);
             return preset;
         }
 
@@ -225,11 +218,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var props = clip.MaterialProps;
             // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
             // Listになってる各MaterialPropがクラスのため、参照になっちゃう
-            props.GetCopyProperties(out var cList, out var fList, out var iList);
+            props.GetCopyProperties(out var cList, out var fList);
             
             clip.PresetRef.MaterialProps.Colors = cList;
             clip.PresetRef.MaterialProps.Floats = fList;
-            clip.PresetRef.MaterialProps.Ints = iList;
             EditorUtility.SetDirty(clip.PresetRef);
             AssetDatabase.SaveAssetIfDirty(clip.PresetRef);
         }

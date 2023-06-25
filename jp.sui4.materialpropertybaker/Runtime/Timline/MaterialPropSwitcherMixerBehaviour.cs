@@ -72,31 +72,22 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     // 重み付き和じゃないといけないので、CreatePropertyBlockFromProfile は使えない
                     foreach (var cProp in _matProps.Colors)
                     {
-                        if(_cMap.ContainsKey(cProp.id))
-                            _cMap[cProp.id] += cProp.value * inputWeight;
+                        if(_cMap.ContainsKey(cProp.ID))
+                            _cMap[cProp.ID] += cProp.Value * inputWeight;
                         else
-                            _cMap.Add(cProp.id, cProp.value * inputWeight);
+                            _cMap.Add(cProp.ID, cProp.Value * inputWeight);
                         
-                        _mpb.SetColor(cProp.id, _cMap[cProp.id]);
+                        _mpb.SetColor(cProp.ID, _cMap[cProp.ID]);
                     }
 
                     foreach (var fProp in _matProps.Floats)
                     {
-                        if(_fMap.ContainsKey(fProp.id))
-                            _fMap[fProp.id] += fProp.value * inputWeight;
+                        if(_fMap.ContainsKey(fProp.ID))
+                            _fMap[fProp.ID] += fProp.Value * inputWeight;
                         else
-                            _fMap.Add(fProp.id, fProp.value * inputWeight);
+                            _fMap.Add(fProp.ID, fProp.Value * inputWeight);
                         
-                        _mpb.SetFloat(fProp.id, _fMap[fProp.id]);
-                    }
-
-                    if (greatestWeight < inputWeight)
-                    {
-                        greatestWeight = inputWeight;
-                        foreach (var iProps in _matProps.Ints)
-                        {
-                            _mpb.SetInt(iProps.id, iProps.value);
-                        }
+                        _mpb.SetFloat(fProp.ID, _fMap[fProp.ID]);
                     }
                 }
             }
