@@ -26,7 +26,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             int inputCount = playable.GetInputCount();
             float totalWeight = 0;
-            float greatestWeight = 0;
             _mpb = new MaterialPropertyBlock();
             
             if(!_isShaderIDGenerated)

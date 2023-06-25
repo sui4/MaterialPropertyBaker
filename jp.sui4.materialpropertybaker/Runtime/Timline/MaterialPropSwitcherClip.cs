@@ -76,7 +76,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (!string.IsNullOrEmpty(bakedPropertiesPath) &&
                 bakedPropertiesPath.StartsWith(thisAssetPath))
             {
-                Debug.Log($"Destroy BakedProperties: {_bakedProperties.name}");
+                // Debug.Log($"Destroy BakedProperties: {_bakedProperties.name}");
                 Undo.DestroyObjectImmediate(_bakedProperties);
                 DestroyImmediate(_bakedProperties, true);
                 _bakedProperties = null;
@@ -95,12 +95,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 DestroyBakedPropertiesIfChild();
             }
-            _bakedProperties = CreateInstance<BakedProperties>();
-            LoadValuesFromPreset();
+
+            _bakedProperties = Instantiate(_presetRef);
+            // CopyValueOfPresetRef();
             _bakedProperties.name = this.name + "_Baked_" + _presetRef.name;
             Undo.RegisterCreatedObjectUndo(_bakedProperties, "Instantiate BakedProperties FromPreset");
             AssetDatabase.AddObjectToAsset(_bakedProperties, this);
-            Debug.Log($"Created BakedProperties: {_bakedProperties.name}");
+            // Debug.Log($"Created BakedProperties: {_bakedProperties.name}");
 
         }
         
@@ -115,19 +116,25 @@ namespace sui4.MaterialPropertyBaker.Timeline
             _bakedProperties.name = this.name + "_BakedProperties";
             Undo.RegisterCreatedObjectUndo(_bakedProperties, "Create BakedProperties");
             AssetDatabase.AddObjectToAsset(_bakedProperties, this);
-            Debug.Log($"Created BakedProperties: {_bakedProperties.name}");
+            // Debug.Log($"Created BakedProperties: {_bakedProperties.name}");
         }
         
         public void LoadValuesFromPreset()
         {
-            if (_presetRef != null && _bakedProperties != null)
+            if (_presetRef == null)
             {
-                _bakedProperties.CopyValuesFromOther(_presetRef);
+                Debug.LogError($"Load skipped because presetRef is null");
+                return;
+            }
+            if (_bakedProperties == null)
+            {
+                InstantiateBakedPropertiesFromPreset();
             }
             else
             {
-                Debug.LogError($"Load skipped because presetRef or bakedProperties is null");
+                _bakedProperties.CopyValuesFromOther(_presetRef);
             }
+
         }
     }
 }
