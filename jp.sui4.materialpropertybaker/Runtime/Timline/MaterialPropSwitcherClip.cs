@@ -8,6 +8,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
     [Serializable]
     public class MaterialPropSwitcherClip: PlayableAsset, ITimelineClipAsset
     {
+        private MaterialPropSwitcherBehaviour _template = new MaterialPropSwitcherBehaviour();
+
         [SerializeField] private BakedProperties _presetRef;
         [SerializeField] private MaterialProps _materialProps = new MaterialProps();
         [SerializeField] private bool _syncWithPreset = true;
@@ -30,7 +32,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
             set => _syncWithPreset = value;
         }
         
-        private MaterialPropSwitcherBehaviour _template = new MaterialPropSwitcherBehaviour();
         public ClipCaps clipCaps => ClipCaps.Blending;
 
         private void OnEnable()

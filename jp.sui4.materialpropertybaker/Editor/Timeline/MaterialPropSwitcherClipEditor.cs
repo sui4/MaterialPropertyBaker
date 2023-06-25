@@ -37,49 +37,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
             serializedObject.Update();
             var clip = (MaterialPropSwitcherClip)target;
 
-            using (var changeCheck = new EditorGUI.ChangeCheckScope())
-            {
-                var label = new GUIContent("Preset Profile");
-                EditorGUILayout.PropertyField(_presetRef, label);
 
-                if (changeCheck.changed)
-                {
-                    if (_presetRef.objectReferenceValue != null)
-                    {
-                        ((BakedProperties)_presetRef.objectReferenceValue).UpdateShaderID();
-                    }
-                    serializedObject.ApplyModifiedProperties();
-                }
-            }
-
-            // Load Save buttons
-            if (clip.PresetRef != null)
-            {
-                using (var h = new EditorGUILayout.HorizontalScope())
-                {
-                    var tmp = GUI.backgroundColor;
-                    GUI.backgroundColor = Color.green;
-                    if (GUILayout.Button("Load"))
-                    {
-                        clip.LoadProfile(clip.PresetRef);
-                    }
-                
-                    GUI.backgroundColor = Color.red;
-                    if (GUILayout.Button("Update Preset"))
-                    {
-                        UpdatePreset();
-                    }
-                    GUI.backgroundColor = tmp;
-                }
-                using (var changeCheck = new EditorGUI.ChangeCheckScope())
-                {
-                    var label = new GUIContent("Sync with preset");
-                    EditorGUILayout.PropertyField(_syncWithPreset, label);
-                    if (changeCheck.changed)
-                        serializedObject.ApplyModifiedProperties();
-                }
-            }
-
+            PresetGUI();
+            
             EditorGUILayout.Separator();
 
             // Export button
@@ -106,12 +66,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     if (clip.PresetRef == null)
                     {
                         clip.SyncWithPreset = false;
-                        serializedObject.Update();
                     }
                     else
                     {
                         clip.LoadProfile(clip.PresetRef);
                     }
+                    serializedObject.Update();
                 }
                 MaterialPropsGUI(_props);
             }
@@ -119,6 +79,49 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         
         //--- GUI ---//
+        private void PresetGUI()
+        {
+            using (var changeCheck = new EditorGUI.ChangeCheckScope())
+            {
+                var label = new GUIContent("Preset Profile");
+                EditorGUILayout.PropertyField(_presetRef, label);
+
+                if (changeCheck.changed)
+                {
+                    if (_presetRef.objectReferenceValue != null)
+                    {
+                        ((BakedProperties)_presetRef.objectReferenceValue).UpdateShaderID();
+                    }
+                    serializedObject.ApplyModifiedProperties();
+                }
+            }
+
+            var clip = (MaterialPropSwitcherClip)target;
+            // Load Save buttons
+            if (clip.PresetRef != null)
+            {
+                using (var h = new EditorGUILayout.HorizontalScope())
+                {
+                    var tmp = GUI.backgroundColor;
+                    GUI.backgroundColor = Color.green;
+                    if (GUILayout.Button("Load"))
+                        clip.LoadProfile(clip.PresetRef);
+                
+                    GUI.backgroundColor = Color.red;
+                    if (GUILayout.Button("Update Preset"))
+                        UpdatePreset();
+                    GUI.backgroundColor = tmp;
+                }
+                using (var changeCheck = new EditorGUI.ChangeCheckScope())
+                {
+                    var label = new GUIContent("Sync with preset");
+                    EditorGUILayout.PropertyField(_syncWithPreset, label);
+                    if (changeCheck.changed)
+                        serializedObject.ApplyModifiedProperties();
+                }
+            }
+        }
+        
         private void MaterialPropsGUI(SerializedProperty materialProps)
         {
             var colors = materialProps.FindPropertyRelative("_colors");
@@ -150,18 +153,22 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
         }
         
+        private SerializedProperty _matProp;
+        private SerializedProperty _propName;
+        private SerializedProperty _id;
+        private SerializedProperty _value;
         private void PropGUI(SerializedProperty matProps)
         {
             for(int i = 0; i < matProps.arraySize; i++)
             {
-                var matProp = matProps.GetArrayElementAtIndex(i);
-                var propName = matProp.FindPropertyRelative("property");
-                var id = matProp.FindPropertyRelative("id");
-                var value = matProp.FindPropertyRelative("value");
+                _matProp = matProps.GetArrayElementAtIndex(i);
+                _propName = _matProp.FindPropertyRelative("property");
+                _id = _matProp.FindPropertyRelative("id");
+                _value = _matProp.FindPropertyRelative("value");
                 
-                var label = new GUIContent(Utils.UnderscoresToSpaces(propName.stringValue));
+                var label = new GUIContent(Utils.UnderscoresToSpaces(_propName.stringValue));
 
-                EditorGUILayout.PropertyField(value, label);
+                EditorGUILayout.PropertyField(_value, label);
             }
         }
         #endregion //--- End GUI ---//
