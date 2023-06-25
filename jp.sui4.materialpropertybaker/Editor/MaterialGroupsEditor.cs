@@ -7,7 +7,7 @@ namespace sui4.MaterialPropertyBaker
     public class MaterialGroupsEditor: Editor
     {
         private SerializedProperty _defaultProfile;
-        private SerializedProperty _shaderProperties;
+        private SerializedProperty _materialPropertyConfig;
         private SerializedProperty _materialStatusListList;
 
         private SerializedProperty _materialStatusList;
@@ -15,8 +15,8 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _renderer;
         private void OnEnable()
         {
-            _defaultProfile = serializedObject.FindProperty("_defaultProfile");
-            _shaderProperties = serializedObject.FindProperty("_materialPropertyConfig");
+            _defaultProfile = serializedObject.FindProperty("_overrideOverrideDefaultPreset");
+            _materialPropertyConfig = serializedObject.FindProperty("_materialPropertyConfig");
             _materialStatusListList = serializedObject.FindProperty("_materialStatusListList");
         }
 
@@ -33,9 +33,11 @@ namespace sui4.MaterialPropertyBaker
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(_defaultProfile);
+                EditorGUILayout.PropertyField(_materialPropertyConfig);
                 EditorGUILayout.Separator();
-                EditorGUILayout.PropertyField(_shaderProperties);
+                
+                EditorGUILayout.PropertyField(_defaultProfile);
+
                 if (change.changed)
                     serializedObject.ApplyModifiedProperties();
             }

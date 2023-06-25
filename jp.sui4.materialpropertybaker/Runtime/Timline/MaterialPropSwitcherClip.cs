@@ -16,6 +16,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
         [SerializeField] private bool _syncWithPreset = true;
         
         private MaterialPropSwitcherTrack _parentTrack;
+        private MaterialGroups _bindingMaterialGroups;
+
+        public MaterialGroups BindingMaterialGroups => _bindingMaterialGroups;
         public MaterialPropSwitcherTrack ParentTrack
         {
             get => _parentTrack;
@@ -76,6 +79,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     if (binding != null)
                     {
                         var materialGroups = binding as MaterialGroups;
+                        _bindingMaterialGroups = materialGroups;
                         var config = materialGroups == null ? null : materialGroups.MaterialPropertyConfig;
                         if (config != null)
                         {

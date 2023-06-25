@@ -76,9 +76,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (totalWeight == 0f)
             {
                 _mpb = new MaterialPropertyBlock();
-                if(_trackBinding.DefaultProfile != null)
+                if(_trackBinding.OverrideDefaultPreset != null)
                 {
-                    Utils.CreatePropertyBlockFromProfile(_trackBinding.DefaultProfile, out _mpb);
+                    Utils.CreatePropertyBlockFromProfile(_trackBinding.OverrideDefaultPreset, out _mpb);
                 }
                 else
                 {
@@ -120,9 +120,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (_trackBinding == null)
                 return;
 
-            if (_trackBinding.DefaultProfile != null)
+            if (_trackBinding.OverrideDefaultPreset != null)
             {
-                Utils.CreatePropertyBlockFromProfile(_trackBinding.DefaultProfile, out _mpb);                
+                Utils.CreatePropertyBlockFromProfile(_trackBinding.OverrideDefaultPreset, out _mpb);                
             }
             else
             {

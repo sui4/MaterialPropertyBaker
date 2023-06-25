@@ -27,7 +27,7 @@ namespace sui4.MaterialPropertyBaker
 
         private List<Material> _materials = new List<Material>(); 
 
-        [MenuItem("tools/Material Property Baker/Baker")]
+        // [MenuItem("tools/Material Property Baker/Baker")]
         private static void Init()
         {
             var window = (MaterialPropsExporter)GetWindow(typeof(MaterialPropsExporter));

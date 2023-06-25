@@ -64,15 +64,15 @@ namespace sui4.MaterialPropertyBaker
     
     public class MaterialGroups: MonoBehaviour
     {
-        [SerializeField] private BakedMaterialProperty _defaultProfile;
-        [FormerlySerializedAs("_materialPropertyRule")] [FormerlySerializedAs("_shaderProperties")] [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
+        [SerializeField] private BakedMaterialProperty _overrideOverrideDefaultPreset;
+        [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         [SerializeField] private List<MaterialStatusList> _materialStatusListList = new List<MaterialStatusList>();
 
-        public BakedMaterialProperty DefaultProfile
+        public BakedMaterialProperty OverrideDefaultPreset
         {
-            get => _defaultProfile;
-            set => _defaultProfile = value;
+            get => _overrideOverrideDefaultPreset;
+            set => _overrideOverrideDefaultPreset = value;
         }
         public MaterialPropertyConfig MaterialPropertyConfig
         {
@@ -83,7 +83,10 @@ namespace sui4.MaterialPropertyBaker
 
         private void OnEnable()
         {
-            throw new NotImplementedException();
+            if (_materialStatusListList.Count == 0)
+            {
+                _materialStatusListList.Add(new MaterialStatusList());
+            }
         }
 
         public int GetIndex(int ri, int mi)

@@ -112,6 +112,7 @@ namespace sui4.MaterialPropertyBaker
             ExportConfig(_materialPropertyConfig, configPath, out var exportedConfig);
 
             _bakedMaterialProperty.MaterialPropertyConfig = exportedConfig;
+            _bakedMaterialProperty.DeleteUnEditableProperties();
             // folderPathの.assetを"_properties.asset"に置き換える
             var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
             ExportBakedProperty(_bakedMaterialProperty, propertyPath, out var exportedProperty);
