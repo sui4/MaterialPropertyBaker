@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -39,7 +41,57 @@ namespace sui4.MaterialPropertyBaker
             foreach (var f in _floats)
                 f.UpdateShaderID();
         }
-        
+
+        public void AddProperties(string propName, ShaderPropertyType spType)
+        {
+            switch (spType)
+            {
+                case ShaderPropertyType.Color:
+                    _colors.Add(new MaterialProp<Color>(propName));
+                    break;
+                case ShaderPropertyType.Float:
+                case ShaderPropertyType.Range:
+                    _floats.Add(new MaterialProp<float>(propName));
+                    break;
+                case ShaderPropertyType.Int:
+                case ShaderPropertyType.Vector:
+                case ShaderPropertyType.Texture:
+                    Debug.LogWarning($"Not supported property type. {spType}");
+                    break;
+                default:
+                    Debug.LogWarning($"Not supported property type. {spType}");
+                    break;
+            }
+        }
+
+        public bool HasProperties(string propName, ShaderPropertyType spType)
+        {
+            var hasProp = false;
+            switch (spType)
+            {
+                case ShaderPropertyType.Color:
+                    // var foundMaterialProp = _colors.FirstOrDefault(materialProp => materialProp.Name == propName);
+                    hasProp = _colors.Any(materialProp => materialProp.Name == propName);
+                    break;
+                case ShaderPropertyType.Float:
+                case ShaderPropertyType.Range:
+                    hasProp = _floats.Any(materialProp => materialProp.Name == propName);
+                    break;
+                case ShaderPropertyType.Int:
+                case ShaderPropertyType.Vector:
+                case ShaderPropertyType.Texture:
+                    hasProp = false;
+                    Debug.LogWarning($"Not supported property type. {spType}");
+                    break;
+                default:
+                    hasProp = false;
+                    Debug.LogWarning($"Not supported property type. {spType}");
+                    break;
+            }
+
+            return hasProp;
+        } 
+
         public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
             cList = new List<MaterialProp<Color>>();

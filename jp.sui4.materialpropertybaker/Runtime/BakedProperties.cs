@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -11,12 +11,19 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private MaterialProps _materialProps;
         [SerializeField] private string _shaderName;
+        [SerializeField] private ShaderProperties _shaderProperties;
         public string ShaderName
         {
             get => _shaderName;
             set => _shaderName = value;
         }
         public MaterialProps MaterialProps => _materialProps;
+
+        public ShaderProperties ShaderProperties
+        {
+            get => _shaderProperties;
+            set => _shaderProperties = value;
+        }
 
         private void OnEnable()
         {
