@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -10,7 +11,7 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private Material _material = null;
         [SerializeField] private bool _isTarget = false;
-        [SerializeField] private BakedProperties _preset = null;
+        [SerializeField] private BakedMaterialProperty _preset = null;
 
         public Material Material
         {
@@ -22,7 +23,7 @@ namespace sui4.MaterialPropertyBaker
             get => _isTarget;
             set => _isTarget = value;
         }
-        public BakedProperties Preset
+        public BakedMaterialProperty Preset
         {
             get => _preset;
             set => _preset = value;
@@ -63,15 +64,20 @@ namespace sui4.MaterialPropertyBaker
     
     public class MaterialGroups: MonoBehaviour
     {
-        [SerializeField] private BakedProperties _defaultProfile;
-        
+        [SerializeField] private BakedMaterialProperty _defaultProfile;
+        [FormerlySerializedAs("_materialPropertyRule")] [FormerlySerializedAs("_shaderProperties")] [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         [SerializeField] private List<MaterialStatusList> _materialStatusListList = new List<MaterialStatusList>();
 
-        public BakedProperties DefaultProfile
+        public BakedMaterialProperty DefaultProfile
         {
             get => _defaultProfile;
             set => _defaultProfile = value;
+        }
+        public MaterialPropertyConfig MaterialPropertyConfig
+        {
+            get => _materialPropertyConfig;
+            set => _materialPropertyConfig = value;
         }
         public List<MaterialStatusList> MaterialStatusListList => _materialStatusListList;
 

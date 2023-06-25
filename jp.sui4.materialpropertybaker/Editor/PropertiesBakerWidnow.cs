@@ -14,10 +14,10 @@ namespace sui4.MaterialPropertyBaker
     public class MaterialPropsExporter : EditorWindow
     {
         [SerializeField] private List<Material> _targets = new List<Material>();
-        [SerializeField] private List<BakedProperties> _presets = new List<BakedProperties>();
+        [SerializeField] private List<BakedMaterialProperty> _presets = new List<BakedMaterialProperty>();
         
         private int _selected = 0; 
-        private BakedPropertiesEditor _editor;
+        private BakedMaterialPropertiesEditor _editor;
 
         private Vector2 _scrollPosition = Vector2.zero;
         
@@ -44,7 +44,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 _targets.Add(null);
                 _presets.Clear();
-                _presets.Add(ScriptableObject.CreateInstance<BakedProperties>());
+                _presets.Add(ScriptableObject.CreateInstance<BakedMaterialProperty>());
             }
         }
 
@@ -96,7 +96,7 @@ namespace sui4.MaterialPropertyBaker
             if (GUILayout.Button("Add Target Material"))
             {
                 _targets.Add(null);
-                _presets.Add(ScriptableObject.CreateInstance<BakedProperties>());
+                _presets.Add(ScriptableObject.CreateInstance<BakedMaterialProperty>());
             }
             
             EditorGUILayout.LabelField("Target Materials");
@@ -168,13 +168,13 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        private void MaterialPropsGUI(ref Material material, ref BakedProperties preset)
+        private void MaterialPropsGUI(ref Material material, ref BakedMaterialProperty preset)
         {
             if (_editor == null)
             {
                 if(preset == null)
                     return;
-                _editor = Editor.CreateEditor(preset) as BakedPropertiesEditor;
+                _editor = Editor.CreateEditor(preset) as BakedMaterialPropertiesEditor;
             }
             else if (_editor.target != preset)
             {
@@ -182,7 +182,7 @@ namespace sui4.MaterialPropertyBaker
                 _editor = null;
                 if(preset == null)
                     return;
-                _editor = Editor.CreateEditor(preset) as BakedPropertiesEditor;
+                _editor = Editor.CreateEditor(preset) as BakedMaterialPropertiesEditor;
             }
 
             if (_editor != null)
@@ -275,7 +275,7 @@ namespace sui4.MaterialPropertyBaker
 
         #region Export
         // 単体でExportする場合
-        private bool ExportProfile(in Material targetMat, BakedProperties preset)
+        private bool ExportProfile(in Material targetMat, BakedMaterialProperty preset)
         {
             if (targetMat == null)
             {
@@ -318,7 +318,7 @@ namespace sui4.MaterialPropertyBaker
         
         // path: Assets以下のパス
         // パスを指定してExportする場合
-        private bool ExportProfile(in Material targetMat, BakedProperties preset, string path, bool refresh = true)
+        private bool ExportProfile(in Material targetMat, BakedMaterialProperty preset, string path, bool refresh = true)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -365,7 +365,7 @@ namespace sui4.MaterialPropertyBaker
             return true;
         }
 
-        public void ExportProfilesAll(List<Material> materials, List<BakedProperties> presets)
+        public void ExportProfilesAll(List<Material> materials, List<BakedMaterialProperty> presets)
         {
             var defaultPath = Application.dataPath; 
             var defaultFolderName = $"MaterialProfileData";
@@ -403,7 +403,7 @@ namespace sui4.MaterialPropertyBaker
 
         #endregion // Export
 
-        private static void DestroyProfile(ref BakedProperties preset)
+        private static void DestroyProfile(ref BakedMaterialProperty preset)
         {
             if (preset != null)
             {
@@ -411,9 +411,9 @@ namespace sui4.MaterialPropertyBaker
                 preset = null;
             }
         }
-        private static void CreateProfile(Material mat, out BakedProperties preset)
+        private static void CreateProfile(Material mat, out BakedMaterialProperty preset)
         {
-            preset = ScriptableObject.CreateInstance<BakedProperties>();
+            preset = ScriptableObject.CreateInstance<BakedMaterialProperty>();
             preset.name = mat.name;
             preset.ShaderName = mat.shader.name;
             preset.CreatePropsFromMaterial(mat);

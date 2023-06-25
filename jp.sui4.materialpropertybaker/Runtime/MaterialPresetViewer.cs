@@ -8,9 +8,9 @@ namespace sui4.MaterialPropertyBaker
     {
         private MaterialPropertyBlock _mpb;
         [SerializeField] private MaterialGroups _materialGroups;
-        [SerializeField] private List<BakedProperties> _presets;
+        [SerializeField] private List<BakedMaterialProperty> _presets;
         
-        public List<BakedProperties> Presets
+        public List<BakedMaterialProperty> Presets
         {
             get => _presets;
             set => _presets = value;
@@ -20,12 +20,12 @@ namespace sui4.MaterialPropertyBaker
             _mpb = new MaterialPropertyBlock();
             if (_presets == null)
             {
-                _presets = new List<BakedProperties>();
+                _presets = new List<BakedMaterialProperty>();
                 _presets.Add(null);
             }
         }
 
-        public void ApplyPreset(BakedProperties preset)
+        public void ApplyPreset(BakedMaterialProperty preset)
         {
             if (preset == null) return;
             preset.UpdateShaderID();

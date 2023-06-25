@@ -10,16 +10,16 @@ namespace sui4.MaterialPropertyBaker.Timeline
     [DisplayName("Material Property Baker/Material Prop Switcher Track")]
     public class MaterialPropSwitcherTrack : TrackAsset
     {
-        [SerializeField] private BakedProperties _defaultProfile;
-        [SerializeField] private BakedProperties _profileAppliedOnDestroy;
+        [SerializeField] private BakedMaterialProperty _defaultProfile;
+        [SerializeField] private BakedMaterialProperty _profileAppliedOnDestroy;
 
-        public BakedProperties DefaultProfile
+        public BakedMaterialProperty DefaultProfile
         {
             get => _defaultProfile;
             set => _defaultProfile = value;
         }
         
-        public BakedProperties ProfileAppliedOnDestroy
+        public BakedMaterialProperty ProfileAppliedOnDestroy
         {
             get => _profileAppliedOnDestroy;
             set => _profileAppliedOnDestroy = value;

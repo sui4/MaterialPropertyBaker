@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [CustomEditor(typeof(ShaderProperties))]
-    public class ShaderPropertiesEditor: Editor
+    [CustomEditor(typeof(MaterialPropertyConfig))]
+    public class MaterialPropertyConfigEditor: Editor
     {
         private SerializedProperty _shaderName;
         private SerializedProperty _propertyNames;
@@ -32,7 +32,7 @@ namespace sui4.MaterialPropertyBaker
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            var sp = (ShaderProperties)target;
+            var sp = (MaterialPropertyConfig)target;
 
             using (new EditorGUI.DisabledScope(true))
             {

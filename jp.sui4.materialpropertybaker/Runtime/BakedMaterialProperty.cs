@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 namespace sui4.MaterialPropertyBaker
 {
     [Serializable]
     [CreateAssetMenu(menuName = "MaterialPropertyBaker/BakedProperties")]
-    public class BakedProperties: ScriptableObject
+    public class BakedMaterialProperty: ScriptableObject
     {
         [SerializeField] private MaterialProps _materialProps;
         [SerializeField] private string _shaderName;
-        [SerializeField] private ShaderProperties _shaderProperties;
+        [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
         public string ShaderName
         {
             get => _shaderName;
@@ -20,10 +21,10 @@ namespace sui4.MaterialPropertyBaker
         }
         public MaterialProps MaterialProps => _materialProps;
 
-        public ShaderProperties ShaderProperties
+        public MaterialPropertyConfig MaterialPropertyConfig
         {
-            get => _shaderProperties;
-            set => _shaderProperties = value;
+            get => _materialPropertyConfig;
+            set => _materialPropertyConfig = value;
         }
 
         private void OnEnable()
@@ -76,18 +77,18 @@ namespace sui4.MaterialPropertyBaker
             MaterialProps.GetCopyProperties(out cList, out fList);
         }
         
-        public void CopyValuesFromOther(BakedProperties other)
+        public void CopyValuesFromOther(BakedMaterialProperty other)
         {
             _materialProps ??= new MaterialProps();
             _materialProps.CopyValuesFromOther(other.MaterialProps);
             _shaderName = other.ShaderName;
-            _shaderProperties = other.ShaderProperties;
+            _materialPropertyConfig = other.MaterialPropertyConfig;
         }
 
         // shader propertiesに含まれない, またはEditableではないプロパティを削除する
         public void DeleteUnEditableProperties()
         {
-            if(_shaderProperties == null) return;
+            if(_materialPropertyConfig == null) return;
 
             var colorDeleteIndex = new List<int>();
             var floatDeleteIndex = new List<int>();
@@ -96,12 +97,12 @@ namespace sui4.MaterialPropertyBaker
             for (int ci = 0; ci < _materialProps.Colors.Count; ci++)
             {
                 var colorProp = _materialProps.Colors[ci];
-                var index = _shaderProperties.PropertyNames.IndexOf(colorProp.Name);
+                var index = _materialPropertyConfig.PropertyNames.IndexOf(colorProp.Name);
                 if (index == -1)
                 {
                     colorDeleteIndex.Add(ci);
                 }
-                else if(_shaderProperties.Editable[index] == false)
+                else if(_materialPropertyConfig.Editable[index] == false)
                 {
                     colorDeleteIndex.Add(ci);
                 }
@@ -110,12 +111,12 @@ namespace sui4.MaterialPropertyBaker
             for (int fi = 0; fi < _materialProps.Floats.Count; fi++)
             {
                 var floatProp = _materialProps.Floats[fi];
-                var index = _shaderProperties.PropertyNames.IndexOf(floatProp.Name);
+                var index = _materialPropertyConfig.PropertyNames.IndexOf(floatProp.Name);
                 if (index == -1)
                 {
                     floatDeleteIndex.Add(fi);
                 }
-                else if(_shaderProperties.Editable[index] == false)
+                else if(_materialPropertyConfig.Editable[index] == false)
                 {
                     floatDeleteIndex.Add(fi);
                 }

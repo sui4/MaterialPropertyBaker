@@ -6,8 +6,8 @@ using UnityEngine.Rendering;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [CustomEditor(typeof(BakedProperties))]
-    public class BakedPropertiesEditor : Editor
+    [CustomEditor(typeof(BakedMaterialProperty))]
+    public class BakedMaterialPropertiesEditor : Editor
     {
         private SerializedProperty _shaderName;
         private SerializedProperty _shaderProperties;
@@ -22,7 +22,7 @@ namespace sui4.MaterialPropertyBaker
             if (target == null)
                 return;
             _shaderName = serializedObject.FindProperty("_shaderName");
-            _shaderProperties = serializedObject.FindProperty("_shaderProperties");
+            _shaderProperties = serializedObject.FindProperty("_materialPropertyConfig");
             _materialProps = serializedObject.FindProperty("_materialProps");
             _colors = _materialProps.FindPropertyRelative("_colors");
             _floats = _materialProps.FindPropertyRelative("_floats");
@@ -56,7 +56,7 @@ namespace sui4.MaterialPropertyBaker
                     GUI.backgroundColor = Color.red;
                     if (GUILayout.Button("Delete According to ShaderProperties"))
                     {
-                        ((BakedProperties)target).DeleteUnEditableProperties();
+                        ((BakedMaterialProperty)target).DeleteUnEditableProperties();
                     }
                     GUI.backgroundColor = tmp;
                 }
@@ -121,7 +121,7 @@ namespace sui4.MaterialPropertyBaker
             else
             {
                 // add from shader properties
-                var shaderProperties = (ShaderProperties)_shaderProperties.objectReferenceValue;
+                var shaderProperties = (MaterialPropertyConfig)_shaderProperties.objectReferenceValue;
                 if (shaderProperties != null)
                 {
                     using (new EditorGUILayout.HorizontalScope())
@@ -135,11 +135,11 @@ namespace sui4.MaterialPropertyBaker
 
         private void AddPropertyPopupGUI(SerializedProperty props, ShaderPropertyType spType, Type type = null)
         {
-            var shaderProperties = (ShaderProperties)_shaderProperties.objectReferenceValue;
+            var shaderProperties = (MaterialPropertyConfig)_shaderProperties.objectReferenceValue;
             if (shaderProperties == null)
                 return;
 
-            var bp = (BakedProperties)target;
+            var bp = (BakedMaterialProperty)target;
 
             // 一致する型のプロパティを取得
             var propertySelectList = new List<string> { "Add Property" };

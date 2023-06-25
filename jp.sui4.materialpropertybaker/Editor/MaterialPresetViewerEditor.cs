@@ -62,7 +62,7 @@ namespace sui4.MaterialPropertyBaker
                             if (change.changed)
                             {
                                 serializedObject.ApplyModifiedProperties();
-                                ((BakedProperties)presetProp.objectReferenceValue).UpdateShaderID();
+                                ((BakedMaterialProperty)presetProp.objectReferenceValue).UpdateShaderID();
                             }
                         }
 
@@ -70,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
                         GUI.backgroundColor = Color.green;
                         if (GUILayout.Button("Apply"))
                         {
-                            var preset = (BakedProperties)presetProp.objectReferenceValue;
+                            var preset = (BakedMaterialProperty)presetProp.objectReferenceValue;
                             if(preset == null)
                                 continue;
                             preset.UpdateShaderID();

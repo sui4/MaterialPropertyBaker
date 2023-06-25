@@ -5,7 +5,7 @@ namespace sui4.MaterialPropertyBaker
 {
     public class Utils
     {
-        public static void CreatePropertyBlockFromProfile(in BakedProperties preset, out MaterialPropertyBlock mpb)
+        public static void CreatePropertyBlockFromProfile(in BakedMaterialProperty preset, out MaterialPropertyBlock mpb)
         {
             mpb = new MaterialPropertyBlock();
             var matProps = preset.MaterialProps;
