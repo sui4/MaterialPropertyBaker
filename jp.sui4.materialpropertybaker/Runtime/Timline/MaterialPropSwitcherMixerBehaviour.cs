@@ -76,11 +76,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (totalWeight == 0f)
             {
                 _mpb = new MaterialPropertyBlock();
-                if (ParentSwitcherTrack.DefaultProfile != null)
-                {
-                    Utils.CreatePropertyBlockFromProfile(ParentSwitcherTrack.DefaultProfile, out _mpb);
-                }
-                else if(_trackBinding.DefaultProfile != null)
+                if(_trackBinding.DefaultProfile != null)
                 {
                     Utils.CreatePropertyBlockFromProfile(_trackBinding.DefaultProfile, out _mpb);
                 }
@@ -96,9 +92,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         public override void OnGraphStart(Playable playable)
         {
             int inputCount = playable.GetInputCount();
-
-            if(ParentSwitcherTrack.DefaultProfile)
-                ParentSwitcherTrack.DefaultProfile.UpdateShaderID();
 
             for (int i = 0; i < inputCount; i++)
             {
@@ -127,11 +120,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (_trackBinding == null)
                 return;
 
-            if (ParentSwitcherTrack.ProfileAppliedOnDestroy != null)
-            {
-                Utils.CreatePropertyBlockFromProfile(ParentSwitcherTrack.ProfileAppliedOnDestroy, out _mpb);
-            }
-            else if (_trackBinding.DefaultProfile != null)
+            if (_trackBinding.DefaultProfile != null)
             {
                 Utils.CreatePropertyBlockFromProfile(_trackBinding.DefaultProfile, out _mpb);                
             }
