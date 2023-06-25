@@ -7,208 +7,120 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialProps
     {
-        [SerializeField] private List<MaterialPropColor> _colors = new List<MaterialPropColor>();
-        [SerializeField] private List<MaterialPropFloat> _floats = new List<MaterialPropFloat>();
-        [SerializeField] private List<MaterialPropInt> _ints = new List<MaterialPropInt>();
+        [SerializeField] private List<MaterialProp<Color>> _colors = new List<MaterialProp<Color>>();
+        [SerializeField] private List<MaterialProp<float>> _floats = new List<MaterialProp<float>>();
 
-        public List<MaterialPropColor> Colors
+        public List<MaterialProp<Color>> Colors
         {
             get => _colors;
             set => _colors = value;
         }
 
-        public List<MaterialPropFloat> Floats
+        public List<MaterialProp<float>> Floats
         {
             get => _floats;
             set => _floats = value;
         }
 
-        public List<MaterialPropInt> Ints
-        {
-            get => _ints;
-            set => _ints = value;
-        }
+
         public MaterialProps() { }
-        public MaterialProps(List<MaterialPropColor> c, List<MaterialPropFloat> f, List<MaterialPropInt> i)
+        public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f)
         {
             _colors.AddRange(c);
             _floats.AddRange(f);
-            _ints.AddRange(i);
             UpdateShaderID();
         }
 
         public void UpdateShaderID()
         {
             foreach (var c in _colors)
-            {
-                c.UpdateProperty(c.property);
-            }
+                c.UpdateShaderID();
+
             foreach (var f in _floats)
-            {
-                f.UpdateProperty(f.property);
-            }
-            foreach (var i in _ints)
-            {
-                i.UpdateProperty(i.property);
-            }
+                f.UpdateShaderID();
         }
         
-        public void GetCopyProperties(out List<MaterialPropColor> cList, out List<MaterialPropFloat> fList, out List<MaterialPropInt> iList)
+        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
-            cList = new List<MaterialPropColor>();
-            fList = new List<MaterialPropFloat>();
-            iList = new List<MaterialPropInt>();
+            cList = new List<MaterialProp<Color>>();
+            fList = new List<MaterialProp<float>>();
             // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
             // Listになってる各MaterialPropがクラスのため、参照になっちゃう
             foreach (var colors in _colors)
             {
-                MaterialPropColor c = new MaterialPropColor
+                MaterialProp<Color> c = new MaterialProp<Color>
                 {
-                    value = colors.value,
-                    property = colors.property,
-                    id = colors.id
+                    Value = colors.Value,
+                    Name = colors.Name,
+                    ID = colors.ID
                 };
                 cList.Add(c);
             }
             foreach (var floats in _floats)
             {
-                MaterialPropFloat f = new MaterialPropFloat
+                MaterialProp<float> f = new MaterialProp<float>
                 {
-                    value = floats.value,
-                    property = floats.property,
-                    id = floats.id
+                    Value = floats.Value,
+                    Name = floats.Name,
+                    ID = floats.ID
                 };
                 fList.Add(f);
-            }
-            foreach (var ints in _ints)
-            {
-                MaterialPropInt i = new MaterialPropInt
-                {
-                    value = ints.value,
-                    property = ints.property,
-                    id = ints.id
-                };
-                iList.Add(i);
             }
         }
     }
     
     // base class
     [Serializable]
-    public class MaterialProp
+    public class MaterialProp<T>
     {
-        [NonSerialized] public int id;
+        [NonSerialized] public int ID;
 
-        public string property;
+        [SerializeField] private string _name;
+        [SerializeField] private T _value;
+        
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                ID = Shader.PropertyToID(_name);
+            }
+        }
+        public T Value
+        {
+            get => _value;
+            set => _value = value;
+        }
+        
         public MaterialProp()
         {
-            property = "propName";
-            id = Shader.PropertyToID(property);
+            Name = "";
         }
         public MaterialProp(string propName)
         {
-            property = propName;
-            id = Shader.PropertyToID(property);
+            Name = propName;
         }
-        public virtual void GetProperty(Material mat){}
-
-        public virtual void ApplyProperty(Material mat){}
-
-        public void UpdateProperty(string propName)
+        public MaterialProp(string propName, T value) :this(propName)
         {
-            property = propName;
-            id = Shader.PropertyToID(propName);
+            Value = value;
+        }
+        public MaterialProp(string propName, Material mat) : this(propName)
+        {
+            Value = typeof(T) switch
+            {
+                { } t when t == typeof(Color) => (T)Convert.ChangeType(mat.GetColor(ID), typeof(T)),
+                { } t when t == typeof(Vector4) => (T)Convert.ChangeType(mat.GetVector(ID), typeof(T)),
+                { } t when t == typeof(float) => (T)Convert.ChangeType(mat.GetFloat(ID), typeof(T)),
+                { } t when t == typeof(Texture) => (T)Convert.ChangeType(mat.GetTexture(ID), typeof(T)),
+                _ => Value
+            };
+        }
+
+        public void UpdateShaderID()
+        {
+            ID = Shader.PropertyToID(_name);
         }
     }
 
-    #region VariableType
-    [Serializable]
-    public class MaterialPropColor : MaterialProp
-    {
-        [SerializeField, ColorUsage(false, true)] public Color value = Color.black;
-        
-        public MaterialPropColor(): base() { }
-        public MaterialPropColor(string propName) : base(propName)
-        {
-            value = Color.black;
-        }
-        public MaterialPropColor(string propName, Color color) : base(propName)
-        {
-            value = color;
-        }
-        
-        public MaterialPropColor(string propName, Material mat) : base(propName)
-        {
-            value = mat.GetColor(id);
-        }
-        
-        public override void GetProperty(Material mat)
-        {
-            value  = mat.GetColor(id);
-        }
-    
-        public override void ApplyProperty(Material mat)
-        {
-            mat.SetColor(id, value);
-        }
-    }
-    [Serializable]
-    public class MaterialPropFloat : MaterialProp
-    {
-        public float value = 0f;
-        
-        public MaterialPropFloat(): base() { }
-        public MaterialPropFloat(string propName) :base(propName) { }
-
-        public MaterialPropFloat(string propName, float v) : base(propName)
-        {
-            value = v;
-        }
-        
-        public MaterialPropFloat(string propName, Material mat) : base(propName)
-        {
-            value = mat.GetFloat(id);
-        }
-
-        public override void GetProperty(Material mat)
-        {
-            value  = mat.GetFloat(id);
-        }
-    
-        public override void ApplyProperty(Material mat)
-        {
-            mat.SetFloat(id, value);
-        }
-    }
-    
-    [Serializable]
-    public class MaterialPropInt : MaterialProp
-    {
-        public int value = 0;
-        
-        public MaterialPropInt(): base() { }
-        public MaterialPropInt(string propName) :base(propName) { }
-
-        public MaterialPropInt(string propName, int v) : base(propName)
-        {
-            value = id;
-        }
-        
-        public MaterialPropInt(string propName, Material mat) : base(propName)
-        {
-            value = mat.GetInt(id);
-        }
-
-        public override void GetProperty(Material mat)
-        {
-            value  = mat.GetInt(id);
-        }
-
-        public override void ApplyProperty(Material mat)
-        {
-            mat.SetInt(id, value);
-        }
-    }
-    
-    #endregion // VariableType
 }

@@ -54,7 +54,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 LoadProfile(_presetRef);
             }
-            else if(_materialProps.Colors.Count < 0 && _materialProps.Floats.Count < 0 && _materialProps.Ints.Count < 0)
+            else if(_materialProps.Colors.Count == 0 && _materialProps.Floats.Count == 0)
             {
                 var profile = CreateInstance<BakedProperties>();
                 LoadProfile(profile);
@@ -73,10 +73,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 Debug.LogWarning("preset profile is null. ");
                 return;
             }
-            profile.GetCopyProperties(out var colors, out var floats, out var ints);
+            profile.GetCopyProperties(out var colors, out var floats);
             _materialProps.Colors = colors;
             _materialProps.Floats = floats;
-            _materialProps.Ints = ints;
         }
     }
 }

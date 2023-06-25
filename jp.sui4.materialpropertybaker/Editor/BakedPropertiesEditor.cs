@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,7 +11,6 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _materialProps;
         private SerializedProperty _colors;
         private SerializedProperty _floats;
-        private SerializedProperty _ints;
 
         private bool _editMode;
 
@@ -23,7 +22,6 @@ namespace sui4.MaterialPropertyBaker
             _materialProps = serializedObject.FindProperty("_materialProps");
             _colors = _materialProps.FindPropertyRelative("_colors");
             _floats = _materialProps.FindPropertyRelative("_floats");
-            _ints = _materialProps.FindPropertyRelative("_ints");
         }
 
         public override void OnInspectorGUI()
@@ -45,11 +43,6 @@ namespace sui4.MaterialPropertyBaker
                 {
                     PropsGUI(_floats);
                 }
-                EditorGUILayout.Separator();
-                using (new EditorGUILayout.VerticalScope("box"))
-                {
-                    PropsGUI(_ints);
-                }
                   
                 if (change.changed)
                 {
@@ -70,8 +63,8 @@ namespace sui4.MaterialPropertyBaker
             for (int pi = 0; pi < props.arraySize; pi++)
             {
                 SerializedProperty prop = props.GetArrayElementAtIndex(pi);
-                _property = prop.FindPropertyRelative("property");
-                _value = prop.FindPropertyRelative("value");
+                _property = prop.FindPropertyRelative("_name");
+                _value = prop.FindPropertyRelative("_value");
                 
                 using (new GUILayout.HorizontalScope())
                 {

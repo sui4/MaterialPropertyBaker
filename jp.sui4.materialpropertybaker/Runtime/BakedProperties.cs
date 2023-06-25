@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -25,15 +25,15 @@ namespace sui4.MaterialPropertyBaker
 
         public void UpdateShaderID()
         {
-            _materialProps.UpdateShaderID();
+            if(_materialProps != null)
+                _materialProps.UpdateShaderID();
         }
 
         public void CreatePropsFromMaterial(in Material mat)
         {
             _shaderName = mat.shader.name;
-            var colors = new List<MaterialPropColor>();
-            var floats = new List<MaterialPropFloat>();
-            var ints = new List<MaterialPropInt>();
+            var colors = new List<MaterialProp<Color>>();
+            var floats = new List<MaterialProp<float>>();
             for (int pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
             {
                 var propType = mat.shader.GetPropertyType(pi);
@@ -42,60 +42,48 @@ namespace sui4.MaterialPropertyBaker
                 switch (propType)
                 {
                     case ShaderPropertyType.Color:
-                        colors.Add(new MaterialPropColor(propName, mat));
+                        colors.Add(new MaterialProp<Color>(propName, mat));
                         break; 
                     case ShaderPropertyType.Float:
-                        floats.Add(new MaterialPropFloat(propName, mat));
-                        break;
-                    case ShaderPropertyType.Int:
-                        ints.Add(new MaterialPropInt(propName, mat));
+                    case ShaderPropertyType.Range:
+                        floats.Add(new MaterialProp<float>(propName, mat));
                         break;
                     default:
                         break;
                 }
             }
-            _materialProps = new MaterialProps(colors, floats, ints);
+            _materialProps = new MaterialProps(colors, floats);
             UpdateShaderID();
         }
 
-        public void GetCopyProperties(out List<MaterialPropColor> cList, out List<MaterialPropFloat> fList, out List<MaterialPropInt> iList)
+        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
-            cList = new List<MaterialPropColor>();
-            fList = new List<MaterialPropFloat>();
-            iList = new List<MaterialPropInt>();
+            cList = new List<MaterialProp<Color>>();
+            fList = new List<MaterialProp<float>>();
             var mp = _materialProps;
             // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
             // Listになってる各MaterialPropがクラスのため、参照になっちゃう
             foreach (var colors in mp.Colors)
             {
-                MaterialPropColor c = new MaterialPropColor
+                MaterialProp<Color> c = new MaterialProp<Color>
                 {
-                    value = colors.value,
-                    property = colors.property,
-                    id = colors.id
+                    Value = colors.Value,
+                    Name = colors.Name,
+                    ID = colors.ID
                 };
                 cList.Add(c);
             }
             foreach (var floats in mp.Floats)
             {
-                MaterialPropFloat f = new MaterialPropFloat
+                MaterialProp<float> f = new MaterialProp<float>
                 {
-                    value = floats.value,
-                    property = floats.property,
-                    id = floats.id
+                    Value = floats.Value,
+                    Name = floats.Name,
+                    ID = floats.ID
                 };
                 fList.Add(f);
             }
-            foreach (var ints in mp.Ints)
-            {
-                MaterialPropInt i = new MaterialPropInt
-                {
-                    value = ints.value,
-                    property = ints.property,
-                    id = ints.id
-                };
-                iList.Add(i);
-            }
+
         }
         
     }

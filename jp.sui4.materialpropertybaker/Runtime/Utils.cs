@@ -11,14 +11,11 @@ namespace sui4.MaterialPropertyBaker
             var matProps = preset.MaterialProps;
             foreach (var cProp in matProps.Colors)
             {
-                mpb.SetColor(cProp.id, cProp.value);
+                mpb.SetColor(cProp.ID, cProp.Value);
             }
 
             foreach (var fProp in matProps.Floats)
-                mpb.SetFloat(fProp.id, fProp.value);
-
-            foreach (var iProp in matProps.Ints)
-                mpb.SetInt(iProp.id, iProp.value);
+                mpb.SetFloat(fProp.ID, fProp.Value);
         }
         
         public void CreatePropertyBlockFromProps(in MaterialProps props, out MaterialPropertyBlock mpb)
@@ -31,11 +28,9 @@ namespace sui4.MaterialPropertyBaker
         public void UpdatePropertyBlockFromProps(in MaterialProps props, ref MaterialPropertyBlock mpb)
         {
             foreach (var c in props.Colors)
-                mpb.SetColor(c.id, c.value);
+                mpb.SetColor(c.ID, c.Value);
             foreach (var f in props.Floats)
-                mpb.SetFloat(f.id, f.value);
-            foreach (var i in props.Ints)
-                mpb.SetInt(i.id, i.value);
+                mpb.SetFloat(f.ID, f.Value);
         }
         
         public static string UnderscoresToSpaces(string input)
