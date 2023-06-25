@@ -158,49 +158,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 _editor.OnInspectorGUI();
             
         }
-        private void MaterialPropsGUI(SerializedProperty materialProps)
-        {
-            var colors = materialProps.FindPropertyRelative("_colors");
-            var floats = materialProps.FindPropertyRelative("_floats");
-            
-            serializedObject.Update();
-            
-            EditorGUI.BeginChangeCheck();
-            using (var changeCheckScope = new EditorGUI.ChangeCheckScope())
-            {
-                PropGUI(colors);
-            
-                EditorGUILayout.Separator();
-                EditorGUILayout.Separator();
-
-                PropGUI(floats);
-            
-                EditorGUILayout.Separator();
-                EditorGUILayout.Separator();
-
-                if (changeCheckScope.changed)
-                {
-                    serializedObject.ApplyModifiedProperties();
-                }
-            }
-        }
         
-        private SerializedProperty _matProp;
-        private SerializedProperty _propName;
-        private SerializedProperty _value;
-        private void PropGUI(SerializedProperty matProps)
-        {
-            for(int i = 0; i < matProps.arraySize; i++)
-            {
-                _matProp = matProps.GetArrayElementAtIndex(i);
-                _propName = _matProp.FindPropertyRelative("_name");
-                _value = _matProp.FindPropertyRelative("_value");
-                
-                var label = new GUIContent(Utils.UnderscoresToSpaces(_propName.stringValue));
-
-                EditorGUILayout.PropertyField(_value, label);
-            }
-        }
         #endregion //--- End GUI ---//
         
         #region AssetsHandle
