@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -91,6 +92,54 @@ namespace sui4.MaterialPropertyBaker
                 fList.Add(f);
             }
 
+        }
+
+        // shader propertiesに含まれない, またはEditableではないプロパティを削除する
+        public void DeleteUnEditableProperties()
+        {
+            if(_shaderProperties == null) return;
+
+            var colorDeleteIndex = new List<int>();
+            var floatDeleteIndex = new List<int>();
+
+            // 含まれないプロパティを探す
+            for (int ci = 0; ci < _materialProps.Colors.Count; ci++)
+            {
+                var colorProp = _materialProps.Colors[ci];
+                var index = _shaderProperties.PropertyNames.IndexOf(colorProp.Name);
+                if (index == -1)
+                {
+                    colorDeleteIndex.Add(ci);
+                }
+                else if(_shaderProperties.Editable[index] == false)
+                {
+                    colorDeleteIndex.Add(ci);
+                }
+            }
+            
+            for (int fi = 0; fi < _materialProps.Floats.Count; fi++)
+            {
+                var floatProp = _materialProps.Floats[fi];
+                var index = _shaderProperties.PropertyNames.IndexOf(floatProp.Name);
+                if (index == -1)
+                {
+                    floatDeleteIndex.Add(fi);
+                }
+                else if(_shaderProperties.Editable[index] == false)
+                {
+                    floatDeleteIndex.Add(fi);
+                }
+            }
+            
+            // 後ろから削除
+            for(int di = colorDeleteIndex.Count - 1; di >= 0; di--)
+            {
+                _materialProps.Colors.RemoveAt(colorDeleteIndex[di]);
+            }
+            for(int di = floatDeleteIndex.Count - 1; di >= 0; di--)
+            {
+                _materialProps.Floats.RemoveAt(floatDeleteIndex[di]);
+            }
         }
         
     }
