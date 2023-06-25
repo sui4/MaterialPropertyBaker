@@ -10,7 +10,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
     [CanEditMultipleObjects]
     public class MaterialPropSwitcherClipEditor : Editor
     {
-        private SerializedProperty _bakedProperties;
         private SerializedProperty _presetRef;
         private SerializedProperty _syncWithPreset;
 
@@ -21,7 +20,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 return;
             var t = (MaterialPropSwitcherClip)target;
 
-            _bakedProperties = serializedObject.FindProperty("_bakedMaterialProperty");
             _presetRef = serializedObject.FindProperty("_presetRef");
             _syncWithPreset = serializedObject.FindProperty("_syncWithPreset");
         }
@@ -145,13 +143,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
             
             if (_editor == null)
             {
-                _editor = (BakedMaterialPropertiesEditor)Editor.CreateEditor(bakedProperties);
+                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperties);
             }
             else if(_editor.target != bakedProperties)
             {
                 DestroyImmediate(_editor);
                 _editor = null;
-                _editor = (BakedMaterialPropertiesEditor)Editor.CreateEditor(bakedProperties);
+                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperties);
             }
             
             if(_editor != null)
