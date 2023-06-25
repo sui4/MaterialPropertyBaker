@@ -148,8 +148,8 @@ namespace sui4.MaterialPropertyBaker
                 var pName = shaderProperties.PropertyNames[pi];
                 var pType = shaderProperties.PropertyTypes[pi];
                 // TODO: ShaderPropertyTypeと、MaterialPropsのTypeは1:1じゃない。Range, floatはともにfloatに対応する
-                // 型が一致、かつ、MaterialPropsに存在しないプロパティのみ追加
-                if (pType == spType && !bp.MaterialProps.HasProperties(pName, pType))
+                // 型が一致、かつ、MaterialPropsに存在しない かつ editableなプロパティのみ追加
+                if (pType == spType && shaderProperties.HasEditableProperty(pName) && !bp.MaterialProps.HasProperties(pName, pType))
                 {
                     propertySelectList.Add(pName);
                 }

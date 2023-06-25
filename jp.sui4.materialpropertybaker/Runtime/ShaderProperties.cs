@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -22,6 +23,14 @@ namespace sui4.MaterialPropertyBaker
         public List<string> PropertyNames => _propertyNames;
         public List<ShaderPropertyType> PropertyTypes => _propertyTypes;
         public List<bool> Editable => _editable;
+
+        public bool HasEditableProperty(string propName)
+        {
+            var index = PropertyNames.IndexOf(propName);
+            if (index < 0)
+                return false;
+            return Editable[index];
+        }
         
         public void LoadProperties(Material mat)
         {

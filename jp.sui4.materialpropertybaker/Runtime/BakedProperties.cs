@@ -141,6 +141,5 @@ namespace sui4.MaterialPropertyBaker
                 _materialProps.Floats.RemoveAt(floatDeleteIndex[di]);
             }
         }
-        
     }
 }
