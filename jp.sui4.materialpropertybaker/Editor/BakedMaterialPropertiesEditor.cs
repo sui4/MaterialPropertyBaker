@@ -167,7 +167,7 @@ namespace sui4.MaterialPropertyBaker
                         if(selected == 0) return;
                         
                         var propName = propertySelectList[selected];
-                        bp.MaterialProps.AddProperties(propName, spType);
+                        bp.MaterialProps.AddProperty(propName, spType);
                         serializedObject.Update();
                     }
                 }

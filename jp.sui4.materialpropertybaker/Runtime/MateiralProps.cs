@@ -24,13 +24,17 @@ namespace sui4.MaterialPropertyBaker
             set => _floats = value;
         }
 
-
         public MaterialProps() { }
         public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f)
         {
             _colors.AddRange(c);
             _floats.AddRange(f);
             UpdateShaderID();
+        }
+        
+        public bool IsEmpty()
+        {
+            return _colors.Count == 0 && _floats.Count == 0;
         }
 
         public void UpdateShaderID()
@@ -42,7 +46,7 @@ namespace sui4.MaterialPropertyBaker
                 f.UpdateShaderID();
         }
 
-        public void AddProperties(string propName, ShaderPropertyType spType)
+        public void AddProperty(string propName, ShaderPropertyType spType)
         {
             switch (spType)
             {
