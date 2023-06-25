@@ -50,18 +50,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 float inputWeight = playable.GetInputWeight(i);
                 var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
-                if (clip.SyncWithPreset)
-                {
-                    if (clip.PresetRef == null)
-                    {
-                        clip.SyncWithPreset = false;
-                    }
-                    else
-                    {
-                        // Caution: 毎フレームやると重いかも
-                        clip.CopyValueOfPresetRef();
-                    }
-                }
+
+                if(clip.BakedProperties == null) continue;
                 _matProps = clip.BakedProperties.MaterialProps;
                 if(_matProps == null) continue;
                 
@@ -110,6 +100,34 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
             
             SetPropertyBlock(_mpb);
+        }
+
+        public override void OnGraphStart(Playable playable)
+        {
+            int inputCount = playable.GetInputCount();
+
+            for (int i = 0; i < inputCount; i++)
+            {
+                var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
+                var clip = sp.GetBehaviour().Clip;
+                _isShaderIDGenerated = true;
+                
+                if (clip.SyncWithPreset)
+                {
+                    if (clip.PresetRef == null)
+                    {
+                        clip.SyncWithPreset = false;
+                    }
+                    else
+                    {
+                        clip.LoadValuesFromPreset();
+                    }
+                }
+                if(clip.BakedProperties == null) continue;
+                clip.BakedProperties.UpdateShaderID();
+            }
+
+            base.OnGraphStart(playable);
         }
 
         public override void OnPlayableDestroy(Playable playable)

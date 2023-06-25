@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.ComponentModel;
+using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
@@ -6,6 +7,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 {
     [TrackClipType(typeof(MaterialPropSwitcherClip))]
     [TrackBindingType(typeof(MaterialGroups))]
+    [DisplayName("Material Property Baker/Material Prop Switcher Track")]
     public class MaterialPropSwitcherTrack : TrackAsset
     {
         [SerializeField] private BakedProperties _defaultProfile;

@@ -60,7 +60,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                         }
                         else
                         {
-                            clip.InstantiateBakedPropertiesFromPreset();
+                            clip.LoadValuesFromPreset();
                         }
                         serializedObject.Update();
                     }
@@ -115,6 +115,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     if (GUILayout.Button("Load"))
                     {
                         clip.InstantiateBakedPropertiesFromPreset();
+                        Repaint();
                     }
                 
                     GUI.backgroundColor = Color.red;
@@ -134,9 +135,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void BakedPropertiesGUI()
         {
-            var bakedProperties = _bakedProperties.objectReferenceValue as BakedProperties;
+            var bakedProperties = ((MaterialPropSwitcherClip)target).BakedProperties;
             if(bakedProperties == null)
             {
+                ((MaterialPropSwitcherClip)target).CreateBakedProperties();
                 EditorGUILayout.HelpBox("BakedProperties is null", MessageType.Error);
                 return;
             }

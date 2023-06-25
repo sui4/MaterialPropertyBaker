@@ -119,6 +119,13 @@ namespace sui4.MaterialPropertyBaker
                 fList.Add(f);
             }
         }
+
+        public void CopyValuesFromOther(MaterialProps other)
+        {
+            other.GetCopyProperties(out var outC, out var outF);
+            _colors = outC;
+            _floats = outF;
+        }
     }
     
     // base class

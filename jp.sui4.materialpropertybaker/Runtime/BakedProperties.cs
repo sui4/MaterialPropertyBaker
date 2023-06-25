@@ -28,6 +28,8 @@ namespace sui4.MaterialPropertyBaker
 
         private void OnEnable()
         {
+            if(_materialProps == null)
+                _materialProps = new MaterialProps();
             UpdateShaderID();
         }
 
@@ -66,12 +68,20 @@ namespace sui4.MaterialPropertyBaker
 
         public void CraetePropsFromMaterialProps(MaterialProps matProps)
         {
-            matProps.GetCopyProperties(out var cList, out var fList);
-            _materialProps = new MaterialProps(cList, fList);
+            _materialProps ??= new MaterialProps();
+            _materialProps.CopyValuesFromOther(matProps);
         }
         public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
             MaterialProps.GetCopyProperties(out cList, out fList);
+        }
+        
+        public void CopyValuesFromOther(BakedProperties other)
+        {
+            _materialProps ??= new MaterialProps();
+            _materialProps.CopyValuesFromOther(other.MaterialProps);
+            _shaderName = other.ShaderName;
+            _shaderProperties = other.ShaderProperties;
         }
 
         // shader propertiesに含まれない, またはEditableではないプロパティを削除する
