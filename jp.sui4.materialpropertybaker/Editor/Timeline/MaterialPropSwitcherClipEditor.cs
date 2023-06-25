@@ -14,11 +14,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private SerializedProperty _syncWithPreset;
 
         private BakedMaterialPropertiesEditor _editor;
+
+        private MaterialPropSwitcherClip _targetClip;
         private void OnEnable()
         {
             if(target == null)
                 return;
-            var t = (MaterialPropSwitcherClip)target;
+            _targetClip = (MaterialPropSwitcherClip)target;
 
             _presetRef = serializedObject.FindProperty("_presetRef");
             _syncWithPreset = serializedObject.FindProperty("_syncWithPreset");
@@ -35,8 +37,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
 
             serializedObject.Update();
-            var clip = (MaterialPropSwitcherClip)target;
-
+            var clip = _targetClip;
 
             using (new EditorGUILayout.VerticalScope("box"))
             {
@@ -94,11 +95,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
                 if (changeCheck.changed)
                 {
+                    serializedObject.ApplyModifiedProperties();
                     if (_presetRef.objectReferenceValue != null)
                     {
                         ((BakedMaterialProperty)_presetRef.objectReferenceValue).UpdateShaderID();
+                        _targetClip.LoadValuesFromPreset();
                     }
-                    serializedObject.ApplyModifiedProperties();
                 }
             }
 
