@@ -147,11 +147,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
             for (int lli = 0; lli < _trackBinding.MaterialStatusListList.Count; lli++)
             {
                 var list = _trackBinding.MaterialStatusListList[lli];
-                var renderer = list._renderer;
-                for (int li = 0; li < list._materialStatusList.Count; li++)
+                var renderer = list.Renderer;
+                for (int li = 0; li < list.MaterialStatuses.Count; li++)
                 {
-                    var matStatus = list._materialStatusList[li];
-                    if (matStatus.isTarget)
+                    var matStatus = list.MaterialStatuses[li];
+                    if (matStatus.IsTarget)
                     {
                         renderer.SetPropertyBlock(mpb, li);
                     }

@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+using UnityEditor;
 using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
@@ -8,6 +8,10 @@ namespace sui4.MaterialPropertyBaker
     {
         private SerializedProperty _defaultProfile;
         private SerializedProperty _materialStatusListList;
+
+        private SerializedProperty _materialStatusList;
+        private SerializedProperty _materialStatues;
+        private SerializedProperty _renderer;
         private void OnEnable()
         {
             _defaultProfile = serializedObject.FindProperty("_defaultProfile");
@@ -41,10 +45,10 @@ namespace sui4.MaterialPropertyBaker
                 for(int i=0; i < _materialStatusListList.arraySize; i++)
                 {
                     
-                    SerializedProperty listlistProp = _materialStatusListList.GetArrayElementAtIndex(i);
+                    _materialStatusList = _materialStatusListList.GetArrayElementAtIndex(i);
                     using (new EditorGUILayout.VerticalScope("box"))
                     {
-                        RendererGUI(listlistProp, i);
+                        RendererGUI(_materialStatusList, i);
                     }
                     EditorGUILayout.Separator();
                 }
@@ -63,35 +67,35 @@ namespace sui4.MaterialPropertyBaker
         private void RendererGUI(SerializedProperty listlistProp, int ri)
         {
             var mg = (MaterialGroups)target;
-            SerializedProperty matStatusListProp = listlistProp.FindPropertyRelative("_materialStatusList");
-            SerializedProperty listRendererProp = listlistProp.FindPropertyRelative("_renderer");
+            _materialStatues = listlistProp.FindPropertyRelative("_materialStatuses");
+            _renderer = listlistProp.FindPropertyRelative("_renderer");
             
             using (new GUILayout.HorizontalScope())
             {
                 using (var change = new EditorGUI.ChangeCheckScope())
                 {
-                    EditorGUILayout.ObjectField(listRendererProp);
+                    EditorGUILayout.ObjectField(_renderer);
                     if (change.changed)
                     {
                         serializedObject.ApplyModifiedProperties();
-                        if (listRendererProp.objectReferenceValue != null)
+                        if (_renderer.objectReferenceValue != null)
                         {
-                            var ren = (Renderer)listRendererProp.objectReferenceValue;
-                            mg.MaterialStatusListList[ri]._renderer = ren;
-                            mg.MaterialStatusListList[ri]._materialStatusList.Clear();
+                            var ren = (Renderer)_renderer.objectReferenceValue;
+                            mg.MaterialStatusListList[ri].Renderer = ren;
+                            mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
                             for(int mi = 0; mi < ren.sharedMaterials.Length; mi++)
                             {
                                 var mat = ren.sharedMaterials[mi];
                                 var matStatus = new MaterialStatus();
-                                matStatus.material = mat;
-                                matStatus.isTarget = true;
-                                mg.MaterialStatusListList[ri]._materialStatusList.Add(matStatus);
+                                matStatus.Material = mat;
+                                matStatus.IsTarget = true;
+                                mg.MaterialStatusListList[ri].MaterialStatuses.Add(matStatus);
                             }
                             Debug.Log("Added" + ren.sharedMaterials.Length);
                         }
                         else
                         {
-                            mg.MaterialStatusListList[ri]._materialStatusList.Clear();
+                            mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
                         }
                         serializedObject.Update();
 
@@ -99,8 +103,8 @@ namespace sui4.MaterialPropertyBaker
                 }
                 if(GUILayout.Button("-", GUILayout.Width(25)))
                 {
-                    mg.MaterialStatusListList[ri]._materialStatusList.Clear();
-                    mg.MaterialStatusListList[ri]._renderer = null;
+                    mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
+                    mg.MaterialStatusListList[ri].Renderer = null;
                     mg.MaterialStatusListList.RemoveAt(ri);
                     EditorUtility.SetDirty(mg);
                     serializedObject.Update();
@@ -108,20 +112,20 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
 
-            var renderer = mg.MaterialStatusListList[ri]._renderer;
+            var renderer = mg.MaterialStatusListList[ri].Renderer;
             if(renderer == null) return;
 
             var mats = renderer.sharedMaterials;
             
             EditorGUI.indentLevel++;
-            for (int mi = 0; mi < matStatusListProp.arraySize; mi++)
+            for (int mi = 0; mi < _materialStatues.arraySize; mi++)
             {
                 int index = mg.GetIndex(ri, mi);
                 var mat = mats[mi];
-                SerializedProperty matStatusProp = matStatusListProp.GetArrayElementAtIndex(mi);
+                SerializedProperty matStatusProp = _materialStatues.GetArrayElementAtIndex(mi);
                 
-                SerializedProperty matProp = matStatusProp.FindPropertyRelative("material");
-                SerializedProperty isTargetProp = matStatusProp.FindPropertyRelative("isTarget");
+                SerializedProperty matProp = matStatusProp.FindPropertyRelative("_material");
+                SerializedProperty isTargetProp = matStatusProp.FindPropertyRelative("_isTarget");
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     using (var change = new EditorGUI.ChangeCheckScope())
