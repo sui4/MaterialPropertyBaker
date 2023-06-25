@@ -9,8 +9,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private MaterialGroups _trackBinding;
         public MaterialPropSwitcherTrack ParentSwitcherTrack;
 
-        private bool _isShaderIDGenerated = false;
-
         private MaterialPropertyBlock _mpb;
         
         private Dictionary<int, Color> _cMap = new Dictionary<int, Color>();
@@ -27,21 +25,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             int inputCount = playable.GetInputCount();
             float totalWeight = 0;
             _mpb = new MaterialPropertyBlock();
-            
-            if(!_isShaderIDGenerated)
-            {
-                for(int i = 0; i < inputCount; i++) {
-                    var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
-                    var clip = sp.GetBehaviour().Clip;
-                    clip.BakedProperties.UpdateShaderID();
-                    _isShaderIDGenerated = true;
-                }
-                if(ParentSwitcherTrack.DefaultProfile)
-                    ParentSwitcherTrack.DefaultProfile.UpdateShaderID();
-                if(_trackBinding.DefaultProfile)
-                    _trackBinding.DefaultProfile.UpdateShaderID();
-            }
-            
+
             _cMap.Clear();
             _fMap.Clear();
             for(int i = 0; i < inputCount; i++)
@@ -50,8 +34,16 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
 
-                if(clip.BakedProperties == null) continue;
-                _matProps = clip.BakedProperties.MaterialProps;
+                if (clip.SyncWithPreset)
+                {
+                    _matProps = clip.PresetRef.MaterialProps;
+                }
+                else
+                {
+                    if(clip.BakedProperties == null) continue;
+                    _matProps = clip.BakedProperties.MaterialProps;
+                }
+                
                 if(_matProps == null) continue;
                 
                 // 各paramの重み付き和
@@ -105,27 +97,28 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             int inputCount = playable.GetInputCount();
 
+            if(ParentSwitcherTrack.DefaultProfile)
+                ParentSwitcherTrack.DefaultProfile.UpdateShaderID();
+
             for (int i = 0; i < inputCount; i++)
             {
                 var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
-                _isShaderIDGenerated = true;
-                
+                if (clip.BakedProperties == null)
+                {
+                    Debug.LogError($"bakedProperties is null. {clip.name}");
+                }
+                clip.BakedProperties.UpdateShaderID();
+
+                // sync with preset
                 if (clip.SyncWithPreset)
                 {
                     if (clip.PresetRef == null)
-                    {
                         clip.SyncWithPreset = false;
-                    }
                     else
-                    {
                         clip.LoadValuesFromPreset();
-                    }
                 }
-                if(clip.BakedProperties == null) continue;
-                clip.BakedProperties.UpdateShaderID();
             }
-
             base.OnGraphStart(playable);
         }
 
