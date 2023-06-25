@@ -66,32 +66,7 @@ namespace sui4.MaterialPropertyBaker
 
         public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
-            cList = new List<MaterialProp<Color>>();
-            fList = new List<MaterialProp<float>>();
-            var mp = _materialProps;
-            // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
-            // Listになってる各MaterialPropがクラスのため、参照になっちゃう
-            foreach (var colors in mp.Colors)
-            {
-                MaterialProp<Color> c = new MaterialProp<Color>
-                {
-                    Value = colors.Value,
-                    Name = colors.Name,
-                    ID = colors.ID
-                };
-                cList.Add(c);
-            }
-            foreach (var floats in mp.Floats)
-            {
-                MaterialProp<float> f = new MaterialProp<float>
-                {
-                    Value = floats.Value,
-                    Name = floats.Name,
-                    ID = floats.ID
-                };
-                fList.Add(f);
-            }
-
+            MaterialProps.GetCopyProperties(out cList, out fList);
         }
 
         // shader propertiesに含まれない, またはEditableではないプロパティを削除する
