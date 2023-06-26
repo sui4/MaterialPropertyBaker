@@ -31,6 +31,8 @@ namespace sui4.MaterialPropertyBaker
 
         public override void OnInspectorGUI()
         {
+            if(target == null) return;
+            
             serializedObject.Update();
             var sp = (MaterialPropertyConfig)target;
 
