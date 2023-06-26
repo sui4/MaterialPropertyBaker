@@ -121,8 +121,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void OnDestroy()
         {
+#if UNITY_EDITOR
             if(_bakedMaterialProperty == null) return;
-            
             Undo.RecordObject(this, "Destroy clip and baked properties");
             // _bakedPropertiesのアセットパスを取得
             string bakedPropertiesPath = AssetDatabase.GetAssetPath(_bakedMaterialProperty);
@@ -138,10 +138,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 DestroyImmediate(_bakedMaterialProperty, true);
                 _bakedMaterialProperty = null;
             }
+#endif
         }
 
         private void DestroyBakedPropertiesIfChild()
         {
+#if UNITY_EDITOR
             // _bakedPropertiesのアセットパスを取得
             string bakedPropertiesPath = AssetDatabase.GetAssetPath(_bakedMaterialProperty);
 
@@ -157,6 +159,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 DestroyImmediate(_bakedMaterialProperty, true);
                 _bakedMaterialProperty = null;
             }
+#endif
         }
 
         public void CopyValueOfPresetRef()
@@ -166,6 +169,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         public void InstantiateBakedPropertiesFromPreset()
         {
+#if UNITY_EDITOR
             Undo.RecordObject(this, "Create BakedProperties from Preset");
             if (_bakedMaterialProperty != null)
             {
@@ -178,11 +182,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
             Undo.RegisterCreatedObjectUndo(_bakedMaterialProperty, "Instantiate BakedProperties FromPreset");
             AssetDatabase.AddObjectToAsset(_bakedMaterialProperty, this);
             // Debug.Log($"Created BakedProperties: {_bakedProperties.name}");
-
+#endif
         }
         
         public void CreateBakedProperties()
         {
+#if UNITY_EDITOR
             Undo.RecordObject(this, "Create BakedProperties");
             if (_bakedMaterialProperty != null)
             {
@@ -193,6 +198,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             Undo.RegisterCreatedObjectUndo(_bakedMaterialProperty, "Create BakedProperties");
             AssetDatabase.AddObjectToAsset(_bakedMaterialProperty, this);
             // Debug.Log($"Created BakedProperties: {_bakedProperties.name}");
+#endif
         }
         
         public void LoadValuesFromPreset()
