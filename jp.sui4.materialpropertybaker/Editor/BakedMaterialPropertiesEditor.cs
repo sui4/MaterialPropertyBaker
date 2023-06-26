@@ -50,16 +50,16 @@ namespace sui4.MaterialPropertyBaker
                 }
                 
                 EditorGUILayout.Separator();
-                if(_shaderProperties.objectReferenceValue != null)
-                {
-                    var tmp = GUI.backgroundColor;
-                    GUI.backgroundColor = Color.red;
-                    if (GUILayout.Button("Delete According to ShaderProperties"))
-                    {
-                        ((BakedMaterialProperty)target).DeleteUnEditableProperties();
-                    }
-                    GUI.backgroundColor = tmp;
-                }
+                // if(_shaderProperties.objectReferenceValue != null)
+                // {
+                //     var tmp = GUI.backgroundColor;
+                //     GUI.backgroundColor = Color.red;
+                //     if (GUILayout.Button("Delete According to ShaderProperties"))
+                //     {
+                //         ((BakedMaterialProperty)target).DeleteUnEditableProperties();
+                //     }
+                //     GUI.backgroundColor = tmp;
+                // }
                   
                 if (change.changed)
                 {
