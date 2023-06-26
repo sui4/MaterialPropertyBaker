@@ -70,11 +70,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (totalWeight > 0f)
             {
-                SetPropertyBlock(ref _mpb, _cMap, _fMap);
+                _trackBinding.SetPropertyBlock(_cMap, _fMap);
             }
             else if (_trackBinding.OverrideDefaultPreset != null)
             {
-                SetPropertyBlock(ref _mpb, _trackBinding.OverrideDefaultPreset.MaterialProps);
+                _trackBinding.ResetDefaultPropertyBlock();
             }
             
         }
@@ -110,54 +110,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (_trackBinding == null)
                 return;
 
-            if (_trackBinding.OverrideDefaultPreset != null)
-            {
-                SetPropertyBlock(ref _mpb, _trackBinding.OverrideDefaultPreset.MaterialProps);
-            }
-            else
-            {
-                SetPropertyBlock(ref _mpb, new Dictionary<int, Color>(), new Dictionary<int, float>());
-            }
+            _trackBinding.ResetDefaultPropertyBlock();
             _mpb = null;
         }
-
-        private void SetPropertyBlock(ref MaterialPropertyBlock mpb, in MaterialProps materialProps)
-        {
-            for (int lli = 0; lli < _trackBinding.MaterialStatusListList.Count; lli++)
-            {
-                var list = _trackBinding.MaterialStatusListList[lli];
-                var renderer = list.Renderer;
-                for (int li = 0; li < list.MaterialStatuses.Count; li++)
-                {
-                    var matStatus = list.MaterialStatuses[li];
-                    if (matStatus.IsTarget)
-                    {
-                        renderer.GetPropertyBlock(mpb, li);
-                        Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
-                        renderer.SetPropertyBlock(mpb, li);
-                    }
-                }
-            }
-        }
-
-        private void SetPropertyBlock(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropMap, Dictionary<int, float> fPropMap)
-        {
-            for (int lli = 0; lli < _trackBinding.MaterialStatusListList.Count; lli++)
-            {
-                var list = _trackBinding.MaterialStatusListList[lli];
-                var renderer = list.Renderer;
-                for (int li = 0; li < list.MaterialStatuses.Count; li++)
-                {
-                    var matStatus = list.MaterialStatuses[li];
-                    if (matStatus.IsTarget)
-                    {
-                        renderer.GetPropertyBlock(mpb, li);
-                        Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
-                        renderer.SetPropertyBlock(mpb, li);
-                    }
-                }
-            }
-        }
-
     }
 }

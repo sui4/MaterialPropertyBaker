@@ -68,6 +68,7 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         [SerializeField] private List<MaterialStatusList> _materialStatusListList = new List<MaterialStatusList>();
+        private MaterialPropertyBlock _mpb;
 
         public BakedMaterialProperty OverrideDefaultPreset
         {
@@ -83,6 +84,7 @@ namespace sui4.MaterialPropertyBaker
 
         private void OnEnable()
         {
+            _mpb = new MaterialPropertyBlock();
             if (_materialStatusListList.Count == 0)
             {
                 _materialStatusListList.Add(new MaterialStatusList());
@@ -104,11 +106,10 @@ namespace sui4.MaterialPropertyBaker
             index += mi;
             return index;
         }
-
-        private MaterialPropertyBlock _mpb;
         
         public void SetPropertyBlock(in MaterialProps materialProps)
         {
+            _mpb = new MaterialPropertyBlock();
             for (int lli = 0; lli < _materialStatusListList.Count; lli++)
             {
                 var list = _materialStatusListList[lli];
@@ -118,12 +119,67 @@ namespace sui4.MaterialPropertyBaker
                     var matStatus = list.MaterialStatuses[li];
                     if (matStatus.IsTarget)
                     {
-                        
-                        ren.GetPropertyBlock(_mpb, li);
+                        if(ren.HasPropertyBlock())
+                        {
+                            ren.GetPropertyBlock(_mpb, li);
+                        }
                         Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
                         ren.SetPropertyBlock(_mpb, li);
                     }
                 }
+            }
+        }
+
+        public void SetPropertyBlock(in Dictionary<int, Color> cPropMap, in Dictionary<int, float> fPropMap)
+        {
+            _mpb = new MaterialPropertyBlock();
+            for (int lli = 0; lli < _materialStatusListList.Count; lli++)
+            {
+                var list = _materialStatusListList[lli];
+                var ren = list.Renderer;
+                for (int li = 0; li < list.MaterialStatuses.Count; li++)
+                {
+                    var matStatus = list.MaterialStatuses[li];
+                    if (matStatus.IsTarget)
+                    {
+                        if (ren.HasPropertyBlock())
+                        {
+                            ren.GetPropertyBlock(_mpb, li);
+                        }
+                        Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
+                        ren.SetPropertyBlock(_mpb, li);
+                    }
+                }
+            }
+        }
+
+        public void ResetPropertyBlock()
+        {
+            _mpb = new MaterialPropertyBlock();
+            for (int lli = 0; lli < _materialStatusListList.Count; lli++)
+            {
+                var list = _materialStatusListList[lli];
+                var ren = list.Renderer;
+                for (int li = 0; li < list.MaterialStatuses.Count; li++)
+                {
+                    var matStatus = list.MaterialStatuses[li];
+                    if (matStatus.IsTarget)
+                    {
+                        ren.SetPropertyBlock(_mpb, li);
+                    }
+                }
+            }
+        }
+
+        public void ResetDefaultPropertyBlock()
+        {
+            if (_overrideOverrideDefaultPreset)
+            {
+                SetPropertyBlock(_overrideOverrideDefaultPreset.MaterialProps);
+            }
+            else
+            {
+                ResetPropertyBlock();
             }
         }
     }

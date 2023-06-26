@@ -18,8 +18,7 @@ namespace sui4.MaterialPropertyBaker
         {
             if (_presets == null)
             {
-                _presets = new List<BakedMaterialProperty>();
-                _presets.Add(null);
+                _presets = new List<BakedMaterialProperty> { null };
             }
         }
 
@@ -33,9 +32,8 @@ namespace sui4.MaterialPropertyBaker
 
         public void ResetView()
         {
-            _materialGroups.SetPropertyBlock(new MaterialProps());
+            _materialGroups.ResetDefaultPropertyBlock();
         }
         
-
     }
 }
