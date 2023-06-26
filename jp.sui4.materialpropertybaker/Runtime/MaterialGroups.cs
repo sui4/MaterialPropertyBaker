@@ -104,8 +104,10 @@ namespace sui4.MaterialPropertyBaker
             index += mi;
             return index;
         }
+
+        private MaterialPropertyBlock _mpb;
         
-        public void SetPropertyBlock(in MaterialPropertyBlock mpb)
+        public void SetPropertyBlock(in MaterialProps materialProps)
         {
             for (int lli = 0; lli < _materialStatusListList.Count; lli++)
             {
@@ -116,11 +118,13 @@ namespace sui4.MaterialPropertyBaker
                     var matStatus = list.MaterialStatuses[li];
                     if (matStatus.IsTarget)
                     {
-                        ren.SetPropertyBlock(mpb, li);
+                        
+                        ren.GetPropertyBlock(_mpb, li);
+                        Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
+                        ren.SetPropertyBlock(_mpb, li);
                     }
                 }
             }
         }
-
     }
 }
