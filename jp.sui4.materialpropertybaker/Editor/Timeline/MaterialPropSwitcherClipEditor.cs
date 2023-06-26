@@ -72,7 +72,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     {
                         var tmp = GUI.backgroundColor;
                         GUI.backgroundColor = Color.cyan;
-                        if(GUILayout.Button("Export"))
+                        if(GUILayout.Button("Save as"))
                         {
                             var preset = CreatePresetFromProps(clip.BakedMaterialProperty.MaterialProps);
                             ExportProfile(preset);
