@@ -24,7 +24,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             int inputCount = playable.GetInputCount();
             float totalWeight = 0;
-            _mpb = new MaterialPropertyBlock();
 
             _cMap.Clear();
             _fMap.Clear();
@@ -57,8 +56,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
                             _cMap[cProp.ID] += cProp.Value * inputWeight;
                         else
                             _cMap.Add(cProp.ID, cProp.Value * inputWeight);
-                        
-                        _mpb.SetColor(cProp.ID, _cMap[cProp.ID]);
                     }
 
                     foreach (var fProp in _matProps.Floats)
@@ -67,26 +64,19 @@ namespace sui4.MaterialPropertyBaker.Timeline
                             _fMap[fProp.ID] += fProp.Value * inputWeight;
                         else
                             _fMap.Add(fProp.ID, fProp.Value * inputWeight);
-                        
-                        _mpb.SetFloat(fProp.ID, _fMap[fProp.ID]);
                     }
                 }
             }
 
-            if (totalWeight == 0f)
+            if (totalWeight > 0f)
             {
-                _mpb = new MaterialPropertyBlock();
-                if(_trackBinding.OverrideDefaultPreset != null)
-                {
-                    Utils.CreatePropertyBlockFromProfile(_trackBinding.OverrideDefaultPreset, out _mpb);
-                }
-                else
-                {
-                    _mpb = new MaterialPropertyBlock();
-                }
+                SetPropertyBlock(ref _mpb, _cMap, _fMap);
+            }
+            else if (_trackBinding.OverrideDefaultPreset != null)
+            {
+                SetPropertyBlock(ref _mpb, _trackBinding.OverrideDefaultPreset.MaterialProps);
             }
             
-            SetPropertyBlock(_mpb);
         }
 
         public override void OnGraphStart(Playable playable)
@@ -122,17 +112,16 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (_trackBinding.OverrideDefaultPreset != null)
             {
-                Utils.CreatePropertyBlockFromProfile(_trackBinding.OverrideDefaultPreset, out _mpb);                
+                SetPropertyBlock(ref _mpb, _trackBinding.OverrideDefaultPreset.MaterialProps);
             }
             else
             {
-                _mpb = new MaterialPropertyBlock();
+                SetPropertyBlock(ref _mpb, new Dictionary<int, Color>(), new Dictionary<int, float>());
             }
-            SetPropertyBlock(_mpb);
             _mpb = null;
         }
 
-        private void SetPropertyBlock(in MaterialPropertyBlock mpb)
+        private void SetPropertyBlock(ref MaterialPropertyBlock mpb, in MaterialProps materialProps)
         {
             for (int lli = 0; lli < _trackBinding.MaterialStatusListList.Count; lli++)
             {
@@ -143,6 +132,27 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     var matStatus = list.MaterialStatuses[li];
                     if (matStatus.IsTarget)
                     {
+                        renderer.GetPropertyBlock(mpb, li);
+                        Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
+                        renderer.SetPropertyBlock(mpb, li);
+                    }
+                }
+            }
+        }
+
+        private void SetPropertyBlock(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropMap, Dictionary<int, float> fPropMap)
+        {
+            for (int lli = 0; lli < _trackBinding.MaterialStatusListList.Count; lli++)
+            {
+                var list = _trackBinding.MaterialStatusListList[lli];
+                var renderer = list.Renderer;
+                for (int li = 0; li < list.MaterialStatuses.Count; li++)
+                {
+                    var matStatus = list.MaterialStatuses[li];
+                    if (matStatus.IsTarget)
+                    {
+                        renderer.GetPropertyBlock(mpb, li);
+                        Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
                         renderer.SetPropertyBlock(mpb, li);
                     }
                 }

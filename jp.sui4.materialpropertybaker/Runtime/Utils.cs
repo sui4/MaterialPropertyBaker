@@ -1,36 +1,44 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
     public class Utils
     {
-        public static void CreatePropertyBlockFromProfile(in BakedMaterialProperty preset, out MaterialPropertyBlock mpb)
+        public static void CreatePropertyBlockFromProfile(out MaterialPropertyBlock mpb, in BakedMaterialProperty preset)
         {
             mpb = new MaterialPropertyBlock();
             var matProps = preset.MaterialProps;
-            foreach (var cProp in matProps.Colors)
-            {
-                mpb.SetColor(cProp.ID, cProp.Value);
-            }
-
-            foreach (var fProp in matProps.Floats)
-                mpb.SetFloat(fProp.ID, fProp.Value);
+            UpdatePropertyBlockFromProps(ref mpb, matProps);
         }
         
-        public void CreatePropertyBlockFromProps(in MaterialProps props, out MaterialPropertyBlock mpb)
+        public static void CreatePropertyBlockFromProps(out MaterialPropertyBlock mpb, in MaterialProps props)
         {
             mpb = new MaterialPropertyBlock();
-            UpdatePropertyBlockFromProps(props, ref mpb);
+            UpdatePropertyBlockFromProps(ref mpb, props);
         }
 
         // 既存のPropertyBlockに追加する, プロパティが重複している場合は上書きする
-        public void UpdatePropertyBlockFromProps(in MaterialProps props, ref MaterialPropertyBlock mpb)
+        public static void UpdatePropertyBlockFromProps(ref MaterialPropertyBlock mpb, in MaterialProps props)
         {
             foreach (var c in props.Colors)
                 mpb.SetColor(c.ID, c.Value);
             foreach (var f in props.Floats)
                 mpb.SetFloat(f.ID, f.Value);
+        }
+        
+        public static void UpdatePropertyBlockFromDict(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropMap, Dictionary<int, float> fPropMap)
+        {
+            foreach (var (shaderID, value) in cPropMap)
+            {
+                mpb.SetColor(shaderID, value);
+            }
+
+            foreach (var (shaderID, value) in fPropMap)
+            {
+                mpb.SetFloat(shaderID, value);
+            }
         }
         
         public static string UnderscoresToSpaces(string input)
