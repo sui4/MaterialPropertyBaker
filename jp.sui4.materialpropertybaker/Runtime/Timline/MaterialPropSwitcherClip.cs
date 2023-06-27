@@ -46,7 +46,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var playableDirector = owner.GetComponent<PlayableDirector>();
             if (playableDirector != null)
             {
-                // GetParentTrack(playableDirector);
+                GetParentTrack(playableDirector);
             }
             return playable;
         }
