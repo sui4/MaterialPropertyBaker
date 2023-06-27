@@ -1,226 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using System.Dynamic;
 using UnityEditor;
+using UnityEditor.Timeline;
 using UnityEngine;
-using System.IO;
-using File = System.IO.File;
+using UnityEngine.Timeline;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {
-    [CustomEditor(typeof(MaterialPropSwitcherClip))]
-    [CanEditMultipleObjects]
-    public class MaterialPropSwitcherClipEditor : Editor
+    [CustomTimelineEditor(typeof(MaterialPropSwitcherClip))]
+    public class MaterialPropSwitcherClipEditor: ClipEditor
     {
-        private SerializedProperty _presetRef;
-        private SerializedProperty _syncWithPreset;
 
-        private BakedMaterialPropertiesEditor _editor;
-
-        private MaterialPropSwitcherClip _targetClip;
-        private void OnEnable()
+        public override void OnClipChanged(TimelineClip clip)
         {
-            if(target == null)
-                return;
-            _targetClip = (MaterialPropSwitcherClip)target;
-
-            _presetRef = serializedObject.FindProperty("_presetRef");
-            _syncWithPreset = serializedObject.FindProperty("_syncWithPreset");
-        }
-
-        #region GUI
-
-        public override void OnInspectorGUI()
-        {
-            // base.OnInspectorGUI();
-            if (target == null)
+            base.OnClipChanged(clip);
+            var mClip = clip.asset as MaterialPropSwitcherClip;
+            if(mClip.BakedMaterialProperty != null && mClip.BakedMaterialProperty.name != clip.displayName)
             {
-                return;
-            }
-
-            serializedObject.Update();
-            var clip = _targetClip;
-
-            using (new EditorGUILayout.VerticalScope("box"))
-            {
-                PresetGUI();
-            }
-            
-            EditorGUILayout.Separator();
-
-            using (new EditorGUILayout.VerticalScope("box"))
-            {
-                using (new EditorGUI.DisabledScope(_syncWithPreset.boolValue))
-                {
-                    // Property Editor
-                    if (clip.SyncWithPreset)
-                    {
-                        if (clip.PresetRef == null)
-                        {
-                            clip.SyncWithPreset = false;
-                        }
-                        else
-                        {
-                            clip.LoadValuesFromPreset();
-                        }
-                        serializedObject.Update();
-                    }
-                    BakedPropertiesGUI();
-                    
-                    EditorGUILayout.Separator();
-            
-                    // Export button
-                    using (var h = new EditorGUILayout.HorizontalScope())
-                    {
-                        var tmp = GUI.backgroundColor;
-                        GUI.backgroundColor = Color.cyan;
-                        if(GUILayout.Button("Save as"))
-                        {
-                            var preset = CreatePresetFromProps(clip.BakedMaterialProperty.MaterialProps);
-                            ExportProfile(preset);
-                        }
-                        GUI.backgroundColor = tmp;
-                    }
-                }
-
+                mClip.BakedMaterialProperty.name = clip.displayName;
+                Undo.RegisterCompleteObjectUndo(mClip.BakedMaterialProperty, "Baked Material Property Changed");
             }
         }
 
-        
-        //--- GUI ---//
-        private void PresetGUI()
+        public override void OnCreate(TimelineClip clip, TrackAsset track, TimelineClip clonedFrom)
         {
-            using (var changeCheck = new EditorGUI.ChangeCheckScope())
+            base.OnCreate(clip, track, clonedFrom);
+            var mClip = clip.asset as MaterialPropSwitcherClip;
+            var mDuplicateClip = clonedFrom?.asset as MaterialPropSwitcherClip;
+            if(mDuplicateClip != null && mDuplicateClip.BakedMaterialProperty != null)
             {
-                var label = new GUIContent("Preset Profile");
-                EditorGUILayout.PropertyField(_presetRef, label);
-
-                if (changeCheck.changed)
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    if (_presetRef.objectReferenceValue != null)
-                    {
-                        ((BakedMaterialProperty)_presetRef.objectReferenceValue).UpdateShaderID();
-                        _targetClip.LoadValuesFromPreset();
-                    }
-                }
+                // clone by doing a deepcopy
+                mClip.BakedMaterialProperty = Object.Instantiate(mDuplicateClip.BakedMaterialProperty);
+                mClip.BakedMaterialProperty.name = clip.displayName;
+                AssetDatabase.AddObjectToAsset(mClip.BakedMaterialProperty, mClip);
             }
-
-            var clip = (MaterialPropSwitcherClip)target;
-            // Load Save buttons
-            if (clip.PresetRef != null)
+            else
             {
-                using (var h = new EditorGUILayout.HorizontalScope())
-                {
-                    var tmp = GUI.backgroundColor;
-                    GUI.backgroundColor = Color.green;
-                    if (GUILayout.Button("Load"))
-                    {
-                        clip.InstantiateBakedPropertiesFromPreset();
-                        Repaint();
-                    }
-                
-                    GUI.backgroundColor = Color.red;
-                    if (GUILayout.Button("Update Preset"))
-                        UpdatePreset();
-                    GUI.backgroundColor = tmp;
-                }
-                using (var changeCheck = new EditorGUI.ChangeCheckScope())
-                {
-                    var label = new GUIContent("Sync with preset");
-                    EditorGUILayout.PropertyField(_syncWithPreset, label);
-                    if (changeCheck.changed)
-                        serializedObject.ApplyModifiedProperties();
-                }
+                // Create a new setting
+                mClip.BakedMaterialProperty = ScriptableObject.CreateInstance<BakedMaterialProperty>();
+                mClip.BakedMaterialProperty.name = clip.displayName;
+                AssetDatabase.AddObjectToAsset(mClip.BakedMaterialProperty, mClip);
             }
         }
-
-        private void BakedPropertiesGUI()
-        {
-            var bakedProperties = ((MaterialPropSwitcherClip)target).BakedMaterialProperty;
-            if(bakedProperties == null)
-            {
-                ((MaterialPropSwitcherClip)target).CreateBakedProperties();
-                EditorGUILayout.HelpBox("BakedProperties is null", MessageType.Error);
-                return;
-            }
-            
-            if (_editor == null)
-            {
-                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperties);
-            }
-            else if(_editor.target != bakedProperties)
-            {
-                DestroyImmediate(_editor);
-                _editor = null;
-                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperties);
-            }
-            
-            if(_editor != null)
-                _editor.OnInspectorGUI();
-            
-        }
-        
-        #endregion //--- End GUI ---//
-        
-        #region AssetsHandle
-        //--- Property Assets Handle ---//
-        private BakedMaterialProperty CreatePresetFromProps(MaterialProps props)
-        {
-            var preset = ScriptableObject.CreateInstance<BakedMaterialProperty>();
-            preset.name = target.name;
-            var materialProps = preset.MaterialProps;
-            materialProps.Colors = new List<MaterialProp<Color>>(props.Colors);
-            materialProps.Floats = new List<MaterialProp<float>>(props.Floats);
-            return preset;
-        }
-
-        private void ExportProfile(BakedMaterialProperty preset)
-        {
-            if (preset == null) return;
-            
-            var assetName = target == null ? "defaultProfile" : $"BakedProperties_{target.name}";
-
-            BakedMaterialProperty profileToSave = Instantiate(preset);
-
-            EditorUtility.SetDirty(profileToSave);
-            var defaultPath = Application.dataPath;
-            var path = EditorUtility.SaveFilePanelInProject(
-                "Save profile",
-                assetName, 
-                "asset",
-                "Save BakedProperties ScriptableObject",
-                defaultPath);
-            
-            if (path.Length != 0)
-            {
-                var fullPath = Path.Join(Application.dataPath, path.Replace("Assets/", "\\"));
-                if (File.Exists(fullPath))
-                {
-                    Debug.Log($"{GetType()}: delete existing: {fullPath}");
-                    AssetDatabase.DeleteAsset(path);
-                }
-                AssetDatabase.CreateAsset(profileToSave, path);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-                Debug.Log($"Saved : {path}");
-            }
-        }
-        
-        // apply to preset(Override)
-        private void UpdatePreset()
-        {
-            var clip = (MaterialPropSwitcherClip)target;
-            var props = clip.BakedMaterialProperty.MaterialProps;
-            // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
-            // Listになってる各MaterialPropがクラスのため、参照になっちゃう
-            props.GetCopyProperties(out var cList, out var fList);
-            
-            clip.PresetRef.MaterialProps.Colors = cList;
-            clip.PresetRef.MaterialProps.Floats = fList;
-            EditorUtility.SetDirty(clip.PresetRef);
-            AssetDatabase.SaveAssetIfDirty(clip.PresetRef);
-        }
-
-        #endregion //--- End Property Assets Handle ---//
-        
     }
 }
