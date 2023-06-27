@@ -253,6 +253,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
                 AssetDatabase.CreateAsset(profileToSave, path);
                 AssetDatabase.SaveAssets();
+                _targetClip.PresetRef = profileToSave;
                 AssetDatabase.Refresh();
                 Debug.Log($"Saved : {path}");
             }
