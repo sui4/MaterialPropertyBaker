@@ -9,8 +9,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private MaterialGroups _trackBinding;
         public MaterialPropSwitcherTrack ParentSwitcherTrack;
 
-        private MaterialPropertyBlock _mpb;
-        
         private Dictionary<int, Color> _cMap = new Dictionary<int, Color>();
         private Dictionary<int, float> _fMap = new Dictionary<int, float>();
 
@@ -102,7 +100,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 return;
 
             _trackBinding.ResetDefaultPropertyBlock();
-            _mpb = null;
         }
     }
 }
