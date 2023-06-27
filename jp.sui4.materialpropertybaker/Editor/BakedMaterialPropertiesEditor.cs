@@ -43,7 +43,7 @@ namespace sui4.MaterialPropertyBaker
                 
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
-                    PropsGUI(_colors, ShaderPropertyType.Color);
+                    PropsGUI(_colors, ShaderPropertyType.Color, true);
                 }
                 EditorGUILayout.Separator();
                 using (new EditorGUILayout.VerticalScope("box"))
@@ -73,7 +73,7 @@ namespace sui4.MaterialPropertyBaker
 
         private SerializedProperty _property;
         private SerializedProperty _value;
-        private void PropsGUI(SerializedProperty props, ShaderPropertyType type)
+        private void PropsGUI(SerializedProperty props, ShaderPropertyType type, bool isColor = false)
         {
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -89,7 +89,14 @@ namespace sui4.MaterialPropertyBaker
                 {
                     var label = Utils.UnderscoresToSpaces(_property.stringValue);
                     label = label.Length == 0 ? " " : label;
-                    EditorGUILayout.PropertyField(_value, new GUIContent(label));
+                    if (isColor)
+                    {
+                        _value.colorValue = EditorGUILayout.ColorField(new GUIContent(label), _value.colorValue, true, true, true);
+                    }
+                    else
+                    {
+                        EditorGUILayout.PropertyField(_value, new GUIContent(label));
+                    }
                     // remove button
                     var tmp = GUI.backgroundColor;
                     GUI.backgroundColor = Color.red;
