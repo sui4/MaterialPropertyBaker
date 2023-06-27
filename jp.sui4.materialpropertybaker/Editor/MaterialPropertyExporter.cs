@@ -153,8 +153,7 @@ namespace sui4.MaterialPropertyBaker
             var configPath = $"{folderPath.Replace(".asset", "")}_config.asset";
             ExportConfig(_materialPropertyConfig, configPath, out var exportedConfig);
 
-            _bakedMaterialProperty.MaterialPropertyConfig = exportedConfig;
-            _bakedMaterialProperty.DeleteUnEditableProperties();
+            _bakedMaterialProperty.DeleteUnEditableProperties(exportedConfig);
             // folderPathの.assetを"_properties.asset"に置き換える
             var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
             ExportBakedProperty(_bakedMaterialProperty, propertyPath, out var exportedProperty);
@@ -202,7 +201,6 @@ namespace sui4.MaterialPropertyBaker
             DestroyBakedMaterialPropertyIfExist();
             
             _bakedMaterialProperty = CreateInstance<BakedMaterialProperty>();
-            _bakedMaterialProperty.MaterialPropertyConfig = _materialPropertyConfig;
             _bakedMaterialProperty.ShaderName = _targetMaterial.shader.name;
             _bakedMaterialProperty.CreatePropsFromMaterial(targetMaterial);
         }

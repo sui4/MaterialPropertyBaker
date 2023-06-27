@@ -10,19 +10,24 @@ namespace sui4.MaterialPropertyBaker
     public class BakedMaterialPropertiesEditor : Editor
     {
         private SerializedProperty _shaderName;
-        private SerializedProperty _shaderProperties;
         private SerializedProperty _materialProps;
         private SerializedProperty _colors;
         private SerializedProperty _floats;
 
         private bool _forceEditMode;
 
+        private MaterialPropertyConfig _materialPropertyConfig;
+        public MaterialPropertyConfig MaterialPropertyConfig
+        {
+            get => _materialPropertyConfig;
+            set => _materialPropertyConfig = value;
+        }
+
         private void OnEnable()
         {
             if (target == null)
                 return;
             _shaderName = serializedObject.FindProperty("_shaderName");
-            _shaderProperties = serializedObject.FindProperty("_materialPropertyConfig");
             _materialProps = serializedObject.FindProperty("_materialProps");
             _colors = _materialProps.FindPropertyRelative("_colors");
             _floats = _materialProps.FindPropertyRelative("_floats");
@@ -35,7 +40,6 @@ namespace sui4.MaterialPropertyBaker
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 EditorGUILayout.LabelField("Shader" ,_shaderName.stringValue, EditorStyles.boldLabel);
-                EditorGUILayout.PropertyField(_shaderProperties);
                 EditorGUILayout.Separator();
                 _forceEditMode = EditorGUILayout.Toggle("Force Edit Mode", _forceEditMode);
                 
@@ -50,7 +54,7 @@ namespace sui4.MaterialPropertyBaker
                 }
                 
                 EditorGUILayout.Separator();
-                // if(_shaderProperties.objectReferenceValue != null)
+                // if(_materialPropertyConfig != null)
                 // {
                 //     var tmp = GUI.backgroundColor;
                 //     GUI.backgroundColor = Color.red;
@@ -121,8 +125,7 @@ namespace sui4.MaterialPropertyBaker
             else
             {
                 // add from shader properties
-                var shaderProperties = (MaterialPropertyConfig)_shaderProperties.objectReferenceValue;
-                if (shaderProperties != null)
+                if (_materialPropertyConfig != null)
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
@@ -135,8 +138,9 @@ namespace sui4.MaterialPropertyBaker
 
         private void AddPropertyPopupGUI(SerializedProperty props, ShaderPropertyType spType, Type type = null)
         {
-            var shaderProperties = (MaterialPropertyConfig)_shaderProperties.objectReferenceValue;
-            if (shaderProperties == null)
+            var config = _materialPropertyConfig;
+            
+            if (config == null)
                 return;
 
             var bp = (BakedMaterialProperty)target;
@@ -144,13 +148,13 @@ namespace sui4.MaterialPropertyBaker
             // 一致する型のプロパティを取得
             var propertySelectList = new List<string> { "Add Property" };
             
-            for(int pi = 0; pi < shaderProperties.PropertyNames.Count; pi++)
+            for(int pi = 0; pi < config.PropertyNames.Count; pi++)
             {
-                var pName = shaderProperties.PropertyNames[pi];
-                var pType = shaderProperties.PropertyTypes[pi];
+                var pName = config.PropertyNames[pi];
+                var pType = config.PropertyTypes[pi];
                 // TODO: ShaderPropertyTypeと、MaterialPropsのTypeは1:1じゃない。Range, floatはともにfloatに対応する
                 // 型が一致、かつ、MaterialPropsに存在しない かつ editableなプロパティのみ追加
-                if (pType == spType && shaderProperties.HasEditableProperty(pName) && !bp.MaterialProps.HasProperties(pName, pType))
+                if (pType == spType && config.HasEditableProperty(pName) && !bp.MaterialProps.HasProperties(pName, pType))
                 {
                     propertySelectList.Add(pName);
                 }

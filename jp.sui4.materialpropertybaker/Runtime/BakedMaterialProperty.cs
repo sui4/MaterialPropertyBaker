@@ -13,7 +13,6 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private MaterialProps _materialProps;
         [SerializeField] private string _shaderName;
-        [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
         public string ShaderName
         {
             get => _shaderName;
@@ -21,11 +20,7 @@ namespace sui4.MaterialPropertyBaker
         }
         public MaterialProps MaterialProps => _materialProps;
 
-        public MaterialPropertyConfig MaterialPropertyConfig
-        {
-            get => _materialPropertyConfig;
-            set => _materialPropertyConfig = value;
-        }
+
 
         private void OnEnable()
         {
@@ -82,13 +77,12 @@ namespace sui4.MaterialPropertyBaker
             _materialProps ??= new MaterialProps();
             _materialProps.CopyValuesFromOther(other.MaterialProps);
             _shaderName = other.ShaderName;
-            _materialPropertyConfig = other.MaterialPropertyConfig;
         }
 
         // shader propertiesに含まれない, またはEditableではないプロパティを削除する
-        public void DeleteUnEditableProperties()
+        public void DeleteUnEditableProperties(MaterialPropertyConfig config)
         {
-            if(_materialPropertyConfig == null) return;
+            if(config == null) return;
 
             var colorDeleteIndex = new List<int>();
             var floatDeleteIndex = new List<int>();
@@ -97,12 +91,12 @@ namespace sui4.MaterialPropertyBaker
             for (int ci = 0; ci < _materialProps.Colors.Count; ci++)
             {
                 var colorProp = _materialProps.Colors[ci];
-                var index = _materialPropertyConfig.PropertyNames.IndexOf(colorProp.Name);
+                var index = config.PropertyNames.IndexOf(colorProp.Name);
                 if (index == -1)
                 {
                     colorDeleteIndex.Add(ci);
                 }
-                else if(_materialPropertyConfig.Editable[index] == false)
+                else if(config.Editable[index] == false)
                 {
                     colorDeleteIndex.Add(ci);
                 }
@@ -111,12 +105,12 @@ namespace sui4.MaterialPropertyBaker
             for (int fi = 0; fi < _materialProps.Floats.Count; fi++)
             {
                 var floatProp = _materialProps.Floats[fi];
-                var index = _materialPropertyConfig.PropertyNames.IndexOf(floatProp.Name);
+                var index = config.PropertyNames.IndexOf(floatProp.Name);
                 if (index == -1)
                 {
                     floatDeleteIndex.Add(fi);
                 }
-                else if(_materialPropertyConfig.Editable[index] == false)
+                else if(config.Editable[index] == false)
                 {
                     floatDeleteIndex.Add(fi);
                 }

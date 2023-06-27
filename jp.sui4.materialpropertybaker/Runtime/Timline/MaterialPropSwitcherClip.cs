@@ -99,7 +99,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void AddProperties(MaterialPropertyConfig config)
         {
-            _bakedMaterialProperty.MaterialPropertyConfig = config;
             _bakedMaterialProperty.ShaderName = config.ShaderName;
             for(int i = 0; i < config.PropertyNames.Count; i++)
             {
