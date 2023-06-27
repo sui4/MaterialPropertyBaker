@@ -140,8 +140,16 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void BakedPropertiesGUI()
         {
-            var bakedProperties = ((MaterialPropSwitcherClip)target).BakedMaterialProperty;
-            if(bakedProperties == null)
+            BakedMaterialProperty bakedProperty = null;
+            if (_targetClip.SyncWithPreset)
+            {
+                bakedProperty = _targetClip.PresetRef;
+            }
+            else
+            {
+                bakedProperty = _targetClip.BakedMaterialProperty;
+            }
+            if(bakedProperty == null)
             {
                 EditorGUILayout.HelpBox("BakedProperties is null", MessageType.Error);
                 return;
@@ -149,13 +157,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
             
             if (_editor == null)
             {
-                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperties);
+                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperty);
             }
-            else if(_editor.target != bakedProperties)
+            else if(_editor.target != bakedProperty)
             {
                 DestroyImmediate(_editor);
                 _editor = null;
-                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperties);
+                _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperty);
             }
             
             if(_editor != null)
