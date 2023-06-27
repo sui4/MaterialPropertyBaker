@@ -14,7 +14,6 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _colors;
         private SerializedProperty _floats;
 
-        private bool _forceEditMode;
 
         private MaterialPropertyConfig _materialPropertyConfig;
         public MaterialPropertyConfig MaterialPropertyConfig
@@ -41,7 +40,6 @@ namespace sui4.MaterialPropertyBaker
             {
                 EditorGUILayout.LabelField("Shader" ,_shaderName.stringValue, EditorStyles.boldLabel);
                 EditorGUILayout.Separator();
-                _forceEditMode = EditorGUILayout.Toggle("Force Edit Mode", _forceEditMode);
                 
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
@@ -89,49 +87,26 @@ namespace sui4.MaterialPropertyBaker
                 
                 using (new GUILayout.HorizontalScope())
                 {
-                    if (_forceEditMode)
+                    var label = Utils.UnderscoresToSpaces(_property.stringValue);
+                    label = label.Length == 0 ? " " : label;
+                    EditorGUILayout.PropertyField(_value, new GUIContent(label));
+                    // remove button
+                    var tmp = GUI.backgroundColor;
+                    GUI.backgroundColor = Color.red;
+                    if (GUILayout.Button("-", GUILayout.Width(30)))
                     {
-                        EditorGUILayout.PropertyField(_property, new GUIContent());
-                        EditorGUILayout.PropertyField(_value, new GUIContent());
-                        // remove button
-                        var tmp = GUI.backgroundColor;
-                        GUI.backgroundColor = Color.red;
-                        if (GUILayout.Button("-", GUILayout.Width(30)))
-                        {
-                            props.DeleteArrayElementAtIndex(pi);
-                        }
-                        GUI.backgroundColor = tmp;
+                        props.DeleteArrayElementAtIndex(pi);
                     }
-                    else
-                    {
-                        var label = Utils.UnderscoresToSpaces(_property.stringValue);
-                        label = label.Length == 0 ? " " : label;
-                        EditorGUILayout.PropertyField(_value, new GUIContent(label));
-                    }
+                    GUI.backgroundColor = tmp;
                 }
             }
-
-            if (_forceEditMode)
+            // add from shader properties
+            if (_materialPropertyConfig != null)
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     EditorGUILayout.Separator();
-                    if (GUILayout.Button("+", GUILayout.Width(40)))
-                    {
-                        props.InsertArrayElementAtIndex(props.arraySize);
-                    }  
-                }
-            }
-            else
-            {
-                // add from shader properties
-                if (_materialPropertyConfig != null)
-                {
-                    using (new EditorGUILayout.HorizontalScope())
-                    {
-                        EditorGUILayout.Separator();
-                        AddPropertyPopupGUI(props, type);
-                    }
+                    AddPropertyPopupGUI(props, type);
                 }
             }
         }

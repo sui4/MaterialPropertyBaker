@@ -17,6 +17,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private MaterialPropSwitcherTrack _parentTrack;
         private MaterialGroups _bindingMaterialGroups;
 
+        [SerializeField] private bool _editable = false;
+        
+        public bool Editable
+        {
+            get => _editable;
+            set => _editable = value;
+        }
+
         public MaterialGroups BindingMaterialGroups => _bindingMaterialGroups;
         public MaterialPropSwitcherTrack ParentTrack
         {

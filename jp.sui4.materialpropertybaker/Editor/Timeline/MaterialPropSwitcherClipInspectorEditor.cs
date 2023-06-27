@@ -12,11 +12,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
     public class MaterialPropSwitcherClipInspectorEditor : Editor
     {
         private SerializedProperty _presetRef;
-        private SerializedProperty _bakedProperties;
+        private SerializedProperty _editable;
         
         private BakedMaterialPropertiesEditor _editor;
         private MaterialPropSwitcherClip _targetClip;
-        private bool _editable;
 
         // プリセットが外れたときに、プリセットの値を_bakedPropertyに引き継ぐための変数
         private BakedMaterialProperty _presetRefPrev;
@@ -28,7 +27,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             _targetClip = (MaterialPropSwitcherClip)target;
 
             _presetRef = serializedObject.FindProperty("_presetRef");
-            _bakedProperties = serializedObject.FindProperty("_bakedMaterialProperty");
+            _editable = serializedObject.FindProperty("_editable");
         }
 
         #region GUI
@@ -40,16 +39,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
             _presetRefPrev = _targetClip.PresetRef;
             serializedObject.Update();
 
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.PropertyField(_bakedProperties, new GUIContent("Property Serialized on Clip"));
-            }
-            
+            // initialize
             if (_targetClip.BakedMaterialProperty == null)
             {
                 CreateAndSaveBakedProperty(_targetClip.PresetRef);
             }
 
+            
             using (new EditorGUILayout.VerticalScope("box"))
             {
                 PresetGUI();
@@ -60,7 +56,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             // Properties GUI
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                using (new EditorGUI.DisabledScope(_targetClip.PresetRef != null && !_editable))
+                using (new EditorGUI.DisabledScope(_targetClip.PresetRef != null && !_editable.boolValue))
                 {
                     BakedPropertiesGUI();
                 }
@@ -72,9 +68,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             using (var changeCheck = new EditorGUI.ChangeCheckScope())
             {
-                var label = new GUIContent("Preset Profile");
-                EditorGUILayout.PropertyField(_presetRef, label);
+                EditorGUILayout.PropertyField(_presetRef, new GUIContent("Preset Profile"));
 
+                // Load Save buttons
+                if (_targetClip.PresetRef != null)
+                {
+                    EditorGUILayout.PropertyField(_editable, new GUIContent("Edit Preset"));
+                }
+                
                 if (changeCheck.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
@@ -93,13 +94,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
             }
 
-            var clip = (MaterialPropSwitcherClip)target;
-            // Load Save buttons
-            if (clip.PresetRef != null)
-            {
-                var label = new GUIContent("Edit Preset");
-                _editable = EditorGUILayout.Toggle(label, _editable);
-            }
+
         }
 
         private void BakedPropertiesGUI()
