@@ -7,7 +7,7 @@ using UnityEngine.Timeline;
 namespace sui4.MaterialPropertyBaker.Timeline
 {
     [CustomTimelineEditor(typeof(MaterialPropSwitcherClip))]
-    public class MaterialPropSwitcherClipEditor: ClipEditor
+    public class MaterialPropSwitcherClipTimelineEditor: ClipEditor
     {
 
         public override void OnClipChanged(TimelineClip clip)

@@ -17,6 +17,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private MaterialPropSwitcherClip _targetClip;
         private bool _editable;
 
+        // プリセットが外れたときに、プリセットの値を_bakedPropertyに引き継ぐための変数
+        private BakedMaterialProperty _presetRefPrev; 
+
         private void OnEnable()
         {
             if(target == null)
@@ -70,10 +73,15 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 if (changeCheck.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
-                    if (_presetRef.objectReferenceValue != null)
+                    var preset = (BakedMaterialProperty)_presetRef.objectReferenceValue;
+                    if (preset != null)
                     {
-                        ((BakedMaterialProperty)_presetRef.objectReferenceValue).UpdateShaderID();
-                        CreateAndSaveBakedProperty();
+                        preset.UpdateShaderID();
+                        CreateAndSaveBakedProperty(preset);
+                    }
+                    else if(_presetRefPrev != null)
+                    {
+                        CreateAndSaveBakedProperty(_presetRefPrev);
                     }
                 }
             }
@@ -135,7 +143,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         #region AssetsHandle
         //--- Property Assets Handle ---//
         
-        private void CreateAndSaveBakedProperty()
+        private void CreateAndSaveBakedProperty(BakedMaterialProperty presetRef = null)
         {
             if (_targetClip.BakedMaterialProperty != null)
             {
@@ -143,10 +151,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
             if (_targetClip.BakedMaterialProperty == null)
             {
-                if (_targetClip.PresetRef != null)
+                if (presetRef != null)
                 {
-                    _targetClip.BakedMaterialProperty = Instantiate(_targetClip.PresetRef);
-                    _targetClip.BakedMaterialProperty.name = _targetClip.name + "_" + _targetClip.PresetRef.name;
+                    _targetClip.BakedMaterialProperty = Instantiate(presetRef);
+                    _targetClip.BakedMaterialProperty.name = _targetClip.name + "_" + presetRef.name;
                     
                     AssetDatabase.AddObjectToAsset(_targetClip.BakedMaterialProperty, _targetClip);
                     AssetDatabase.SaveAssets();
