@@ -42,7 +42,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             EditorGUILayout.PropertyField(_bakedProperties);
             if (_targetClip.BakedMaterialProperty == null)
             {
-                CreateAndSaveBakedProperty();
+                CreateAndSaveBakedProperty(_targetClip.PresetRef);
             }
 
             using (new EditorGUILayout.VerticalScope("box"))
@@ -143,7 +143,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         #region AssetsHandle
         //--- Property Assets Handle ---//
         
-        private void CreateAndSaveBakedProperty(BakedMaterialProperty presetRef = null)
+        private void CreateAndSaveBakedProperty(BakedMaterialProperty presetRef)
         {
             if (_targetClip.BakedMaterialProperty != null)
             {
@@ -175,21 +175,32 @@ namespace sui4.MaterialPropertyBaker.Timeline
         
         private void DestroyBakedPropertyIfChild()
         {
+            var bakedProperties = _targetClip.BakedMaterialProperty;
+            if(bakedProperties == null) return;
+            
             // _bakedPropertiesのアセットパスを取得
-            string bakedPropertiesPath = AssetDatabase.GetAssetPath(_targetClip.BakedMaterialProperty);
-
-            // このオブジェクト自身のアセットパスを取得
-            string thisAssetPath = AssetDatabase.GetAssetPath(this);
-
-            // _bakedPropertiesが自身の子のアセットであるかどうかを確認
-            if (!string.IsNullOrEmpty(bakedPropertiesPath) &&
-                bakedPropertiesPath.StartsWith(thisAssetPath))
+            string bakedPropertiesPath = AssetDatabase.GetAssetPath(bakedProperties);
+            if (string.IsNullOrEmpty(bakedPropertiesPath))
             {
-                // Debug.Log($"Destroy BakedProperties: {_bakedProperties.name}");
-                Undo.DestroyObjectImmediate(_targetClip.BakedMaterialProperty);
-                DestroyImmediate(_targetClip.BakedMaterialProperty, true);
-                _targetClip.BakedMaterialProperty = null;
+                DestroyImmediate(bakedProperties);
+                bakedProperties = null;
             }
+            else
+            {
+                // このオブジェクト自身のアセットパスを取得
+                string thisAssetPath = AssetDatabase.GetAssetPath(this);
+
+                // _bakedPropertiesが自身の子のアセットであるかどうかを確認
+                if (!string.IsNullOrEmpty(bakedPropertiesPath) &&
+                    bakedPropertiesPath.StartsWith(thisAssetPath))
+                {
+                    // Debug.Log($"Destroy BakedProperties: {_bakedProperties.name}");
+                    Undo.DestroyObjectImmediate(bakedProperties);
+                    DestroyImmediate(bakedProperties, true);
+                    _targetClip.BakedMaterialProperty = null;
+                }
+            }
+
         }
 
         private void ExportProfile(BakedMaterialProperty preset)
