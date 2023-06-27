@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -13,7 +13,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         
         [SerializeField] private BakedMaterialProperty _presetRef;
         [SerializeField] private BakedMaterialProperty _bakedMaterialProperty;
-        [SerializeField] private bool _syncWithPreset = true;
         
         private MaterialPropSwitcherTrack _parentTrack;
         private MaterialGroups _bindingMaterialGroups;
@@ -37,12 +36,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
             set => _presetRef = value;
         }
         
-        public bool SyncWithPreset
-        {
-            get => _syncWithPreset;
-            set => _syncWithPreset = value;
-        }
-        
         public ClipCaps clipCaps => ClipCaps.Blending;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
@@ -50,11 +43,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var playable = ScriptPlayable<MaterialPropSwitcherBehaviour>.Create(graph, _template);
             var behaviour = playable.GetBehaviour();
             behaviour.Clip = this;
-            
             var playableDirector = owner.GetComponent<PlayableDirector>();
             if (playableDirector != null)
             {
-                GetParentTrack(playableDirector);
+                // GetParentTrack(playableDirector);
             }
             return playable;
         }

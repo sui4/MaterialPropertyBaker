@@ -11,12 +11,15 @@ namespace sui4.MaterialPropertyBaker.Timeline
     public class MaterialPropSwitcherClipInspectorEditor : Editor
     {
         private SerializedProperty _presetRef;
-        private SerializedProperty _syncWithPreset;
         private SerializedProperty _bakedMaterialProperty;
+        
+        private BakedMaterialProperty _presetPrev;
 
         private BakedMaterialPropertiesEditor _editor;
 
         private MaterialPropSwitcherClip _targetClip;
+
+        private bool _editable;
 
         private void OnEnable()
         {
@@ -25,7 +28,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
             _targetClip = (MaterialPropSwitcherClip)target;
 
             _presetRef = serializedObject.FindProperty("_presetRef");
-            _syncWithPreset = serializedObject.FindProperty("_syncWithPreset");
             _bakedMaterialProperty = serializedObject.FindProperty("_bakedMaterialProperty");
         }
 
@@ -53,21 +55,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                using (new EditorGUI.DisabledScope(_syncWithPreset.boolValue))
+                using (new EditorGUI.DisabledScope(_editable))
                 {
-                    // Property Editor
-                    if (clip.SyncWithPreset)
-                    {
-                        if (clip.PresetRef == null)
-                        {
-                            clip.SyncWithPreset = false;
-                        }
-                        else
-                        {
-                            clip.LoadValuesFromPreset();
-                        }
-                        serializedObject.Update();
-                    }
                     BakedPropertiesGUI();
                     
                     EditorGUILayout.Separator();
@@ -113,42 +102,20 @@ namespace sui4.MaterialPropertyBaker.Timeline
             // Load Save buttons
             if (clip.PresetRef != null)
             {
-                using (var h = new EditorGUILayout.HorizontalScope())
-                {
-                    var tmp = GUI.backgroundColor;
-                    GUI.backgroundColor = Color.green;
-                    if (GUILayout.Button("Load"))
-                    {
-                        clip.InstantiateBakedPropertiesFromPreset();
-                        Repaint();
-                    }
-                
-                    GUI.backgroundColor = Color.red;
-                    if (GUILayout.Button("Update Preset"))
-                        UpdatePreset();
-                    GUI.backgroundColor = tmp;
-                }
+
                 using (var changeCheck = new EditorGUI.ChangeCheckScope())
                 {
-                    var label = new GUIContent("Sync with preset");
-                    EditorGUILayout.PropertyField(_syncWithPreset, label);
-                    if (changeCheck.changed)
-                        serializedObject.ApplyModifiedProperties();
+                    var label = new GUIContent("Editable");
+                    _editable = EditorGUILayout.ToggleLeft(label, _editable);
                 }
             }
         }
 
         private void BakedPropertiesGUI()
         {
-            BakedMaterialProperty bakedProperty = null;
-            if (_targetClip.SyncWithPreset)
-            {
-                bakedProperty = _targetClip.PresetRef;
-            }
-            else
-            {
-                bakedProperty = _targetClip.BakedMaterialProperty;
-            }
+            BakedMaterialProperty bakedProperty = 
+                _targetClip.PresetRef ? _targetClip.PresetRef : _targetClip.BakedMaterialProperty;
+            
             if(bakedProperty == null)
             {
                 EditorGUILayout.HelpBox("BakedProperties is null", MessageType.Error);
@@ -217,21 +184,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
         }
         
-        // apply to preset(Override)
-        private void UpdatePreset()
-        {
-            var clip = (MaterialPropSwitcherClip)target;
-            var props = clip.BakedMaterialProperty.MaterialProps;
-            // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
-            // Listになってる各MaterialPropがクラスのため、参照になっちゃう
-            props.GetCopyProperties(out var cList, out var fList);
-            
-            clip.PresetRef.MaterialProps.Colors = cList;
-            clip.PresetRef.MaterialProps.Floats = fList;
-            EditorUtility.SetDirty(clip.PresetRef);
-            AssetDatabase.SaveAssetIfDirty(clip.PresetRef);
-        }
-
         #endregion //--- End Property Assets Handle ---//
         
     }

@@ -17,7 +17,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private MaterialProps _matProps;
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            // base.ProcessFrame(playable, info, playerData);
             _trackBinding = playerData as MaterialGroups;
             if (_trackBinding == null)
                 return;
@@ -33,7 +32,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
 
-                if (clip.SyncWithPreset)
+                if (clip.PresetRef)
                 {
                     _matProps = clip.PresetRef.MaterialProps;
                 }
@@ -93,14 +92,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
                 clip.BakedMaterialProperty.UpdateShaderID();
 
-                // sync with preset
-                if (clip.SyncWithPreset)
-                {
-                    if (clip.PresetRef == null)
-                        clip.SyncWithPreset = false;
-                    else
-                        clip.LoadValuesFromPreset();
-                }
             }
             base.OnGraphStart(playable);
         }
