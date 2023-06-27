@@ -121,20 +121,21 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (_editor != null)
             {
-                _editor.OnInspectorGUI();
-                EditorGUILayout.Separator();
-            
                 // Export button
                 using (var h = new EditorGUILayout.HorizontalScope())
                 {
                     var tmp = GUI.backgroundColor;
                     GUI.backgroundColor = Color.cyan;
-                    if(GUILayout.Button("Save as"))
+                    var label = _targetClip.PresetRef == null ? "Export" : "Save as";
+                    if(GUILayout.Button(label))
                     {
                         ExportProfile(bakedProperty);
                     }
                     GUI.backgroundColor = tmp;
                 }
+                
+                _editor.OnInspectorGUI();
+                EditorGUILayout.Separator();
             }
         }
         
