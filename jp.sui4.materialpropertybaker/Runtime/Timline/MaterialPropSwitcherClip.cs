@@ -107,30 +107,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var pType = config.PropertyTypes[i];
                 if(config.Editable[i])
                     _bakedMaterialProperty.MaterialProps.AddProperty(pName, pType);
-                
             }
-        }
-
-        private void OnDestroy()
-        {
-#if UNITY_EDITOR
-            if(_bakedMaterialProperty == null) return;
-            Undo.RecordObject(this, "Destroy clip and baked properties");
-            // _bakedPropertiesのアセットパスを取得
-            string bakedPropertiesPath = AssetDatabase.GetAssetPath(_bakedMaterialProperty);
-
-            // このオブジェクト自身のアセットパスを取得
-            string thisAssetPath = AssetDatabase.GetAssetPath(this);
-
-            // _bakedPropertiesが自身の子のアセットであるかどうかを確認
-            if (!string.IsNullOrEmpty(bakedPropertiesPath) &&
-                bakedPropertiesPath.StartsWith(thisAssetPath))
-            {
-                Undo.DestroyObjectImmediate(_bakedMaterialProperty);
-                DestroyImmediate(_bakedMaterialProperty, true);
-                _bakedMaterialProperty = null;
-            }
-#endif
         }
 
         private void DestroyBakedPropertiesIfChild()
