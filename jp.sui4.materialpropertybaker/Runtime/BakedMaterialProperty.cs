@@ -66,8 +66,8 @@ namespace sui4.MaterialPropertyBaker
             _materialProps = new MaterialProps(colors, floats);
             UpdateShaderID();
         }
-
-        public void CraetePropsFromMaterialProps(MaterialProps matProps)
+        
+        public void CreatePropsFromOther(MaterialProps matProps)
         {
             _materialProps ??= new MaterialProps();
             _materialProps.CopyValuesFromOther(matProps);

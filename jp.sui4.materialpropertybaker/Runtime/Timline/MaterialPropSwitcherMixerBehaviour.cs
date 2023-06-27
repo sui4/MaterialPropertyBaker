@@ -71,7 +71,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 _trackBinding.SetPropertyBlock(_cMap, _fMap);
             }
-            else if (_trackBinding.OverrideDefaultPreset != null)
+            else
             {
                 _trackBinding.ResetDefaultPropertyBlock();
             }

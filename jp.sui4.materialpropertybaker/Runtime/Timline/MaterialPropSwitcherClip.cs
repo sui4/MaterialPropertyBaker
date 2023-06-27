@@ -110,5 +110,40 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
         }
 
+        private void OnDestroy()
+        {
+            Undo.RecordObject(this, "OnDestroyClip");
+            Undo.RecordObject(BakedMaterialProperty, "OnDestroyClip and BakedMaterialProperty");
+            DestroyBakedPropertyIfChild();
+        }
+        
+        private void DestroyBakedPropertyIfChild()
+        {
+            var bakedProperties = _bakedMaterialProperty;
+            if(bakedProperties == null) return;
+            
+            // _bakedPropertiesのアセットパスを取得
+            string bakedPropertiesPath = AssetDatabase.GetAssetPath(bakedProperties);
+            if (string.IsNullOrEmpty(bakedPropertiesPath))
+            {
+                DestroyImmediate(bakedProperties);
+                bakedProperties = null;
+            }
+            else
+            {
+                // このオブジェクト自身のアセットパスを取得
+                string thisAssetPath = AssetDatabase.GetAssetPath(this);
+
+                // _bakedPropertiesが自身の子のアセットであるかどうかを確認
+                if (!string.IsNullOrEmpty(bakedPropertiesPath) &&
+                    bakedPropertiesPath.StartsWith(thisAssetPath))
+                {
+                    Debug.Log($"Destroy BakedProperties: {_bakedMaterialProperty.name}");
+                    Undo.DestroyObjectImmediate(bakedProperties);
+                    DestroyImmediate(bakedProperties, true);
+                    _bakedMaterialProperty = null;
+                }
+            }
+        }
     }
 }
