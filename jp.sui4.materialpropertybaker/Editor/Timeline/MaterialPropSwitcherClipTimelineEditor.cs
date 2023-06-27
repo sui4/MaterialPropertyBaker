@@ -37,14 +37,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 // clone by doing a deepcopy
                 mClip.BakedMaterialProperty = Object.Instantiate(mDuplicateClip.BakedMaterialProperty);
-                mClip.BakedMaterialProperty.name = clip.displayName;
+                mClip.BakedMaterialProperty.name = clip.asset.name + "_" + clip.displayName;
                 AssetDatabase.AddObjectToAsset(mClip.BakedMaterialProperty, mClip);
             }
             else
             {
                 // Create a new setting
                 mClip.BakedMaterialProperty = ScriptableObject.CreateInstance<BakedMaterialProperty>();
-                mClip.BakedMaterialProperty.name = clip.displayName;
+                mClip.BakedMaterialProperty.name = clip.asset.name + "_" + clip.displayName;
                 AssetDatabase.AddObjectToAsset(mClip.BakedMaterialProperty, mClip);
             }
         }
