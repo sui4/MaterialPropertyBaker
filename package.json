@@ -1,0 +1,17 @@
+{
+  "author": {
+    "name": "sui4",
+    "url": "https://github.com/sui4"
+  },
+  "description": "Bake Material Properties as Preset",
+  "displayName": "MaterialPropertyBaker",
+  "keywords": [
+    "Unity"
+  ],
+  "license": "MIT",
+  "name":  "jp.sui4.materialpropertybaker",
+  "repository": "github:sui4/MaterialPropertyBaker",
+  "unity": "2021.3",
+  "version": "0.1.0",
+  "type": "tool"
+}
