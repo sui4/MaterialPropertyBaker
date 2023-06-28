@@ -119,18 +119,25 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void OnDestroy()
         {
+#if UNITY_EDITOR
             Undo.RecordObject(this, "OnDestroyClip");
             Undo.RecordObject(BakedMaterialProperty, "OnDestroyClip and BakedMaterialProperty");
+            
+#endif
             DestroyBakedPropertyIfChild();
         }
         
         private void DestroyBakedPropertyIfChild()
         {
+#if UNITY_EDITOR
             var bakedProperties = _bakedMaterialProperty;
             if(bakedProperties == null) return;
             
             // _bakedPropertiesのアセットパスを取得
+
             string bakedPropertiesPath = AssetDatabase.GetAssetPath(bakedProperties);
+            
+
             if (string.IsNullOrEmpty(bakedPropertiesPath))
             {
                 DestroyImmediate(bakedProperties);
@@ -147,10 +154,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 {
                     Debug.Log($"Destroy BakedProperties: {_bakedMaterialProperty.name}");
                     Undo.DestroyObjectImmediate(bakedProperties);
+
                     DestroyImmediate(bakedProperties, true);
                     _bakedMaterialProperty = null;
                 }
             }
+#endif
         }
     }
 }
