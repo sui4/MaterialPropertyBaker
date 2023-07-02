@@ -119,9 +119,13 @@ namespace sui4.MaterialPropertyBaker
                     var matStatus = list.MaterialStatuses[li];
                     if (matStatus.IsTarget)
                     {
-                        if(ren.HasPropertyBlock())
+                        try
                         {
                             ren.GetPropertyBlock(_mpb, li);
+                        }
+                        catch
+                        {
+                            _mpb = new MaterialPropertyBlock();
                         }
                         Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
                         ren.SetPropertyBlock(_mpb, li);
@@ -142,9 +146,13 @@ namespace sui4.MaterialPropertyBaker
                     var matStatus = list.MaterialStatuses[li];
                     if (matStatus.IsTarget)
                     {
-                        if (ren.HasPropertyBlock())
+                        try
                         {
                             ren.GetPropertyBlock(_mpb, li);
+                        }
+                        catch
+                        {
+                            _mpb = new MaterialPropertyBlock();
                         }
                         Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
                         ren.SetPropertyBlock(_mpb, li);
