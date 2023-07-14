@@ -16,14 +16,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var mClip = clip.asset as MaterialPropSwitcherClip;
             if(mClip.BakedMaterialProperty != null && mClip.BakedMaterialProperty.name != clip.displayName)
             {
-                if (mClip.PresetRef)
-                {
-                    mClip.BakedMaterialProperty.name = clip.asset.name + "_" + mClip.PresetRef.name;
-                }
-                else
-                {
+                // if (mClip.PresetRef)
+                // {
+                //     mClip.BakedMaterialProperty.name = clip.asset.name + "_" + mClip.PresetRef.name;
+                // }
+                // else
+                // {
                     mClip.BakedMaterialProperty.name = clip.asset.name + "_" + clip.displayName;
-                }
+                // }
                 Undo.RegisterCompleteObjectUndo(mClip.BakedMaterialProperty, "Baked Material Property Changed");
             }
         }

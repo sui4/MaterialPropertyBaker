@@ -2,6 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Serialization;
 using UnityEngine.Timeline;
 
 namespace sui4.MaterialPropertyBaker.Timeline
@@ -11,8 +12,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private MaterialPropSwitcherBehaviour _template = new MaterialPropSwitcherBehaviour();
         
-        [SerializeField] private BakedMaterialProperty _presetRef;
-        [SerializeField] private BakedMaterialProperty _bakedMaterialProperty;
+        // [SerializeField] private BakedMaterialProperty _presetRef;
+        [FormerlySerializedAs("_bakedMaterialProperty")] [SerializeField] private BakedMaterialProperty _materialPropertyProfile = null;
         
         private MaterialPropSwitcherTrack _parentTrack;
         private MaterialGroups _bindingMaterialGroups;
@@ -34,15 +35,15 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         public BakedMaterialProperty BakedMaterialProperty
         {
-            get => _bakedMaterialProperty;
-            set => _bakedMaterialProperty = value;
+            get => _materialPropertyProfile;
+            set => _materialPropertyProfile = value;
         }
         
-        public BakedMaterialProperty PresetRef
-        {
-            get => _presetRef;
-            set => _presetRef = value;
-        }
+        // public BakedMaterialProperty PresetRef
+        // {
+        //     get => _presetRef;
+        //     set => _presetRef = value;
+        // }
         
         public ClipCaps clipCaps => ClipCaps.Blending;
 
@@ -61,7 +62,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void GetParentTrack(PlayableDirector playableDirector)
         {
-            if(!_bakedMaterialProperty.MaterialProps.IsEmpty()) return;
+            if(_materialPropertyProfile == null) return;
+            if(!_materialPropertyProfile.MaterialProps.IsEmpty()) return;
             
             // trackを取得し、trackをkeyにbindingを取得する
             var timelineAsset = playableDirector.playableAsset;
@@ -107,13 +109,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void AddProperties(MaterialPropertyConfig config)
         {
-            _bakedMaterialProperty.ShaderName = config.ShaderName;
+            _materialPropertyProfile.ShaderName = config.ShaderName;
             for(int i = 0; i < config.PropertyNames.Count; i++)
             {
                 var pName = config.PropertyNames[i];
                 var pType = config.PropertyTypes[i];
                 if(config.Editable[i])
-                    _bakedMaterialProperty.MaterialProps.AddProperty(pName, pType);
+                    _materialPropertyProfile.MaterialProps.AddProperty(pName, pType);
             }
         }
 
@@ -121,7 +123,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
 #if UNITY_EDITOR
             Undo.RecordObject(this, "OnDestroyClip");
-            Undo.RecordObject(BakedMaterialProperty, "OnDestroyClip and BakedMaterialProperty");
+            if(_materialPropertyProfile!=null)Undo.RecordObject(BakedMaterialProperty, "OnDestroyClip and BakedMaterialProperty");
             
 #endif
             DestroyBakedPropertyIfChild();
@@ -130,7 +132,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private void DestroyBakedPropertyIfChild()
         {
 #if UNITY_EDITOR
-            var bakedProperties = _bakedMaterialProperty;
+            var bakedProperties = _materialPropertyProfile;
             if(bakedProperties == null) return;
             
             // _bakedPropertiesのアセットパスを取得
@@ -152,11 +154,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 if (!string.IsNullOrEmpty(bakedPropertiesPath) &&
                     bakedPropertiesPath.StartsWith(thisAssetPath))
                 {
-                    Debug.Log($"Destroy BakedProperties: {_bakedMaterialProperty.name}");
+                    Debug.Log($"Destroy BakedProperties: {_materialPropertyProfile.name}");
                     Undo.DestroyObjectImmediate(bakedProperties);
 
                     DestroyImmediate(bakedProperties, true);
-                    _bakedMaterialProperty = null;
+                    _materialPropertyProfile = null;
                 }
             }
 #endif

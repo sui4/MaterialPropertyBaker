@@ -30,15 +30,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
 
-                if (clip.PresetRef)
-                {
-                    _matProps = clip.PresetRef.MaterialProps;
-                }
-                else
-                {
-                    if(clip.BakedMaterialProperty == null) continue;
-                    _matProps = clip.BakedMaterialProperty.MaterialProps;
-                }
+               
+                if(clip.BakedMaterialProperty == null) continue;
+                _matProps = clip.BakedMaterialProperty.MaterialProps;
                 
                 if(_matProps == null) continue;
                 
