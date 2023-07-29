@@ -136,11 +136,10 @@
       "url": "https://packages.unity.com"
     },
     "jp.sui4.materialpropertybaker": {
-      "version": "https://github.com/sui4/MaterialPropertyBaker.git",
+      "version": "file:../../.",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "5468091b73b353e573e6bea0252b26888eb9e336"
+      "source": "local",
+      "dependencies": {}
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
