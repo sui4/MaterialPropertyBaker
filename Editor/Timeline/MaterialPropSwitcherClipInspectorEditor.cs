@@ -78,7 +78,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    ExportProfile(_targetClip.Props);
                 }
             }
             GUI.backgroundColor = tmp;
@@ -212,11 +212,25 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     AssetDatabase.DeleteAsset(path);
                 }
                 AssetDatabase.CreateAsset(profileToSave, path);
-                AssetDatabase.SaveAssets();
                 _targetClip.PresetRef = profileToSave;
+                EditorUtility.SetDirty(target);
+                AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 Debug.Log($"Saved : {path}");
             }
+        }
+
+        private void ExportProfile(MaterialProps props)
+        {
+            if (props == null)
+            {
+                return;
+                // throw new Exception("Failed to Export MaterialProps is null");
+            }
+            
+            var bakedProps = ScriptableObject.CreateInstance<BakedMaterialProperty>();
+            bakedProps.MaterialProps.CopyValuesFromOther(props);
+            ExportProfile(bakedProps);
         }
         
         #endregion //--- End Property Assets Handle ---//
