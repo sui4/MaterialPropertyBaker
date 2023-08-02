@@ -43,15 +43,21 @@ namespace sui4.MaterialPropertyBaker
                 
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
+                    EditorGUILayout.LabelField("Colors", EditorStyles.boldLabel);
+                    EditorGUI.indentLevel++;
                     PropsGUI(_colors, ShaderPropertyType.Color, true);
+                    EditorGUI.indentLevel--;
                 }
                 EditorGUILayout.Separator();
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
+                    EditorGUILayout.LabelField("Floats", EditorStyles.boldLabel);
+                    EditorGUI.indentLevel++;
                     PropsGUI(_floats, ShaderPropertyType.Float);
+                    EditorGUI.indentLevel--;
                 }
                 
-                EditorGUILayout.Separator();
+                // EditorGUILayout.Separator();
                 // if(_materialPropertyConfig != null)
                 // {
                 //     var tmp = GUI.backgroundColor;
@@ -68,27 +74,23 @@ namespace sui4.MaterialPropertyBaker
                     serializedObject.ApplyModifiedProperties();
                 }
             }
-            
         }
 
         private SerializedProperty _property;
         private SerializedProperty _value;
         private void PropsGUI(SerializedProperty props, ShaderPropertyType type, bool isColor = false)
         {
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                EditorGUILayout.LabelField(props.displayName);
-            }
             for (int pi = 0; pi < props.arraySize; pi++)
             {
                 SerializedProperty prop = props.GetArrayElementAtIndex(pi);
                 _property = prop.FindPropertyRelative("_name");
                 _value = prop.FindPropertyRelative("_value");
                 
+                var label = Utils.UnderscoresToSpaces(_property.stringValue);
+                label = label.Length == 0 ? " " : label;
+                
                 using (new GUILayout.HorizontalScope())
                 {
-                    var label = Utils.UnderscoresToSpaces(_property.stringValue);
-                    label = label.Length == 0 ? " " : label;
                     if (isColor)
                     {
                         _value.colorValue = EditorGUILayout.ColorField(new GUIContent(label), _value.colorValue, true, true, true);
