@@ -62,7 +62,7 @@ namespace sui4.MaterialPropertyBaker
             UpdateShaderID();
         }
         
-        public void CreatePropsFromOther(MaterialProps matProps)
+        public void CreatePropsFromOther(in MaterialProps matProps)
         {
             _materialProps ??= new MaterialProps();
             _materialProps.CopyValuesFromOther(matProps);
@@ -72,7 +72,7 @@ namespace sui4.MaterialPropertyBaker
             MaterialProps.GetCopyProperties(out cList, out fList);
         }
         
-        public void CopyValuesFromOther(BakedMaterialProperty other)
+        public void CopyValuesFromOther(in BakedMaterialProperty other)
         {
             _materialProps ??= new MaterialProps();
             _materialProps.CopyValuesFromOther(other.MaterialProps);
@@ -80,7 +80,7 @@ namespace sui4.MaterialPropertyBaker
         }
 
         // shader propertiesに含まれない, またはEditableではないプロパティを削除する
-        public void DeleteUnEditableProperties(MaterialPropertyConfig config)
+        public void DeleteUnEditableProperties(in MaterialPropertyConfig config)
         {
             if(config == null) return;
 

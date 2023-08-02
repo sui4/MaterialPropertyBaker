@@ -124,7 +124,7 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        public void CopyValuesFromOther(MaterialProps other)
+        public void CopyValuesFromOther(in MaterialProps other)
         {
             other.GetCopyProperties(out var outC, out var outF);
             _colors = outC;
