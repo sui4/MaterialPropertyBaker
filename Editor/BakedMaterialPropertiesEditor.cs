@@ -72,6 +72,8 @@ namespace sui4.MaterialPropertyBaker
                 if (change.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(target);
+                    AssetDatabase.SaveAssets();
                 }
             }
         }
