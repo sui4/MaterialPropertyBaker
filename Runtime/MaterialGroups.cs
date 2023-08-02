@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -40,7 +42,6 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialStatusList
     {
-        
         public Renderer Renderer
         {
             get => _renderer;
@@ -62,7 +63,15 @@ namespace sui4.MaterialPropertyBaker
 
         public MaterialStatusList() { }
     }
+
+    [Serializable]
+    public class MaterialStatusDictWrapper
+    {
+        public Dictionary<Material, bool> MaterialStatusDict => _materialStatusDict.Dictionary;
+        [SerializeField] private SerializedDictionary<Material, bool> _materialStatusDict = new SerializedDictionary<Material, bool>();
+    }
     
+    // [ExecuteAlways]
     public class MaterialGroups: MonoBehaviour
     {
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
@@ -81,85 +90,80 @@ namespace sui4.MaterialPropertyBaker
             set => _materialPropertyConfig = value;
         }
         [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
-
-        public List<MaterialStatusList> MaterialStatusListList => _materialStatusListList;
-        [SerializeField] private List<MaterialStatusList> _materialStatusListList = new List<MaterialStatusList>();
-
+        
+        public Dictionary<Renderer, MaterialStatusDictWrapper> MaterialStatusDictDict => _materialStatusDictDict.Dictionary;
+        [SerializeField] private SerializedDictionary<Renderer, MaterialStatusDictWrapper> _materialStatusDictDict = new SerializedDictionary<Renderer, MaterialStatusDictWrapper>();
+        
+        public List<Renderer> Renderers => _renderers;
+        [SerializeField] private List<Renderer> _renderers = new List<Renderer>();
         private void OnEnable()
         {
             _mpb = new MaterialPropertyBlock();
-            if (_materialStatusListList.Count == 0)
-            {
-                _materialStatusListList.Add(new MaterialStatusList());
-            }
+            if(Renderers.Count == 0)
+                Renderers.Add(null);
+            Debug.Log($"{Renderers.Count}");
         }
 
-        public int GetIndex(int ri, int mi)
+        private void OnValidate()
         {
-            int index = 0;
-            for(int i = 0; i < ri; i++)
-            {
-                var r = _materialStatusListList[i].Renderer;
-                if(r == null) continue;
-                
-                var matNum = r.sharedMaterials.Length;
-                index += matNum;
-            }
-
-            index += mi;
-            return index;
+            if(Renderers.Count == 0)
+                Renderers.Add(null);
         }
-        
+
         public void SetPropertyBlock(in MaterialProps materialProps)
         {
             _mpb = new MaterialPropertyBlock();
-            for (int lli = 0; lli < _materialStatusListList.Count; lli++)
+            
+            foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
             {
-                var list = _materialStatusListList[lli];
-                var ren = list.Renderer;
-                for (int li = 0; li < list.MaterialStatuses.Count; li++)
+                // PropertyBlockにはindexを用いてアクセスするので、for文で回す
+                for (int mi = 0; mi < renderer.sharedMaterials.Length; mi++)
                 {
-                    var matStatus = list.MaterialStatuses[li];
-                    if (matStatus.IsTarget)
+                    var material = renderer.sharedMaterials[mi];
+                    var hasValue = materialStatusDictWrapper.MaterialStatusDict.TryGetValue(material, out var isTarget);
+                    if (hasValue && isTarget)
                     {
                         try
                         {
-                            ren.GetPropertyBlock(_mpb, li);
+                            renderer.GetPropertyBlock(_mpb, mi);
                         }
                         catch
                         {
                             _mpb = new MaterialPropertyBlock();
                         }
-                        Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
-                        ren.SetPropertyBlock(_mpb, li);
                     }
+                    // property blockに値をセットし、rendererにproperty blockをセットする
+                    Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
+                    renderer.SetPropertyBlock(_mpb, mi);
                 }
+
             }
         }
 
         public void SetPropertyBlock(in Dictionary<int, Color> cPropMap, in Dictionary<int, float> fPropMap)
         {
             _mpb = new MaterialPropertyBlock();
-            for (int lli = 0; lli < _materialStatusListList.Count; lli++)
+            foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
             {
-                var list = _materialStatusListList[lli];
-                var ren = list.Renderer;
-                for (int li = 0; li < list.MaterialStatuses.Count; li++)
+                // PropertyBlockにはindexを用いてアクセスするので、for文で回す
+                for (int mi = 0; mi < renderer.sharedMaterials.Length; mi++)
                 {
-                    var matStatus = list.MaterialStatuses[li];
-                    if (matStatus.IsTarget)
+                    var material = renderer.sharedMaterials[mi];
+                    var hasValue = materialStatusDictWrapper.MaterialStatusDict.TryGetValue(material, out var isTarget);
+                    if (hasValue && isTarget)
                     {
                         try
                         {
-                            ren.GetPropertyBlock(_mpb, li);
+                            renderer.GetPropertyBlock(_mpb, mi);
                         }
                         catch
                         {
                             _mpb = new MaterialPropertyBlock();
                         }
-                        Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
-                        ren.SetPropertyBlock(_mpb, li);
                     }
+                    // property blockに値をセットし、rendererにproperty blockをセットする
+                    Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
+                    renderer.SetPropertyBlock(_mpb, mi);
                 }
             }
         }
@@ -167,16 +171,17 @@ namespace sui4.MaterialPropertyBaker
         public void ResetPropertyBlock()
         {
             _mpb = new MaterialPropertyBlock();
-            for (int lli = 0; lli < _materialStatusListList.Count; lli++)
+            foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
             {
-                var list = _materialStatusListList[lli];
-                var ren = list.Renderer;
-                for (int li = 0; li < list.MaterialStatuses.Count; li++)
+                // PropertyBlockにはindexを用いてアクセスするので、for文で回す
+                for (int mi = 0; mi < renderer.sharedMaterials.Length; mi++)
                 {
-                    var matStatus = list.MaterialStatuses[li];
-                    if (matStatus.IsTarget)
+                    var material = renderer.sharedMaterials[mi];
+                    var hasValue = materialStatusDictWrapper.MaterialStatusDict.TryGetValue(material, out var isTarget);
+                    if (hasValue && isTarget)
                     {
-                        ren.SetPropertyBlock(_mpb, li);
+                        // 空のproperty blockをセットするとデフォルトの値に戻る
+                        renderer.SetPropertyBlock(_mpb, mi);
                     }
                 }
             }
@@ -193,5 +198,7 @@ namespace sui4.MaterialPropertyBaker
                 ResetPropertyBlock();
             }
         }
+
+
     }
 }

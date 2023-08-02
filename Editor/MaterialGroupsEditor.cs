@@ -1,38 +1,39 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace sui4.MaterialPropertyBaker
 {
     [CustomEditor(typeof(MaterialGroups))]
     public class MaterialGroupsEditor: Editor
     {
+        // serialized property of MaterialGroups(target)
+        private SerializedProperty _renderers;
+        private SerializedProperty _materialStatusSDictSDict;
         private SerializedProperty _defaultProfile;
         private SerializedProperty _materialPropertyConfig;
-        private SerializedProperty _materialStatusListList;
 
-        private SerializedProperty _materialStatusList;
-        private SerializedProperty _materialStatues;
-        private SerializedProperty _renderer;
+        private MaterialGroups Target => (MaterialGroups)target;
         private void OnEnable()
         {
             _defaultProfile = serializedObject.FindProperty("_overrideOverrideDefaultPreset");
             _materialPropertyConfig = serializedObject.FindProperty("_materialPropertyConfig");
-            _materialStatusListList = serializedObject.FindProperty("_materialStatusListList");
+            _materialStatusSDictSDict = serializedObject.FindProperty("_materialStatusDictDict");
+            _renderers = serializedObject.FindProperty("_renderers");
         }
 
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-
             serializedObject.Update();
-           
-            var mg = (MaterialGroups)target;
-            if (mg == null)
+            if (Target == null)
                 return;
 
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
+                EditorGUILayout.PropertyField(_materialStatusSDictSDict);
                 EditorGUILayout.PropertyField(_materialPropertyConfig);
                 EditorGUILayout.Separator();
                 
@@ -48,111 +49,120 @@ namespace sui4.MaterialPropertyBaker
             using (new EditorGUILayout.VerticalScope("box"))
             {
                 EditorGUILayout.LabelField("Renderers", new GUIStyle("label"));
-                for(int i=0; i < _materialStatusListList.arraySize; i++)
+                for(int i=0; i < _renderers.arraySize; i++)
                 {
-                    
-                    _materialStatusList = _materialStatusListList.GetArrayElementAtIndex(i);
+                    var rendererProp = _renderers.GetArrayElementAtIndex(i);
                     using (new EditorGUILayout.VerticalScope("box"))
                     {
-                        RendererGUI(_materialStatusList, i);
+                        RendererGUI(rendererProp, i);
                     }
                     EditorGUILayout.Separator();
                 }
                 // Add Renderer button
                 if (GUILayout.Button("+"))
                 {
-                    var matStatusList = new MaterialStatusList();
-                    mg.MaterialStatusListList.Add(matStatusList);
-                    EditorUtility.SetDirty(mg);
-                    serializedObject.ApplyModifiedProperties();
+                    Target.Renderers.Add(null);
+                    EditorUtility.SetDirty(Target);
+                    serializedObject.Update();
                 }
             }
         }
         
         // ri = renderer index
-        private void RendererGUI(SerializedProperty listlistProp, int ri)
+        private void RendererGUI(SerializedProperty rendererProp, int ri)
         {
-            var mg = (MaterialGroups)target;
-            _materialStatues = listlistProp.FindPropertyRelative("_materialStatuses");
-            _renderer = listlistProp.FindPropertyRelative("_renderer");
+            var currentRenderer = rendererProp.objectReferenceValue as Renderer;
             
             using (new GUILayout.HorizontalScope())
             {
                 using (var change = new EditorGUI.ChangeCheckScope())
                 {
-                    EditorGUILayout.ObjectField(_renderer);
+                    EditorGUILayout.PropertyField(rendererProp, new GUIContent("Renderer"));
                     if (change.changed)
                     {
-                        serializedObject.ApplyModifiedProperties();
-                        if (_renderer.objectReferenceValue != null)
+                        var newRenderer = rendererProp.objectReferenceValue as Renderer;
+                        if (Target.Renderers.Contains(newRenderer))
                         {
-                            var ren = (Renderer)_renderer.objectReferenceValue;
-                            mg.MaterialStatusListList[ri].Renderer = ren;
-                            mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
-                            for(int mi = 0; mi < ren.sharedMaterials.Length; mi++)
-                            {
-                                var mat = ren.sharedMaterials[mi];
-                                var matStatus = new MaterialStatus();
-                                matStatus.Material = mat;
-                                matStatus.IsTarget = true;
-                                mg.MaterialStatusListList[ri].MaterialStatuses.Add(matStatus);
-                            }
-                            Debug.Log("Added" + ren.sharedMaterials.Length);
+                            Debug.LogWarning($"this renderer is already added to MaterialGroups {target.name}. so skipped.");
                         }
                         else
                         {
-                            mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
+                            if (currentRenderer != null)
+                            {
+                                Target.MaterialStatusDictDict.Remove(currentRenderer);
+                            }
+                        
+                            if (newRenderer != null)
+                            {
+                                var materialStatusDictWrapperToAdd = new MaterialStatusDictWrapper();
+
+                                foreach (var mat in newRenderer.sharedMaterials)
+                                {
+                                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
+                                    {
+                                        // failed to add
+                                        Debug.LogWarning($"MaterialGroups: Failed to add material to MaterialStatusDict {target.name}");
+                                    }
+                                }
+                                Target.MaterialStatusDictDict.TryAdd(newRenderer, materialStatusDictWrapperToAdd);
+                                Debug.Log($"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroups of {target.name}");
+                            }
                         }
+                        Target.Renderers[ri] = newRenderer;
+                        EditorUtility.SetDirty(Target);
                         serializedObject.Update();
 
                     }
                 }
                 if(GUILayout.Button("-", GUILayout.Width(25)))
                 {
-                    mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
-                    mg.MaterialStatusListList[ri].Renderer = null;
-                    mg.MaterialStatusListList.RemoveAt(ri);
-                    EditorUtility.SetDirty(mg);
+                    if (currentRenderer != null)
+                    {
+                        Target.MaterialStatusDictDict.Remove(currentRenderer);
+                    }
+                    Target.Renderers.RemoveAt(ri);
+                    EditorUtility.SetDirty(Target);
                     serializedObject.Update();
                     return;
                 }
             }
 
-            var renderer = mg.MaterialStatusListList[ri].Renderer;
-            if(renderer == null) return;
-
-            var mats = renderer.sharedMaterials;
+            currentRenderer = rendererProp.objectReferenceValue as Renderer;
+            if(currentRenderer == null) return;
             
             EditorGUI.indentLevel++;
-            for (int mi = 0; mi < _materialStatues.arraySize; mi++)
+            var hasValue = Target.MaterialStatusDictDict.TryGetValue(currentRenderer, out var materialStatusDictWrapper);
+            if (hasValue)
             {
-                int index = mg.GetIndex(ri, mi);
-                var mat = mats[mi];
-                SerializedProperty matStatusProp = _materialStatues.GetArrayElementAtIndex(mi);
-                
-                SerializedProperty matProp = matStatusProp.FindPropertyRelative("_material");
-                SerializedProperty isTargetProp = matStatusProp.FindPropertyRelative("_isTarget");
-                using (new EditorGUILayout.HorizontalScope())
+                // foreachで回すと、要素の変更時にエラーが出るので、forで回す
+                // 今回ここでは要素数を変えないため、index out of rangeは起きない
+                for (int mi = 0; mi < materialStatusDictWrapper.MaterialStatusDict.Count; mi++)
                 {
-                    using (var change = new EditorGUI.ChangeCheckScope())
-                    {
-                        EditorGUILayout.LabelField("Apply", GUILayout.Width(60));
-                        EditorGUILayout.PropertyField(isTargetProp, label:new GUIContent());
-                        if (change.changed)
-                        {
-                            serializedObject.ApplyModifiedProperties();
-                        }
-                    }
-
-                    using (new EditorGUI.DisabledScope())
-                    {
-                        EditorGUILayout.PropertyField(matProp, label:new GUIContent());
-                    }
+                    var kvp = materialStatusDictWrapper.MaterialStatusDict.ElementAt(mi);
+                    MaterialGUI(kvp.Key, kvp.Value, ref materialStatusDictWrapper);
                 }
             }
-
-
             EditorGUI.indentLevel--;
+        }
+
+        private void MaterialGUI(Material material, bool isTarget, ref MaterialStatusDictWrapper materialStatusDictWrapper)
+        {
+            // Caution: 要素数が変わるとエラーが出るので、要素数を変えないようにする
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (var change = new EditorGUI.ChangeCheckScope())
+                {
+                    var newValue = EditorGUILayout.ToggleLeft("Apply", isTarget);
+                    if (change.changed)
+                    {
+                        materialStatusDictWrapper.MaterialStatusDict[material] = newValue;
+                        serializedObject.Update();
+                        EditorUtility.SetDirty(Target);
+                    }
+                }
+
+                EditorGUILayout.ObjectField(material, typeof(Material), allowSceneObjects:false);
+            }
         }
     }
 }
