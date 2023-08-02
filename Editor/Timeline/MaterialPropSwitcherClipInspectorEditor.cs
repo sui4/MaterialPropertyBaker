@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
-using System.IO;
-using File = System.IO.File;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {

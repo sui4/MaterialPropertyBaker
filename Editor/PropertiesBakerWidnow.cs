@@ -2,10 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
-using System.IO;
-using File = System.IO.File;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -44,7 +43,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 _targets.Add(null);
                 _presets.Clear();
-                _presets.Add(ScriptableObject.CreateInstance<BakedMaterialProperty>());
+                _presets.Add(CreateInstance<BakedMaterialProperty>());
             }
         }
 
@@ -96,7 +95,7 @@ namespace sui4.MaterialPropertyBaker
             if (GUILayout.Button("Add Target Material"))
             {
                 _targets.Add(null);
-                _presets.Add(ScriptableObject.CreateInstance<BakedMaterialProperty>());
+                _presets.Add(CreateInstance<BakedMaterialProperty>());
             }
             
             EditorGUILayout.LabelField("Target Materials");
@@ -407,13 +406,13 @@ namespace sui4.MaterialPropertyBaker
         {
             if (preset != null)
             {
-                ScriptableObject.DestroyImmediate(preset);
+                DestroyImmediate(preset);
                 preset = null;
             }
         }
         private static void CreateProfile(Material mat, out BakedMaterialProperty preset)
         {
-            preset = ScriptableObject.CreateInstance<BakedMaterialProperty>();
+            preset = CreateInstance<BakedMaterialProperty>();
             preset.name = mat.name;
             preset.ShaderName = mat.shader.name;
             preset.CreatePropsFromMaterial(mat);
