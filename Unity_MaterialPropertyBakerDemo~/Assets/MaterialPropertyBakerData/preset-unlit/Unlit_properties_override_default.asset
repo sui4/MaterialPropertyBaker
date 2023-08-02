@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b94f62325319e24fbefedd36009b987, type: 3}
   m_Name: Unlit_properties_override_default
   m_EditorClassIdentifier: 
+  _shaderName: Unlit/Color
   _materialProps:
     _colors:
     - _name: _Color
-      _value: {r: 0.8296626, g: 0.10849059, b: 1, a: 1}
+      _value: {r: 0.3236027, g: 0.6529014, b: 0.6792453, a: 1}
     _floats: []
-  _shaderName: Unlit/Color

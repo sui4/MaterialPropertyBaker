@@ -191,9 +191,13 @@ PlayableDirector:
   m_SceneBindings:
   - key: {fileID: 1023164227248390001, guid: d6fe13ab5dade764bbf38ab396bd5e62, type: 2}
     value: {fileID: 1370087464}
-  - key: {fileID: -6017560617394293474, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+  - key: {fileID: 0}
     value: {fileID: 1370087464}
-  - key: {fileID: 947363421725104698, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+  - key: {fileID: 0}
+    value: {fileID: 1756667420}
+  - key: {fileID: -676687922413272868, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+    value: {fileID: 1370087464}
+  - key: {fileID: -5430038397715644362, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
     value: {fileID: 1756667420}
   m_ExposedReferences:
     m_References: []
@@ -786,7 +790,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _overrideOverrideDefaultPreset: {fileID: 11400000, guid: 230509335fbd71d4b9c0e0693dd9434e, type: 2}
-  _materialPropertyConfig: {fileID: 11400000, guid: b09898c29de5aad40860b4bae027137c, type: 2}
+  _materialPropertyConfig: {fileID: 11400000, guid: 6cb7daa09dee1d04aab6087987b66c05, type: 2}
   _materialStatusListList:
   - _renderer: {fileID: 1529053847}
     _materialStatuses:
