@@ -36,8 +36,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
                 else
                 {
-                    if(clip.BakedMaterialProperty == null) continue;
-                    _matProps = clip.BakedMaterialProperty.MaterialProps;
+                    if(clip.Props == null) continue;
+                    _matProps = clip.Props;
                 }
                 
                 if(_matProps == null) continue;
@@ -84,12 +84,17 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 var sp = (ScriptPlayable<MaterialPropSwitcherBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
-                if (clip.BakedMaterialProperty == null)
+                if (clip.Props == null)
                 {
-                    Debug.LogError($"bakedProperties is null. {clip.name}");
+                    if (clip.PresetRef == null)
+                    {
+                        Debug.LogError($"Both Preset and Local Properties are null. {clip.name}");
+                    }
                 }
-                clip.BakedMaterialProperty.UpdateShaderID();
-
+                else
+                {
+                    clip.Props.UpdateShaderID();
+                }
             }
             base.OnGraphStart(playable);
         }
