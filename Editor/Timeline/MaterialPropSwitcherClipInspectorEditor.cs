@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -111,6 +111,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                         RenewValueFromPreset(_presetRefPrev); 
                     }
                     _presetRefPrev = preset;
+                    EditorUtility.SetDirty(target);
 
                     serializedObject.Update();
                 }
@@ -141,6 +142,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     {
                         serializedObject.ApplyModifiedProperties();
                         serializedObject.Update();
+                        EditorUtility.SetDirty(target);
                     }
                 }
 
