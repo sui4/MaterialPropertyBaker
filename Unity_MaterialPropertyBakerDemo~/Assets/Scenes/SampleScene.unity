@@ -123,6 +123,32 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &257265408 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 95805745775101316, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}
+  m_PrefabInstance: {fileID: 2873592806562276315}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &257265410
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257265408}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &461517595
 GameObject:
   m_ObjectHideFlags: 0
@@ -191,10 +217,16 @@ PlayableDirector:
   m_SceneBindings:
   - key: {fileID: 1023164227248390001, guid: d6fe13ab5dade764bbf38ab396bd5e62, type: 2}
     value: {fileID: 1370087464}
-  - key: {fileID: -6017560617394293474, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+  - key: {fileID: 0}
     value: {fileID: 1370087464}
-  - key: {fileID: 947363421725104698, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+  - key: {fileID: 0}
     value: {fileID: 1756667420}
+  - key: {fileID: -676687922413272868, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+    value: {fileID: 1370087464}
+  - key: {fileID: -5430038397715644362, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+    value: {fileID: 1756667420}
+  - key: {fileID: 5213919508743077450, guid: eae17df0bf50fad45a9d5e739fd6d347, type: 2}
+    value: {fileID: 257265410}
   m_ExposedReferences:
     m_References: []
 --- !u!4 &570223784
@@ -786,7 +818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _overrideOverrideDefaultPreset: {fileID: 11400000, guid: 230509335fbd71d4b9c0e0693dd9434e, type: 2}
-  _materialPropertyConfig: {fileID: 11400000, guid: b09898c29de5aad40860b4bae027137c, type: 2}
+  _materialPropertyConfig: {fileID: 11400000, guid: 6cb7daa09dee1d04aab6087987b66c05, type: 2}
   _materialStatusListList:
   - _renderer: {fileID: 1529053847}
     _materialStatuses:
@@ -971,5 +1003,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 95805745775101316, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 257265410}
   m_SourcePrefab: {fileID: 100100000, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}

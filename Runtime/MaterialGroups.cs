@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -9,25 +8,27 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialStatus
     {
-        [SerializeField] private Material _material = null;
-        [SerializeField] private bool _isTarget = false;
-        [SerializeField] private BakedMaterialProperty _preset = null;
-
         public Material Material
         {
             get => _material;
             set => _material = value;
         }
+        [SerializeField] private Material _material = null;
+
         public bool IsTarget
         {
             get => _isTarget;
             set => _isTarget = value;
         }
+        [SerializeField] private bool _isTarget = false;
+
         public BakedMaterialProperty Preset
         {
             get => _preset;
             set => _preset = value;
         }
+        [SerializeField] private BakedMaterialProperty _preset = null;
+
         public MaterialStatus() { }
 
         public MaterialStatus(Material mat)
@@ -39,20 +40,20 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialStatusList
     {
-        [SerializeField] private Renderer _renderer = null;
-        [SerializeField] private List<MaterialStatus> _materialStatuses = new List<MaterialStatus>();
         
         public Renderer Renderer
         {
             get => _renderer;
             set => _renderer = value;
         }
-        
+        [SerializeField] private Renderer _renderer = null;
+
         public List<MaterialStatus> MaterialStatuses
         {
             get => _materialStatuses;
             set => _materialStatuses = value;
         }
+        [SerializeField] private List<MaterialStatus> _materialStatuses = new List<MaterialStatus>();
 
         public MaterialStatusList(Renderer ren)
         {
@@ -64,10 +65,7 @@ namespace sui4.MaterialPropertyBaker
     
     public class MaterialGroups: MonoBehaviour
     {
-        [SerializeField] private BakedMaterialProperty _overrideOverrideDefaultPreset;
-        [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
-        [SerializeField] private List<MaterialStatusList> _materialStatusListList = new List<MaterialStatusList>();
         private MaterialPropertyBlock _mpb;
 
         public BakedMaterialProperty OverrideDefaultPreset
@@ -75,12 +73,17 @@ namespace sui4.MaterialPropertyBaker
             get => _overrideOverrideDefaultPreset;
             set => _overrideOverrideDefaultPreset = value;
         }
+        [SerializeField] private BakedMaterialProperty _overrideOverrideDefaultPreset;
+
         public MaterialPropertyConfig MaterialPropertyConfig
         {
             get => _materialPropertyConfig;
             set => _materialPropertyConfig = value;
         }
+        [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
+
         public List<MaterialStatusList> MaterialStatusListList => _materialStatusListList;
+        [SerializeField] private List<MaterialStatusList> _materialStatusListList = new List<MaterialStatusList>();
 
         private void OnEnable()
         {

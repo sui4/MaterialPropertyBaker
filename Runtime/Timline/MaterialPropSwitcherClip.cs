@@ -1,5 +1,4 @@
 using System;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -11,46 +10,44 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private MaterialPropSwitcherBehaviour _template = new MaterialPropSwitcherBehaviour();
         
-        [SerializeField] private BakedMaterialProperty _presetRef;
-        [SerializeField] private BakedMaterialProperty _bakedMaterialProperty;
-        
-        private MaterialPropSwitcherTrack _parentTrack;
-        private MaterialGroups _bindingMaterialGroups;
-
-        [SerializeField] private bool _editable = false;
-        
-        public bool Editable
+        public MaterialProps Props
         {
-            get => _editable;
-            set => _editable = value;
+            get => _props;
+            set => _props = value;
         }
-
-        public MaterialGroups BindingMaterialGroups => _bindingMaterialGroups;
-        public MaterialPropSwitcherTrack ParentTrack
-        {
-            get => _parentTrack;
-            set => _parentTrack = value;
-        }
-
-        public BakedMaterialProperty BakedMaterialProperty
-        {
-            get => _bakedMaterialProperty;
-            set => _bakedMaterialProperty = value;
-        }
+        [SerializeField] private MaterialProps _props;
         
         public BakedMaterialProperty PresetRef
         {
             get => _presetRef;
             set => _presetRef = value;
         }
-        
-        public ClipCaps clipCaps => ClipCaps.Blending;
+        [SerializeField] private BakedMaterialProperty _presetRef;
 
-        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
+        public MaterialPropSwitcherTrack ParentTrack
+        {
+            get => _parentTrack;
+            set => _parentTrack = value;
+        }
+        private MaterialPropSwitcherTrack _parentTrack;
+        public MaterialGroups BindingMaterialGroups => _bindingMaterialGroups;
+        private MaterialGroups _bindingMaterialGroups;
+        
+        public bool Editable
+        {
+            get => _editable;
+            set => _editable = value;
+        }
+        [SerializeField] private bool _editable = false;
+
+       public ClipCaps clipCaps => ClipCaps.Blending;
+
+       public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             var playable = ScriptPlayable<MaterialPropSwitcherBehaviour>.Create(graph, _template);
             var behaviour = playable.GetBehaviour();
             behaviour.Clip = this;
+            
             var playableDirector = owner.GetComponent<PlayableDirector>();
             if (playableDirector != null)
             {
@@ -61,7 +58,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void GetParentTrack(PlayableDirector playableDirector)
         {
-            if(!_bakedMaterialProperty.MaterialProps.IsEmpty()) return;
+            if(!Props.IsEmpty()) return;
             
             // trackを取得し、trackをkeyにbindingを取得する
             var timelineAsset = playableDirector.playableAsset;
@@ -107,59 +104,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void AddProperties(MaterialPropertyConfig config)
         {
-            _bakedMaterialProperty.ShaderName = config.ShaderName;
             for(int i = 0; i < config.PropertyNames.Count; i++)
             {
                 var pName = config.PropertyNames[i];
                 var pType = config.PropertyTypes[i];
                 if(config.Editable[i])
-                    _bakedMaterialProperty.MaterialProps.AddProperty(pName, pType);
+                    Props.AddProperty(pName, pType);
             }
-        }
-
-        private void OnDestroy()
-        {
-#if UNITY_EDITOR
-            Undo.RecordObject(this, "OnDestroyClip");
-            Undo.RecordObject(BakedMaterialProperty, "OnDestroyClip and BakedMaterialProperty");
-            
-#endif
-            DestroyBakedPropertyIfChild();
-        }
-        
-        private void DestroyBakedPropertyIfChild()
-        {
-#if UNITY_EDITOR
-            var bakedProperties = _bakedMaterialProperty;
-            if(bakedProperties == null) return;
-            
-            // _bakedPropertiesのアセットパスを取得
-
-            string bakedPropertiesPath = AssetDatabase.GetAssetPath(bakedProperties);
-            
-
-            if (string.IsNullOrEmpty(bakedPropertiesPath))
-            {
-                DestroyImmediate(bakedProperties);
-                bakedProperties = null;
-            }
-            else
-            {
-                // このオブジェクト自身のアセットパスを取得
-                string thisAssetPath = AssetDatabase.GetAssetPath(this);
-
-                // _bakedPropertiesが自身の子のアセットであるかどうかを確認
-                if (!string.IsNullOrEmpty(bakedPropertiesPath) &&
-                    bakedPropertiesPath.StartsWith(thisAssetPath))
-                {
-                    Debug.Log($"Destroy BakedProperties: {_bakedMaterialProperty.name}");
-                    Undo.DestroyObjectImmediate(bakedProperties);
-
-                    DestroyImmediate(bakedProperties, true);
-                    _bakedMaterialProperty = null;
-                }
-            }
-#endif
         }
     }
 }

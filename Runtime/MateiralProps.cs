@@ -9,20 +9,19 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialProps
     {
-        [SerializeField] private List<MaterialProp<Color>> _colors = new List<MaterialProp<Color>>();
-        [SerializeField] private List<MaterialProp<float>> _floats = new List<MaterialProp<float>>();
-
         public List<MaterialProp<Color>> Colors
         {
             get => _colors;
             set => _colors = value;
         }
+        [SerializeField] private List<MaterialProp<Color>> _colors = new List<MaterialProp<Color>>();
 
         public List<MaterialProp<float>> Floats
         {
             get => _floats;
             set => _floats = value;
         }
+        [SerializeField] private List<MaterialProp<float>> _floats = new List<MaterialProp<float>>();
 
         public MaterialProps() { }
         public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f)
@@ -124,7 +123,7 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        public void CopyValuesFromOther(MaterialProps other)
+        public void CopyValuesFromOther(in MaterialProps other)
         {
             other.GetCopyProperties(out var outC, out var outF);
             _colors = outC;

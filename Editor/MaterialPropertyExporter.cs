@@ -1,8 +1,7 @@
-using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
-using File = System.IO.File;
+
 namespace sui4.MaterialPropertyBaker
 {
     [EditorWindowTitle(title= "Material Property Exporter")]
