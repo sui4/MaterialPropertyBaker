@@ -11,16 +11,15 @@ namespace sui4.MaterialPropertyBaker
     [CreateAssetMenu(menuName = "MaterialPropertyBaker/BakedProperties")]
     public class BakedMaterialProperty: ScriptableObject
     {
-        [SerializeField] private MaterialProps _materialProps;
-        [SerializeField] private string _shaderName;
         public string ShaderName
         {
             get => _shaderName;
             set => _shaderName = value;
         }
+        [SerializeField] private string _shaderName;
+
         public MaterialProps MaterialProps => _materialProps;
-
-
+        [SerializeField] private MaterialProps _materialProps;
 
         private void OnEnable()
         {

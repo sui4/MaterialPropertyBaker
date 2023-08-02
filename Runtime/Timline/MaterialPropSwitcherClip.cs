@@ -11,40 +11,37 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private MaterialPropSwitcherBehaviour _template = new MaterialPropSwitcherBehaviour();
         
+        public BakedMaterialProperty PresetRef
+        {
+            get => _presetRef;
+            set => _presetRef = value;
+        }
         [SerializeField] private BakedMaterialProperty _presetRef;
-        [SerializeField] private BakedMaterialProperty _bakedMaterialProperty;
-        
-        private MaterialPropSwitcherTrack _parentTrack;
-        private MaterialGroups _bindingMaterialGroups;
-
-        [SerializeField] private bool _editable = false;
-        
-        public bool Editable
-        {
-            get => _editable;
-            set => _editable = value;
-        }
-
-        public MaterialGroups BindingMaterialGroups => _bindingMaterialGroups;
-        public MaterialPropSwitcherTrack ParentTrack
-        {
-            get => _parentTrack;
-            set => _parentTrack = value;
-        }
 
         public BakedMaterialProperty BakedMaterialProperty
         {
             get => _bakedMaterialProperty;
             set => _bakedMaterialProperty = value;
         }
+        [SerializeField] private BakedMaterialProperty _bakedMaterialProperty;
         
-        public BakedMaterialProperty PresetRef
+        public MaterialPropSwitcherTrack ParentTrack
         {
-            get => _presetRef;
-            set => _presetRef = value;
+            get => _parentTrack;
+            set => _parentTrack = value;
         }
+        private MaterialPropSwitcherTrack _parentTrack;
+        public MaterialGroups BindingMaterialGroups => _bindingMaterialGroups;
+        private MaterialGroups _bindingMaterialGroups;
         
-        public ClipCaps clipCaps => ClipCaps.Blending;
+        public bool Editable
+        {
+            get => _editable;
+            set => _editable = value;
+        }
+        [SerializeField] private bool _editable = false;
+
+       public ClipCaps clipCaps => ClipCaps.Blending;
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {

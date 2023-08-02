@@ -9,19 +9,21 @@ namespace sui4.MaterialPropertyBaker
     // Material Propsで扱うプロパティをユーザが選択的に追加できるように、shaderのプロパティを保持するクラス
     public class MaterialPropertyConfig: ScriptableObject
     {
-        [SerializeField] private string _shaderName;
-        [SerializeField] private List<string> _propertyNames = new List<string>();
-        [SerializeField] private List<ShaderPropertyType> _propertyTypes = new List<ShaderPropertyType>();
-        [SerializeField] private List<bool> _editable = new List<bool>();
-
         public string ShaderName
         {
             get => _shaderName;
             set => _shaderName = value;
         }
+        [SerializeField] private string _shaderName;
+
         public List<string> PropertyNames => _propertyNames;
+        [SerializeField] private List<string> _propertyNames = new List<string>();
+
         public List<ShaderPropertyType> PropertyTypes => _propertyTypes;
+        [SerializeField] private List<ShaderPropertyType> _propertyTypes = new List<ShaderPropertyType>();
+
         public List<bool> Editable => _editable;
+        [SerializeField] private List<bool> _editable = new List<bool>();
 
         public bool HasEditableProperty(string propName)
         {

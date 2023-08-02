@@ -7,13 +7,14 @@ namespace sui4.MaterialPropertyBaker
     public class MaterialPresetViewer: MonoBehaviour
     {
         [SerializeField] private MaterialGroups _materialGroups;
-        [SerializeField] private List<BakedMaterialProperty> _presets;
         
         public List<BakedMaterialProperty> Presets
         {
             get => _presets;
             set => _presets = value;
         }
+        [SerializeField] private List<BakedMaterialProperty> _presets;
+
         private void OnEnable()
         {
             if (_presets == null)
