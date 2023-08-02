@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -130,6 +130,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     {
                         so.ApplyModifiedProperties();
                         so.Update();
+                        EditorUtility.SetDirty(_presetRef.objectReferenceValue);
+                        AssetDatabase.SaveAssets();
                     }
                 }
                 else
