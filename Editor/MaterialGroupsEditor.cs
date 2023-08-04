@@ -64,13 +64,22 @@ namespace sui4.MaterialPropertyBaker
                     }
                     EditorGUILayout.Separator();
                 }
-                // Add Renderer button
-                if (GUILayout.Button("+"))
+
+                using (new GUILayout.HorizontalScope())
                 {
-                    Target.Renderers.Add(null);
-                    EditorUtility.SetDirty(Target);
-                    serializedObject.Update();
+                    if (GUILayout.Button("Validate"))
+                    {
+                        Target.OnValidate();
+                    }
+                    // Add Renderer button
+                    if (GUILayout.Button("+"))
+                    {
+                        Target.Renderers.Add(null);
+                        EditorUtility.SetDirty(Target);
+                        serializedObject.Update();
+                    }
                 }
+
             }
         }
         
