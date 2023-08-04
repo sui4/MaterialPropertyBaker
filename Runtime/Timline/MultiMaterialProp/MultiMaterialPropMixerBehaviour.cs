@@ -35,34 +35,39 @@ namespace sui4.MaterialPropertyBaker.Timeline
             for (var i = 0; i < inputCount; i++)
             {
                 var inputWeight = playable.GetInputWeight(i);
-                var sp = (ScriptPlayable<MultiMaterialPropBehaviour>)playable.GetInput(i);
-                var clip = sp.GetBehaviour().Clip;
-
+                
                 // 各paramの重み付き和
                 if (inputWeight > 0)
                 {
+                    var sp = (ScriptPlayable<MultiMaterialPropBehaviour>)playable.GetInput(i);
+                    var clip = sp.GetBehaviour().Clip;
                     totalWeight += inputWeight;
                     
                     foreach (var presetIDPair in clip.PresetIDPairs)
                     {
-                        var presetId = presetIDPair.ID;
-                        var propShaderIDDict = new PropShaderIDDict();
-                        foreach (var cProp in presetIDPair.Preset.MaterialProps.Colors)
+                        var preset = presetIDPair.Preset;
+                        if(preset == null) continue;
+                        if (!_propDict.TryGetValue(presetIDPair.ID, out var propShaderIDDict))
                         {
-                            if (propShaderIDDict.ColorPropDict.TryGetValue(cProp.ID, out var value))
-                                value.Value += cProp.Value * inputWeight;
-                            else
-                                propShaderIDDict.ColorPropDict.Add(cProp.ID ,new MaterialProp<Color>(cProp.Name, cProp.Value));
+                            propShaderIDDict = new PropShaderIDDict();
                         }
 
-                        foreach (var fProps in presetIDPair.Preset.MaterialProps.Floats)
+                        foreach (var cProp in preset.MaterialProps.Colors)
+                        {
+                            if (propShaderIDDict.ColorPropDict.ContainsKey(cProp.ID))
+                                propShaderIDDict.ColorPropDict[cProp.ID].Value += cProp.Value * inputWeight;
+                            else
+                                propShaderIDDict.ColorPropDict.Add(cProp.ID ,new MaterialProp<Color>(cProp.Name, cProp.Value * inputWeight));
+                        }
+
+                        foreach (var fProps in preset.MaterialProps.Floats)
                         {
                             if(propShaderIDDict.FloatPropDict.ContainsKey(fProps.ID))
                                 propShaderIDDict.FloatPropDict[fProps.ID].Value += fProps.Value * inputWeight;
                             else
                                 propShaderIDDict.FloatPropDict.Add(fProps.ID, new MaterialProp<float>(fProps.Name ,fProps.Value * inputWeight));
                         }
-                        _propDict.TryAdd(presetId, propShaderIDDict);
+                        _propDict.TryAdd(presetIDPair.ID, propShaderIDDict);
                     }
                 }
             }
