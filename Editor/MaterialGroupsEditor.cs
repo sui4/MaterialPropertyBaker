@@ -158,7 +158,7 @@ namespace sui4.MaterialPropertyBaker
                     var (materialProp, isTargetProp) =
                         SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(mi, matListProp, isTargetListProp);
 
-                    MaterialGUI(materialProp, isTargetProp, ref materialStatusDictWrapper);
+                    MaterialGUI(materialProp, isTargetProp);
                 }
             }
             else
@@ -168,7 +168,7 @@ namespace sui4.MaterialPropertyBaker
             EditorGUI.indentLevel--;
         }
 
-        private void MaterialGUI(SerializedProperty materialProp, SerializedProperty isTarget, ref MaterialStatusDictWrapper materialStatusDictWrapper)
+        private void MaterialGUI(SerializedProperty materialProp, SerializedProperty isTarget)
         {
             // Caution: 要素数が変わるとエラーが出るので、要素数を変えないようにする
             using (new EditorGUILayout.HorizontalScope())
