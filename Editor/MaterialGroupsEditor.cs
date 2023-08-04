@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,153 +7,197 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(MaterialGroups))]
     public class MaterialGroupsEditor: Editor
     {
+        // serialized property of MaterialGroups(target)
+        private SerializedProperty _renderersProp;
+        private SerializedProperty _materialStatusSDictSDict;
         private SerializedProperty _defaultProfile;
         private SerializedProperty _materialPropertyConfig;
-        private SerializedProperty _materialStatusListList;
-
-        private SerializedProperty _materialStatusList;
-        private SerializedProperty _materialStatues;
-        private SerializedProperty _renderer;
+        
+        private static class Styles
+        {
+            public static readonly GUIContent MaterialPropertyConfigLabel = new GUIContent("Material Property Config");
+            public static readonly GUIContent OverrideDefaultProfileLabel = new GUIContent("Preset to Override Default");
+            public static readonly GUIContent MaterialLabel = GUIContent.none;
+            public static readonly GUIContent IsTargetLabel = new GUIContent("Apply");
+        }
+        private MaterialGroups Target => (MaterialGroups)target;
         private void OnEnable()
         {
-            _defaultProfile = serializedObject.FindProperty("_overrideOverrideDefaultPreset");
+            _defaultProfile = serializedObject.FindProperty("_overrideDefaultPreset");
             _materialPropertyConfig = serializedObject.FindProperty("_materialPropertyConfig");
-            _materialStatusListList = serializedObject.FindProperty("_materialStatusListList");
+            _materialStatusSDictSDict = serializedObject.FindProperty("_materialStatusDictDict");
+            _renderersProp = serializedObject.FindProperty("_renderers");
         }
 
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-
             serializedObject.Update();
-           
-            var mg = (MaterialGroups)target;
-            if (mg == null)
+            if (Target == null)
                 return;
 
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(_materialPropertyConfig);
+                // EditorGUILayout.PropertyField(_materialStatusSDictSDict);
+                EditorGUILayout.PropertyField(_materialPropertyConfig, Styles.MaterialPropertyConfigLabel);
                 EditorGUILayout.Separator();
                 
-                EditorGUILayout.PropertyField(_defaultProfile);
+                EditorGUILayout.PropertyField(_defaultProfile, Styles.OverrideDefaultProfileLabel);
 
                 if (change.changed)
                     serializedObject.ApplyModifiedProperties();
             }
-            EditorGUILayout.Separator();
             EditorGUILayout.Separator();
             
             // renderer list
             using (new EditorGUILayout.VerticalScope("box"))
             {
                 EditorGUILayout.LabelField("Renderers", new GUIStyle("label"));
-                for(int i=0; i < _materialStatusListList.arraySize; i++)
+                for(int ri=0; ri < _renderersProp.arraySize; ri++)
                 {
-                    
-                    _materialStatusList = _materialStatusListList.GetArrayElementAtIndex(i);
+                    var rendererProp = _renderersProp.GetArrayElementAtIndex(ri);
+                    var (rendererKeysProp, matStatusSDictWrapperValuesProp ) = SerializedDictionaryUtil.GetKeyValueListSerializedProperty(_materialStatusSDictSDict);
                     using (new EditorGUILayout.VerticalScope("box"))
                     {
-                        RendererGUI(_materialStatusList, i);
+                        RendererGUI(ri, rendererProp, rendererKeysProp, matStatusSDictWrapperValuesProp);
                     }
                     EditorGUILayout.Separator();
                 }
                 // Add Renderer button
                 if (GUILayout.Button("+"))
                 {
-                    var matStatusList = new MaterialStatusList();
-                    mg.MaterialStatusListList.Add(matStatusList);
-                    EditorUtility.SetDirty(mg);
-                    serializedObject.ApplyModifiedProperties();
+                    Target.Renderers.Add(null);
+                    EditorUtility.SetDirty(Target);
+                    serializedObject.Update();
                 }
             }
         }
         
         // ri = renderer index
-        private void RendererGUI(SerializedProperty listlistProp, int ri)
+        private void RendererGUI(int ri, SerializedProperty rendererProp, SerializedProperty rendererKeysProp, SerializedProperty matStatusSDictWrapperListProps)
         {
-            var mg = (MaterialGroups)target;
-            _materialStatues = listlistProp.FindPropertyRelative("_materialStatuses");
-            _renderer = listlistProp.FindPropertyRelative("_renderer");
+            var currentRenderer = rendererProp.objectReferenceValue as Renderer;
             
             using (new GUILayout.HorizontalScope())
             {
                 using (var change = new EditorGUI.ChangeCheckScope())
                 {
-                    EditorGUILayout.ObjectField(_renderer);
+                    EditorGUILayout.PropertyField(rendererProp, new GUIContent("Renderer"));
                     if (change.changed)
                     {
-                        serializedObject.ApplyModifiedProperties();
-                        if (_renderer.objectReferenceValue != null)
+                        var newRenderer = rendererProp.objectReferenceValue as Renderer;
+                        if (newRenderer == null)
                         {
-                            var ren = (Renderer)_renderer.objectReferenceValue;
-                            mg.MaterialStatusListList[ri].Renderer = ren;
-                            mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
-                            for(int mi = 0; mi < ren.sharedMaterials.Length; mi++)
+                            if (currentRenderer != null)
                             {
-                                var mat = ren.sharedMaterials[mi];
-                                var matStatus = new MaterialStatus();
-                                matStatus.Material = mat;
-                                matStatus.IsTarget = true;
-                                mg.MaterialStatusListList[ri].MaterialStatuses.Add(matStatus);
+                                Target.MaterialStatusDictDict.Remove(currentRenderer);
                             }
-                            Debug.Log("Added" + ren.sharedMaterials.Length);
                         }
                         else
                         {
-                            mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
+                            if (Target.MaterialStatusDictDict.ContainsKey(newRenderer))
+                            {
+                                Debug.LogWarning($"this renderer is already added to MaterialGroups {target.name}. so skipped.");
+                            }
+                            else
+                            {
+                                if (currentRenderer != null)
+                                {
+                                    Target.MaterialStatusDictDict.Remove(currentRenderer);
+                                }
+                                var materialStatusDictWrapperToAdd = new MaterialStatusDictWrapper();
+
+                                foreach (var mat in newRenderer.sharedMaterials)
+                                {
+                                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
+                                    {
+                                        // failed to add
+                                        Debug.LogWarning($"MaterialGroups: Failed to add material to MaterialStatusDict {target.name}");
+                                    }
+                                }
+                                Target.MaterialStatusDictDict.TryAdd(newRenderer, materialStatusDictWrapperToAdd);
+                                Debug.Log($"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroups of {target.name}");
+                            }
                         }
+                        Target.Renderers[ri] = newRenderer;
+                        EditorUtility.SetDirty(Target);
                         serializedObject.Update();
 
                     }
                 }
                 if(GUILayout.Button("-", GUILayout.Width(25)))
                 {
-                    mg.MaterialStatusListList[ri].MaterialStatuses.Clear();
-                    mg.MaterialStatusListList[ri].Renderer = null;
-                    mg.MaterialStatusListList.RemoveAt(ri);
-                    EditorUtility.SetDirty(mg);
+                    if (currentRenderer != null)
+                    {
+                        Target.MaterialStatusDictDict.Remove(currentRenderer);
+                    }
+                    Target.Renderers.RemoveAt(ri);
+                    EditorUtility.SetDirty(Target);
                     serializedObject.Update();
                     return;
                 }
             }
 
-            var renderer = mg.MaterialStatusListList[ri].Renderer;
-            if(renderer == null) return;
-
-            var mats = renderer.sharedMaterials;
+            currentRenderer = rendererProp.objectReferenceValue as Renderer;
+            if(currentRenderer == null) return;
             
             EditorGUI.indentLevel++;
-            for (int mi = 0; mi < _materialStatues.arraySize; mi++)
+            var hasValue = Target.MaterialStatusDictDict.TryGetValue(currentRenderer, out var materialStatusDictWrapper);
+            if (hasValue)
             {
-                int index = mg.GetIndex(ri, mi);
-                var mat = mats[mi];
-                SerializedProperty matStatusProp = _materialStatues.GetArrayElementAtIndex(mi);
+                var index = Target.MaterialStatusDictWrapperSDict.Keys.IndexOf(currentRenderer);
+                var (_, materialStatusSDictWrapperProp) =
+                    SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(index, rendererKeysProp, matStatusSDictWrapperListProps);
+                var (matListProp, isTargetListProp) = GetSerializedPropertyFrom(materialStatusSDictWrapperProp);
                 
-                SerializedProperty matProp = matStatusProp.FindPropertyRelative("_material");
-                SerializedProperty isTargetProp = matStatusProp.FindPropertyRelative("_isTarget");
-                using (new EditorGUILayout.HorizontalScope())
+                // foreachで回すと、要素の変更時にエラーが出るので、forで回す
+                // 今回ここでは要素数を変えないため、index out of rangeは起きない
+                for (int mi = 0; mi < materialStatusDictWrapper.MaterialStatusDict.Count; mi++)
                 {
-                    using (var change = new EditorGUI.ChangeCheckScope())
-                    {
-                        EditorGUILayout.LabelField("Apply", GUILayout.Width(60));
-                        EditorGUILayout.PropertyField(isTargetProp, label:new GUIContent());
-                        if (change.changed)
-                        {
-                            serializedObject.ApplyModifiedProperties();
-                        }
-                    }
+                    var (materialProp, isTargetProp) =
+                        SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(mi, matListProp, isTargetListProp);
 
-                    using (new EditorGUI.DisabledScope())
-                    {
-                        EditorGUILayout.PropertyField(matProp, label:new GUIContent());
-                    }
+                    MaterialGUI(materialProp, isTargetProp, ref materialStatusDictWrapper);
                 }
             }
-
-
+            else
+            {
+                Debug.LogError("Renderer is not found in MaterialGroups. This should not happen. Data may be corrupted.");
+            }
             EditorGUI.indentLevel--;
+        }
+
+        private void MaterialGUI(SerializedProperty materialProp, SerializedProperty isTarget, ref MaterialStatusDictWrapper materialStatusDictWrapper)
+        {
+            // Caution: 要素数が変わるとエラーが出るので、要素数を変えないようにする
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (var change = new EditorGUI.ChangeCheckScope())
+                {
+                    EditorGUILayout.PropertyField(isTarget, Styles.IsTargetLabel);
+                    if (change.changed)
+                    {
+                        serializedObject.ApplyModifiedProperties();
+                        EditorUtility.SetDirty(Target);
+                    }
+                }
+
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    EditorGUILayout.PropertyField(materialProp, Styles.MaterialLabel);
+                }
+            }
+        }
+        
+        // utils
+        private static (SerializedProperty keyMaterialListProp, SerializedProperty valueIsTargetListProp) GetSerializedPropertyFrom(SerializedProperty materialStatusSDictWrapperProp)
+        {
+            if (materialStatusSDictWrapperProp == null)
+                throw new NullReferenceException("materialStatusSDictWrapperProp is null");
+            var materialStatusSDictProp = materialStatusSDictWrapperProp.FindPropertyRelative("_materialStatusDict");
+            if (materialStatusSDictProp == null) throw new NullReferenceException("materialStatusSDictProp is null");
+            return SerializedDictionaryUtil.GetKeyValueListSerializedProperty(materialStatusSDictProp);
         }
     }
 }
