@@ -4,64 +4,6 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
-
-    [Serializable]
-    public class MaterialStatus
-    {
-        public Material Material
-        {
-            get => _material;
-            set => _material = value;
-        }
-        [SerializeField] private Material _material = null;
-
-        public bool IsTarget
-        {
-            get => _isTarget;
-            set => _isTarget = value;
-        }
-        [SerializeField] private bool _isTarget = false;
-
-        public BakedMaterialProperty Preset
-        {
-            get => _preset;
-            set => _preset = value;
-        }
-        [SerializeField] private BakedMaterialProperty _preset = null;
-
-        public MaterialStatus() { }
-
-        public MaterialStatus(Material mat)
-        {
-            _material = mat;
-        }
-    }
-
-    [Serializable]
-    public class MaterialStatusList
-    {
-        public Renderer Renderer
-        {
-            get => _renderer;
-            set => _renderer = value;
-        }
-        [SerializeField] private Renderer _renderer = null;
-
-        public List<MaterialStatus> MaterialStatuses
-        {
-            get => _materialStatuses;
-            set => _materialStatuses = value;
-        }
-        [SerializeField] private List<MaterialStatus> _materialStatuses = new List<MaterialStatus>();
-
-        public MaterialStatusList(Renderer ren)
-        {
-            _renderer = ren;
-        }
-
-        public MaterialStatusList() { }
-    }
-
     [Serializable]
     public class MaterialStatusDictWrapper
     {
@@ -69,7 +11,6 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private SerializedDictionary<Material, bool> _materialStatusDict = new SerializedDictionary<Material, bool>();
     }
     
-    // [ExecuteAlways]
     public class MaterialGroup: MonoBehaviour
     {
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
