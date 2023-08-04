@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
@@ -33,6 +34,21 @@ namespace sui4.MaterialPropertyBaker
 
             for (var i = 0; i < _keys.Count; ++i)
                 _dictionary.Add(_keys[i], _values[i]);
+        }
+        
+
+    }
+
+    public class SerializedDictionaryUtil
+    {
+        public static (SerializedProperty keyListProp, SerializedProperty valueListProp) GetKeyValueListSerializedProperty(SerializedProperty serializedDictProp)
+        {
+            return (serializedDictProp.FindPropertyRelative("_keys"), serializedDictProp.FindPropertyRelative("_values"));
+        }
+        
+        public static (SerializedProperty keyProp, SerializedProperty valueProp) GetKeyValueSerializedPropertyAt(int index, SerializedProperty keyListProp, SerializedProperty valueListProp)
+        {
+            return (keyListProp.GetArrayElementAtIndex(index), valueListProp.GetArrayElementAtIndex(index));
         }
     }
 }

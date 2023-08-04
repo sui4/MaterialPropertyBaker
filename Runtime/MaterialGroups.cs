@@ -79,10 +79,10 @@ namespace sui4.MaterialPropertyBaker
 
         public BakedMaterialProperty OverrideDefaultPreset
         {
-            get => _overrideOverrideDefaultPreset;
-            set => _overrideOverrideDefaultPreset = value;
+            get => _overrideDefaultPreset;
+            set => _overrideDefaultPreset = value;
         }
-        [SerializeField] private BakedMaterialProperty _overrideOverrideDefaultPreset;
+        [SerializeField] private BakedMaterialProperty _overrideDefaultPreset;
 
         public MaterialPropertyConfig MaterialPropertyConfig
         {
