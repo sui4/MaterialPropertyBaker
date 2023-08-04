@@ -7,7 +7,7 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private MaterialGroup _targetMaterialGroup;
         [SerializeField] private GameObject _targetParent;
 
-        private void OnValidate()
+        public void OnValidate()
         {
             if (_targetMaterialGroup == null || _targetParent == null) return;
 
