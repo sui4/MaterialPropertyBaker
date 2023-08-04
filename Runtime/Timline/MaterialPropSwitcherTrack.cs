@@ -6,7 +6,7 @@ using UnityEngine.Timeline;
 namespace sui4.MaterialPropertyBaker.Timeline
 {
     [TrackClipType(typeof(MaterialPropSwitcherClip))]
-    [TrackBindingType(typeof(MaterialGroups))]
+    [TrackBindingType(typeof(MaterialGroup))]
     [DisplayName("Material Property Baker/Material Prop Switcher Track")]
     public class MaterialPropSwitcherTrack : TrackAsset
     {

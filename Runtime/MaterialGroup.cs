@@ -70,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
     }
     
     // [ExecuteAlways]
-    public class MaterialGroups: MonoBehaviour
+    public class MaterialGroup: MonoBehaviour
     {
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         private MaterialPropertyBlock _mpb;

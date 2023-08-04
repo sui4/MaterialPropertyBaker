@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [CustomEditor(typeof(MaterialGroups))]
-    public class MaterialGroupsEditor: Editor
+    [CustomEditor(typeof(MaterialGroup))]
+    public class MaterialGroupEditor: Editor
     {
-        // serialized property of MaterialGroups(target)
+        // serialized property of MaterialGroup(target)
         private SerializedProperty _renderersProp;
         private SerializedProperty _materialStatusSDictSDict;
         private SerializedProperty _defaultProfile;
@@ -20,7 +20,7 @@ namespace sui4.MaterialPropertyBaker
             public static readonly GUIContent MaterialLabel = GUIContent.none;
             public static readonly GUIContent IsTargetLabel = new GUIContent("Apply");
         }
-        private MaterialGroups Target => (MaterialGroups)target;
+        private MaterialGroup Target => (MaterialGroup)target;
         private void OnEnable()
         {
             _defaultProfile = serializedObject.FindProperty("_overrideDefaultPreset");
@@ -39,10 +39,7 @@ namespace sui4.MaterialPropertyBaker
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                // EditorGUILayout.PropertyField(_materialStatusSDictSDict);
                 EditorGUILayout.PropertyField(_materialPropertyConfig, Styles.MaterialPropertyConfigLabel);
-                EditorGUILayout.Separator();
-                
                 EditorGUILayout.PropertyField(_defaultProfile, Styles.OverrideDefaultProfileLabel);
 
                 if (change.changed)
@@ -54,6 +51,7 @@ namespace sui4.MaterialPropertyBaker
             using (new EditorGUILayout.VerticalScope("box"))
             {
                 EditorGUILayout.LabelField("Renderers", new GUIStyle("label"));
+                EditorGUI.indentLevel++;
                 for(int ri=0; ri < _renderersProp.arraySize; ri++)
                 {
                     var rendererProp = _renderersProp.GetArrayElementAtIndex(ri);
@@ -64,6 +62,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                     EditorGUILayout.Separator();
                 }
+                EditorGUI.indentLevel--;
 
                 using (new GUILayout.HorizontalScope())
                 {
@@ -137,7 +136,7 @@ namespace sui4.MaterialPropertyBaker
             }
             else
             {
-                Debug.LogError("Renderer is not found in MaterialGroups. This should not happen. Data may be corrupted.");
+                Debug.LogError("Renderer is not found in MaterialGroup. This should not happen. Data may be corrupted.");
             }
             EditorGUI.indentLevel--;
         }
@@ -159,8 +158,8 @@ namespace sui4.MaterialPropertyBaker
             }
             else if (Target.MaterialStatusDictDict.ContainsKey(newRenderer))
             {
-                // すでにMaterialGroupsに追加されているRendererは追加しない
-                Debug.LogWarning($"this renderer is already added to MaterialGroups {target.name}. so skipped.");
+                // すでにMaterialGroupに追加されているRendererは追加しない
+                Debug.LogWarning($"this renderer is already added to MaterialGroup {target.name}. so skipped.");
                 return;
             }
             else
@@ -176,17 +175,17 @@ namespace sui4.MaterialPropertyBaker
                     if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
                     {
                         // failed to add
-                        Debug.LogWarning($"MaterialGroups: Failed to add material to MaterialStatusDict {target.name}");
+                        Debug.LogWarning($"MaterialGroup: Failed to add material to MaterialStatusDict {target.name}");
                     }
                 }
 
                 if (!Target.MaterialStatusDictDict.TryAdd(newRenderer, materialStatusDictWrapperToAdd))
                 {
-                    Debug.LogWarning($"MaterialGroups: Failed to add {newRenderer.name} to MaterialGroups {target.name}");
+                    Debug.LogWarning($"MaterialGroup: Failed to add {newRenderer.name} to MaterialGroup {target.name}");
                 }
                 else
                 {
-                    Debug.Log($"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroups of {target.name}");
+                    Debug.Log($"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroup of {target.name}");
                 }
                 Target.Renderers[ri] = newRenderer;
             }

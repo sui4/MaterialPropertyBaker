@@ -6,7 +6,7 @@ namespace sui4.MaterialPropertyBaker
     [ExecuteAlways]
     public class MaterialPresetViewer: MonoBehaviour
     {
-        [SerializeField] private MaterialGroups _materialGroups;
+        [SerializeField] private MaterialGroup _materialGroup;
         
         public List<BakedMaterialProperty> Presets
         {
@@ -27,13 +27,13 @@ namespace sui4.MaterialPropertyBaker
         {
             if (preset == null) return;
             preset.UpdateShaderID();
-            _materialGroups.SetPropertyBlock(preset.MaterialProps);
+            _materialGroup.SetPropertyBlock(preset.MaterialProps);
         }
 
 
         public void ResetView()
         {
-            _materialGroups.ResetDefaultPropertyBlock();
+            _materialGroup.ResetDefaultPropertyBlock();
         }
         
     }

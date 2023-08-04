@@ -30,8 +30,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
             set => _parentTrack = value;
         }
         private MaterialPropSwitcherTrack _parentTrack;
-        public MaterialGroups BindingMaterialGroups => _bindingMaterialGroups;
-        private MaterialGroups _bindingMaterialGroups;
+        public MaterialGroup BindingMaterialGroup => _bindingMaterialGroup;
+        private MaterialGroup _bindingMaterialGroup;
         
         public bool Editable
         {
@@ -75,8 +75,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     var binding = playableDirector.GetGenericBinding(track);
                     if (binding != null)
                     {
-                        var materialGroups = binding as MaterialGroups;
-                        _bindingMaterialGroups = materialGroups;
+                        var materialGroups = binding as MaterialGroup;
+                        _bindingMaterialGroup = materialGroups;
                         var config = materialGroups == null ? null : materialGroups.MaterialPropertyConfig;
                         if (config != null)
                         {

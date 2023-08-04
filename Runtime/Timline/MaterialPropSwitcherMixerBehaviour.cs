@@ -6,7 +6,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 {
     public class MaterialPropSwitcherMixerBehaviour : PlayableBehaviour
     {
-        private MaterialGroups _trackBinding;
+        private MaterialGroup _trackBinding;
         public MaterialPropSwitcherTrack ParentSwitcherTrack;
 
         private Dictionary<int, Color> _cMap = new Dictionary<int, Color>();
@@ -15,7 +15,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private MaterialProps _matProps;
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            _trackBinding = playerData as MaterialGroups;
+            _trackBinding = playerData as MaterialGroup;
             if (_trackBinding == null)
                 return;
 

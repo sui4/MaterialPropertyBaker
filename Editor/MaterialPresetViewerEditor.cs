@@ -6,11 +6,11 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(MaterialPresetViewer))]
     public class MaterialPresetViewerEditor: Editor
     {
-        private SerializedProperty _materialGroups;
+        private SerializedProperty _materialGroup;
         private SerializedProperty _presets;
         private void OnEnable()
         {
-            _materialGroups = serializedObject.FindProperty("_materialGroups");
+            _materialGroup = serializedObject.FindProperty("_materialGroup");
             _presets = serializedObject.FindProperty("_presets");
         }
         
@@ -26,7 +26,7 @@ namespace sui4.MaterialPropertyBaker
 
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(_materialGroups);
+                EditorGUILayout.PropertyField(_materialGroup);
                 if (change.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
