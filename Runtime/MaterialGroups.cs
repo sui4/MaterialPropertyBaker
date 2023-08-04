@@ -102,7 +102,7 @@ namespace sui4.MaterialPropertyBaker
                 Renderers.Add(null);
         }
 
-        private void OnValidate()
+        public void OnValidate()
         {
             if(Renderers.Count == 0)
                 Renderers.Add(null);

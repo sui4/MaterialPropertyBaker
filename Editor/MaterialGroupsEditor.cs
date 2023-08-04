@@ -87,43 +87,8 @@ namespace sui4.MaterialPropertyBaker
                     if (change.changed)
                     {
                         var newRenderer = rendererProp.objectReferenceValue as Renderer;
-                        if (newRenderer == null)
-                        {
-                            if (currentRenderer != null)
-                            {
-                                Target.MaterialStatusDictDict.Remove(currentRenderer);
-                            }
-                        }
-                        else
-                        {
-                            if (Target.MaterialStatusDictDict.ContainsKey(newRenderer))
-                            {
-                                Debug.LogWarning($"this renderer is already added to MaterialGroups {target.name}. so skipped.");
-                            }
-                            else
-                            {
-                                if (currentRenderer != null)
-                                {
-                                    Target.MaterialStatusDictDict.Remove(currentRenderer);
-                                }
-                                var materialStatusDictWrapperToAdd = new MaterialStatusDictWrapper();
-
-                                foreach (var mat in newRenderer.sharedMaterials)
-                                {
-                                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
-                                    {
-                                        // failed to add
-                                        Debug.LogWarning($"MaterialGroups: Failed to add material to MaterialStatusDict {target.name}");
-                                    }
-                                }
-                                Target.MaterialStatusDictDict.TryAdd(newRenderer, materialStatusDictWrapperToAdd);
-                                Debug.Log($"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroups of {target.name}");
-                            }
-                        }
-                        Target.Renderers[ri] = newRenderer;
-                        EditorUtility.SetDirty(Target);
-                        serializedObject.Update();
-
+                        OnRendererChanging(currentRenderer, newRenderer, ri);
+                        Target.OnValidate();
                     }
                 }
                 if(GUILayout.Button("-", GUILayout.Width(25)))
@@ -166,6 +131,57 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogError("Renderer is not found in MaterialGroups. This should not happen. Data may be corrupted.");
             }
             EditorGUI.indentLevel--;
+        }
+
+        private void OnRendererChanging(Renderer currentRenderer, Renderer newRenderer, int ri)
+        {
+            if (currentRenderer == newRenderer)
+            {
+                Target.OnValidate();
+                return;
+            }
+            
+            // when currentRenderer != newRenderer
+            if (newRenderer == null)
+            {
+                // currentRenderer != newRendererなので、currentRendererはnullではない
+                Target.MaterialStatusDictDict.Remove(currentRenderer);
+                Target.Renderers[ri] = newRenderer;
+            }
+            else if (Target.MaterialStatusDictDict.ContainsKey(newRenderer))
+            {
+                // すでにMaterialGroupsに追加されているRendererは追加しない
+                Debug.LogWarning($"this renderer is already added to MaterialGroups {target.name}. so skipped.");
+            }
+            else
+            {
+                if (currentRenderer != null)
+                {
+                    Target.MaterialStatusDictDict.Remove(currentRenderer);
+                }
+                var materialStatusDictWrapperToAdd = new MaterialStatusDictWrapper();
+
+                foreach (var mat in newRenderer.sharedMaterials)
+                {
+                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
+                    {
+                        // failed to add
+                        Debug.LogWarning($"MaterialGroups: Failed to add material to MaterialStatusDict {target.name}");
+                    }
+                }
+
+                if (!Target.MaterialStatusDictDict.TryAdd(newRenderer, materialStatusDictWrapperToAdd))
+                {
+                    Debug.LogWarning($"MaterialGroups: Failed to add {newRenderer.name} to MaterialGroups {target.name}");
+                }
+                else
+                {
+                    Debug.Log($"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroups of {target.name}");
+                }
+                Target.Renderers[ri] = newRenderer;
+            }
+            EditorUtility.SetDirty(Target);
+            serializedObject.Update();
         }
 
         private void MaterialGUI(SerializedProperty materialProp, SerializedProperty isTarget)
