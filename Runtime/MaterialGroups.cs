@@ -130,12 +130,11 @@ namespace sui4.MaterialPropertyBaker
                         {
                             _mpb = new MaterialPropertyBlock();
                         }
+                        // property blockに値をセットし、rendererにproperty blockをセットする
+                        Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
+                        renderer.SetPropertyBlock(_mpb, mi);
                     }
-                    // property blockに値をセットし、rendererにproperty blockをセットする
-                    Utils.UpdatePropertyBlockFromProps(ref _mpb, materialProps);
-                    renderer.SetPropertyBlock(_mpb, mi);
                 }
-
             }
         }
 
@@ -159,10 +158,10 @@ namespace sui4.MaterialPropertyBaker
                         {
                             _mpb = new MaterialPropertyBlock();
                         }
+                        // property blockに値をセットし、rendererにproperty blockをセットする
+                        Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
+                        renderer.SetPropertyBlock(_mpb, mi);
                     }
-                    // property blockに値をセットし、rendererにproperty blockをセットする
-                    Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
-                    renderer.SetPropertyBlock(_mpb, mi);
                 }
             }
         }
