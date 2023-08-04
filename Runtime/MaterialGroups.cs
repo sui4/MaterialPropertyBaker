@@ -189,9 +189,9 @@ namespace sui4.MaterialPropertyBaker
 
         public void ResetDefaultPropertyBlock()
         {
-            if (_overrideOverrideDefaultPreset)
+            if (_overrideDefaultPreset)
             {
-                SetPropertyBlock(_overrideOverrideDefaultPreset.MaterialProps);
+                SetPropertyBlock(_overrideDefaultPreset.MaterialProps);
             }
             else
             {
