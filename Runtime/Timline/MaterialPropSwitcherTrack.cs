@@ -10,7 +10,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
     [DisplayName("Material Property Baker/Material Prop Switcher Track")]
     public class MaterialPropSwitcherTrack : TrackAsset
     {
-
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
             var mixer = ScriptPlayable<MaterialPropSwitcherMixerBehaviour>.Create(graph, inputCount);

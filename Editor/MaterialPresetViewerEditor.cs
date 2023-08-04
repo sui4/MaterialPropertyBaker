@@ -4,16 +4,17 @@ using UnityEngine;
 namespace sui4.MaterialPropertyBaker
 {
     [CustomEditor(typeof(MaterialPresetViewer))]
-    public class MaterialPresetViewerEditor: Editor
+    public class MaterialPresetViewerEditor : Editor
     {
         private SerializedProperty _materialGroup;
         private SerializedProperty _presets;
+
         private void OnEnable()
         {
             _materialGroup = serializedObject.FindProperty("_materialGroup");
             _presets = serializedObject.FindProperty("_presets");
         }
-        
+
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
@@ -21,7 +22,7 @@ namespace sui4.MaterialPropertyBaker
             var viewer = (MaterialPresetViewer)target;
             if (viewer == null)
                 return;
-            
+
             serializedObject.Update();
 
             using (var change = new EditorGUI.ChangeCheckScope())
@@ -46,7 +47,7 @@ namespace sui4.MaterialPropertyBaker
                         serializedObject.Update();
                     }
                 }
-                
+
                 EditorGUILayout.Separator();
 
                 EditorGUI.indentLevel++;
@@ -71,7 +72,7 @@ namespace sui4.MaterialPropertyBaker
                         if (GUILayout.Button("Apply"))
                         {
                             var preset = (BakedMaterialProperty)presetProp.objectReferenceValue;
-                            if(preset == null)
+                            if (preset == null)
                                 continue;
                             preset.UpdateShaderID();
                             viewer.ApplyPreset(preset);
@@ -87,6 +88,7 @@ namespace sui4.MaterialPropertyBaker
                         GUI.backgroundColor = tmp;
                     }
                 }
+
                 EditorGUI.indentLevel--;
             }
 
@@ -94,7 +96,6 @@ namespace sui4.MaterialPropertyBaker
             {
                 viewer.ResetView();
             }
-                
         }
     }
 }

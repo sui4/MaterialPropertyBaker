@@ -5,7 +5,7 @@ using UnityEngine;
 namespace sui4.MaterialPropertyBaker
 {
     [CustomEditor(typeof(MaterialPropertyConfig))]
-    public class MaterialPropertyConfigEditor: Editor
+    public class MaterialPropertyConfigEditor : Editor
     {
         private SerializedProperty _shaderName;
         private SerializedProperty _propertyNames;
@@ -17,8 +17,9 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _propertyEditable;
 
         private Vector2 _scrollPos = Vector2.zero;
-        
+
         private string _filterQuery = "";
+
         private void OnEnable()
         {
             if (target == null)
@@ -31,8 +32,8 @@ namespace sui4.MaterialPropertyBaker
 
         public override void OnInspectorGUI()
         {
-            if(target == null) return;
-            
+            if (target == null) return;
+
             serializedObject.Update();
             var sp = (MaterialPropertyConfig)target;
 
@@ -40,10 +41,10 @@ namespace sui4.MaterialPropertyBaker
             {
                 EditorGUILayout.PropertyField(_shaderName, new GUIContent("Shader Name"));
             }
-            
+
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                _filterQuery = EditorGUILayout.TextField("Filter by name",_filterQuery);
+                _filterQuery = EditorGUILayout.TextField("Filter by name", _filterQuery);
 
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -51,12 +52,13 @@ namespace sui4.MaterialPropertyBaker
                     EditorGUILayout.LabelField("Properties");
                     EditorGUILayout.LabelField("Types");
                 }
+
                 using (var scrollScope = new EditorGUILayout.ScrollViewScope(_scrollPos))
                 {
-                    _scrollPos = scrollScope.scrollPosition; 
+                    _scrollPos = scrollScope.scrollPosition;
                     for (int pi = 0; pi < _propertyNames.arraySize; pi++)
                     {
-                        if (string.IsNullOrEmpty(_filterQuery) || 
+                        if (string.IsNullOrEmpty(_filterQuery) ||
                             sp.PropertyNames[pi].IndexOf(_filterQuery, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             _propertyName = _propertyNames.GetArrayElementAtIndex(pi);
@@ -81,7 +83,6 @@ namespace sui4.MaterialPropertyBaker
                     serializedObject.ApplyModifiedProperties();
                 }
             }
-
         }
     }
 }

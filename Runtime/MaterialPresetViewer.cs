@@ -4,23 +4,20 @@ using UnityEngine;
 namespace sui4.MaterialPropertyBaker
 {
     [ExecuteAlways]
-    public class MaterialPresetViewer: MonoBehaviour
+    public class MaterialPresetViewer : MonoBehaviour
     {
         [SerializeField] private MaterialGroup _materialGroup;
-        
+        [SerializeField] private List<BakedMaterialProperty> _presets;
+
         public List<BakedMaterialProperty> Presets
         {
             get => _presets;
             set => _presets = value;
         }
-        [SerializeField] private List<BakedMaterialProperty> _presets;
 
         private void OnEnable()
         {
-            if (_presets == null)
-            {
-                _presets = new List<BakedMaterialProperty> { null };
-            }
+            if (_presets == null) _presets = new List<BakedMaterialProperty> { null };
         }
 
         public void ApplyPreset(BakedMaterialProperty preset)
@@ -35,6 +32,5 @@ namespace sui4.MaterialPropertyBaker
         {
             _materialGroup.ResetDefaultPropertyBlock();
         }
-        
     }
 }

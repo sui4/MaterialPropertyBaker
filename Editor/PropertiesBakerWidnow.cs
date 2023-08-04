@@ -8,23 +8,22 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
-    
     [EditorWindowTitle(title = "Material Property Baker")]
     public class MaterialPropsExporter : EditorWindow
     {
         [SerializeField] private List<Material> _targets = new List<Material>();
         [SerializeField] private List<BakedMaterialProperty> _presets = new List<BakedMaterialProperty>();
-        
-        private int _selected = 0; 
+
+        private int _selected = 0;
         private BakedMaterialPropertiesEditor _editor;
 
         private Vector2 _scrollPosition = Vector2.zero;
-        
+
         private Vector2 _scrollPositionSearched = Vector2.zero;
         private string _searchQuery = ""; // shader name
         private string _filterQuery = "";
 
-        private List<Material> _materials = new List<Material>(); 
+        private List<Material> _materials = new List<Material>();
 
         // [MenuItem("tools/Material Property Baker/Baker")]
         private static void Init()
@@ -49,18 +48,20 @@ namespace sui4.MaterialPropertyBaker
 
         private void OnDestroy()
         {
-            for(int i = 0; i < _presets.Count; i++)
+            for (int i = 0; i < _presets.Count; i++)
             {
                 var preset = _presets[i];
                 DestroyProfile(ref preset);
                 _presets[i] = null;
             }
+
             _presets.Clear();
         }
 
         #endregion // Lifecycle
 
         #region GUI
+
         private void OnGUI()
         {
             GUILayout.Label("MaterialProps Exporter", EditorStyles.boldLabel);
@@ -97,7 +98,7 @@ namespace sui4.MaterialPropertyBaker
                 _targets.Add(null);
                 _presets.Add(CreateInstance<BakedMaterialProperty>());
             }
-            
+
             EditorGUILayout.LabelField("Target Materials");
             for (int i = 0; i < _targets.Count; i++)
             {
@@ -110,20 +111,22 @@ namespace sui4.MaterialPropertyBaker
                         if (isCurrentSelected)
                         {
                             _selected = i; // Select a new item otherwise.
-                            Repaint();  // Force the editor window to repaint.
+                            Repaint(); // Force the editor window to repaint.
                         }
+
                         _targets[i] = (Material)EditorGUILayout.ObjectField(_targets[i], typeof(Material), true);
 
                         if (change.changed)
                         {
                             var prev = _presets[i];
-                            if(prev != null)
+                            if (prev != null)
                                 DestroyProfile(ref prev);
                             CreateProfile(_targets[i], out var preset);
                             _presets[i] = preset;
                         }
                     }
-                    using(new EditorGUI.DisabledScope(_targets.Count == 1))
+
+                    using (new EditorGUI.DisabledScope(_targets.Count == 1))
                     {
                         if (GUILayout.Button("X", GUILayout.Width(20)))
                         {
@@ -131,18 +134,19 @@ namespace sui4.MaterialPropertyBaker
                         }
                     }
                 }
+
                 // Check if the last layout control (our ObjectField) was clicked.
-                if (Event.current.type == EventType.MouseDown && GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+                if (Event.current.type == EventType.MouseDown &&
+                    GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
                 {
-                    _selected = i;  // Set selected to current index.
-                    Repaint();  // Force the editor window to repaint.
+                    _selected = i; // Set selected to current index.
+                    Repaint(); // Force the editor window to repaint.
                 }
             }
         }
 
         private void SelectedBakedPropertiesGUI(int selected)
         {
-            
             using (new EditorGUILayout.VerticalScope())
             {
                 //--- profile ---//
@@ -171,7 +175,7 @@ namespace sui4.MaterialPropertyBaker
         {
             if (_editor == null)
             {
-                if(preset == null)
+                if (preset == null)
                     return;
                 _editor = Editor.CreateEditor(preset) as BakedMaterialPropertiesEditor;
             }
@@ -179,7 +183,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 DestroyImmediate(_editor);
                 _editor = null;
-                if(preset == null)
+                if (preset == null)
                     return;
                 _editor = Editor.CreateEditor(preset) as BakedMaterialPropertiesEditor;
             }
@@ -194,17 +198,18 @@ namespace sui4.MaterialPropertyBaker
                 {
                     _editor.OnInspectorGUI();
                 }
+
                 EditorGUI.indentLevel--;
                 EditorGUILayout.EndScrollView();
-                        
+
                 Color tmp = GUI.backgroundColor;
                 GUI.backgroundColor = Color.green;
                 if (GUILayout.Button($"Export \"{material.name}\""))
                 {
                     ExportProfile(material, preset);
                 }
-                GUI.backgroundColor = tmp;
 
+                GUI.backgroundColor = tmp;
             }
         }
 
@@ -212,7 +217,7 @@ namespace sui4.MaterialPropertyBaker
         {
             //--- search material ---//
             _searchQuery = EditorGUILayout.TextField("Shader Name", _searchQuery);
-            
+
             if (GUILayout.Button("Search Material in Folder"))
             {
                 var absolutePath = EditorUtility.SaveFolderPanel("Select Folder", Application.dataPath, "");
@@ -224,19 +229,20 @@ namespace sui4.MaterialPropertyBaker
                 }
 
                 _materials = MaterialFinder.GetMaterialsByShaderNameInFolder(_searchQuery, relativePath);
-                
-                EditorUtility.DisplayDialog("Search Material", $"Found {_materials.Count} materials of {_searchQuery}", "OK");
+
+                EditorUtility.DisplayDialog("Search Material", $"Found {_materials.Count} materials of {_searchQuery}",
+                    "OK");
                 Debug.Log(_materials.Count);
             }
         }
-        
+
         private void SearchedMaterialListWithFilterGUI()
         {
             // search result
             using (new EditorGUILayout.VerticalScope(GUI.skin.box))
             {
                 EditorGUILayout.LabelField("Search Result");
-                
+
                 // Filter field
                 _filterQuery = EditorGUILayout.TextField("Filter", _filterQuery);
                 EditorGUILayout.Separator();
@@ -246,10 +252,11 @@ namespace sui4.MaterialPropertyBaker
                 foreach (var mat in _materials)
                 {
                     // Filter materials based on search query
-                    if (string.IsNullOrEmpty(_filterQuery) || mat.name.IndexOf(_filterQuery, StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (string.IsNullOrEmpty(_filterQuery) ||
+                        mat.name.IndexOf(_filterQuery, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         EditorGUILayout.BeginHorizontal();
-                        
+
                         // Add button to add material to target list
                         if (GUILayout.Button("Add", GUILayout.Width(50)))
                         {
@@ -257,15 +264,18 @@ namespace sui4.MaterialPropertyBaker
                             CreateProfile(mat, out var preset);
                             _presets.Add(preset);
                         }
+
                         // Use non-editable ObjectField to display and select materials
                         EditorGUILayout.LabelField(Utils.UnderscoresToSpaces(mat.name));
                         using (new EditorGUI.DisabledScope(true))
                         {
                             EditorGUILayout.ObjectField("", mat, typeof(Material), false);
                         }
+
                         EditorGUILayout.EndHorizontal();
                     }
                 }
+
                 EditorGUILayout.EndScrollView();
             }
         }
@@ -273,6 +283,7 @@ namespace sui4.MaterialPropertyBaker
         #endregion // GUI
 
         #region Export
+
         // 単体でExportする場合
         private bool ExportProfile(in Material targetMat, BakedMaterialProperty preset)
         {
@@ -281,17 +292,20 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogWarning($"Export BakedProperties: target material is null.: export skipped");
                 return false;
             }
+
             if (preset == null)
             {
                 CreateProfile(targetMat, out preset);
             }
+
             var assetName = $"MaterialProps_{targetMat.name}";
-            
+
             var profileToSave = Instantiate(preset);
-            
+
             EditorUtility.SetDirty(profileToSave);
             var defaultPath = Application.dataPath;
-            var path = EditorUtility.SaveFilePanelInProject("Save profile", assetName, "asset", "Save BakedProperties ScriptableObject", defaultPath);
+            var path = EditorUtility.SaveFilePanelInProject("Save profile", assetName, "asset",
+                "Save BakedProperties ScriptableObject", defaultPath);
             if (path.Length != 0)
             {
                 var fullPath = Path.Join(Application.dataPath, path.Replace("Assets/", "\\"));
@@ -305,6 +319,7 @@ namespace sui4.MaterialPropertyBaker
                         return false;
                     }
                 }
+
                 AssetDatabase.CreateAsset(profileToSave, path);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
@@ -314,14 +329,16 @@ namespace sui4.MaterialPropertyBaker
 
             return true;
         }
-        
+
         // path: Assets以下のパス
         // パスを指定してExportする場合
-        private bool ExportProfile(in Material targetMat, BakedMaterialProperty preset, string path, bool refresh = true)
+        private bool ExportProfile(in Material targetMat, BakedMaterialProperty preset, string path,
+            bool refresh = true)
         {
             if (string.IsNullOrEmpty(path))
             {
-                Debug.LogError($"Export BakedProperties: path is null or empty.: failed to export preset of{targetMat.name}");
+                Debug.LogError(
+                    $"Export BakedProperties: path is null or empty.: failed to export preset of{targetMat.name}");
                 return false;
             }
 
@@ -330,6 +347,7 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogWarning($"Export BakedProperties: target material is null.: export skipped");
                 return false;
             }
+
             if (preset == null)
             {
                 CreateProfile(targetMat, out preset);
@@ -366,10 +384,11 @@ namespace sui4.MaterialPropertyBaker
 
         public void ExportProfilesAll(List<Material> materials, List<BakedMaterialProperty> presets)
         {
-            var defaultPath = Application.dataPath; 
+            var defaultPath = Application.dataPath;
             var defaultFolderName = $"MaterialProfileData";
-            
-            string relativeFolderPath = EditorUtility.SaveFolderPanel("Select Folder to Save Profiles", defaultPath, defaultFolderName);
+
+            string relativeFolderPath =
+                EditorUtility.SaveFolderPanel("Select Folder to Save Profiles", defaultPath, defaultFolderName);
             var absoluteFolderPath = relativeFolderPath.Replace(Application.dataPath, "Assets");
             if (string.IsNullOrEmpty(absoluteFolderPath))
             {
@@ -378,7 +397,9 @@ namespace sui4.MaterialPropertyBaker
             }
 
             int skipped = 0, failed = 0, exported = 0;
-            if(EditorUtility.DisplayDialog("Export BakedProperties", $"Export BakedProperties Preset to {absoluteFolderPath}. すでに存在している同名のプリセットは上書きされますがよろしいですか？", "OK", "Cancel"))
+            if (EditorUtility.DisplayDialog("Export BakedProperties",
+                    $"Export BakedProperties Preset to {absoluteFolderPath}. すでに存在している同名のプリセットは上書きされますがよろしいですか？", "OK",
+                    "Cancel"))
             {
                 for (int i = 0; i < materials.Count; i++)
                 {
@@ -387,11 +408,13 @@ namespace sui4.MaterialPropertyBaker
                         skipped++;
                         continue;
                     }
+
                     var sucess = ExportProfile(materials[i], presets[i], absoluteFolderPath, false);
                     exported += sucess ? 1 : 0;
                     failed += sucess ? 0 : 1;
                 }
             }
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
@@ -410,6 +433,7 @@ namespace sui4.MaterialPropertyBaker
                 preset = null;
             }
         }
+
         private static void CreateProfile(Material mat, out BakedMaterialProperty preset)
         {
             preset = CreateInstance<BakedMaterialProperty>();
@@ -417,7 +441,7 @@ namespace sui4.MaterialPropertyBaker
             preset.ShaderName = mat.shader.name;
             preset.CreatePropsFromMaterial(mat);
         }
-    } 
+    }
 }
 
 #endif

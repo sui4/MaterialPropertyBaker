@@ -13,13 +13,13 @@ namespace sui4.MaterialPropertyBaker
             string[] guids = AssetDatabase.FindAssets("t:Material");
             return GetMaterialsByShaderName(shaderName, guids);
         }
-        
+
         public static List<Material> GetMaterialsByShaderNameInFolder(string shaderName, string folderPath)
         {
             string[] guids = AssetDatabase.FindAssets("t:Material", new string[] { folderPath });
             return GetMaterialsByShaderName(shaderName, guids);
         }
-        
+
         public static List<Material> GetMaterialsByShaderName(in string shaderName, in string[] guids)
         {
             List<Material> materialsWithShader = new List<Material>();
@@ -32,19 +32,17 @@ namespace sui4.MaterialPropertyBaker
 
                 if (filter)
                 {
-                    if(material.shader.name == shaderName)
+                    if (material.shader.name == shaderName)
                         materialsWithShader.Add(material);
                 }
                 else
                 {
                     materialsWithShader.Add(material);
                 }
-
             }
+
             return materialsWithShader;
         }
-
-
     }
 }
 

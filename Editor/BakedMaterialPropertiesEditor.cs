@@ -16,6 +16,7 @@ namespace sui4.MaterialPropertyBaker
 
 
         private MaterialPropertyConfig _materialPropertyConfig;
+
         public MaterialPropertyConfig MaterialPropertyConfig
         {
             get => _materialPropertyConfig;
@@ -38,9 +39,9 @@ namespace sui4.MaterialPropertyBaker
             serializedObject.Update();
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.LabelField("Shader" ,_shaderName.stringValue, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Shader", _shaderName.stringValue, EditorStyles.boldLabel);
                 EditorGUILayout.Separator();
-                
+
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
                     EditorGUILayout.LabelField("Colors", EditorStyles.boldLabel);
@@ -48,6 +49,7 @@ namespace sui4.MaterialPropertyBaker
                     PropsGUI(_colors, ShaderPropertyType.Color, true);
                     EditorGUI.indentLevel--;
                 }
+
                 EditorGUILayout.Separator();
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
@@ -56,7 +58,7 @@ namespace sui4.MaterialPropertyBaker
                     PropsGUI(_floats, ShaderPropertyType.Float);
                     EditorGUI.indentLevel--;
                 }
-                
+
                 // EditorGUILayout.Separator();
                 // if(_materialPropertyConfig != null)
                 // {
@@ -68,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
                 //     }
                 //     GUI.backgroundColor = tmp;
                 // }
-                  
+
                 if (change.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
@@ -80,6 +82,7 @@ namespace sui4.MaterialPropertyBaker
 
         private SerializedProperty _property;
         private SerializedProperty _value;
+
         private void PropsGUI(SerializedProperty props, ShaderPropertyType type, bool isColor = false)
         {
             for (int pi = 0; pi < props.arraySize; pi++)
@@ -87,20 +90,22 @@ namespace sui4.MaterialPropertyBaker
                 SerializedProperty prop = props.GetArrayElementAtIndex(pi);
                 _property = prop.FindPropertyRelative("_name");
                 _value = prop.FindPropertyRelative("_value");
-                
+
                 var label = Utils.UnderscoresToSpaces(_property.stringValue);
                 label = label.Length == 0 ? " " : label;
-                
+
                 using (new GUILayout.HorizontalScope())
                 {
                     if (isColor)
                     {
-                        _value.colorValue = EditorGUILayout.ColorField(new GUIContent(label), _value.colorValue, true, true, true);
+                        _value.colorValue = EditorGUILayout.ColorField(new GUIContent(label), _value.colorValue, true,
+                            true, true);
                     }
                     else
                     {
                         EditorGUILayout.PropertyField(_value, new GUIContent(label));
                     }
+
                     // remove button
                     var tmp = GUI.backgroundColor;
                     GUI.backgroundColor = Color.red;
@@ -108,9 +113,11 @@ namespace sui4.MaterialPropertyBaker
                     {
                         props.DeleteArrayElementAtIndex(pi);
                     }
+
                     GUI.backgroundColor = tmp;
                 }
             }
+
             // add from shader properties
             if (_materialPropertyConfig != null)
             {
@@ -125,7 +132,7 @@ namespace sui4.MaterialPropertyBaker
         private void AddPropertyPopupGUI(SerializedProperty props, ShaderPropertyType spType, Type type = null)
         {
             var config = _materialPropertyConfig;
-            
+
             if (config == null)
                 return;
 
@@ -133,19 +140,20 @@ namespace sui4.MaterialPropertyBaker
 
             // 一致する型のプロパティを取得
             var propertySelectList = new List<string> { "Add Property" };
-            
-            for(int pi = 0; pi < config.PropertyNames.Count; pi++)
+
+            for (int pi = 0; pi < config.PropertyNames.Count; pi++)
             {
                 var pName = config.PropertyNames[pi];
                 var pType = config.PropertyTypes[pi];
                 // TODO: ShaderPropertyTypeと、MaterialPropsのTypeは1:1じゃない。Range, floatはともにfloatに対応する
                 // 型が一致、かつ、MaterialPropsに存在しない かつ editableなプロパティのみ追加
-                if (pType == spType && config.HasEditableProperty(pName) && !bp.MaterialProps.HasProperties(pName, pType))
+                if (pType == spType && config.HasEditableProperty(pName) &&
+                    !bp.MaterialProps.HasProperties(pName, pType))
                 {
                     propertySelectList.Add(pName);
                 }
             }
-            
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 EditorGUILayout.Separator();
@@ -154,8 +162,8 @@ namespace sui4.MaterialPropertyBaker
                     var selected = EditorGUILayout.Popup(0, propertySelectList.ToArray());
                     if (change.changed)
                     {
-                        if(selected == 0) return;
-                        
+                        if (selected == 0) return;
+
                         var propName = propertySelectList[selected];
                         bp.MaterialProps.AddProperty(propName, spType);
                         serializedObject.Update();
@@ -163,6 +171,5 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        
     }
 }
