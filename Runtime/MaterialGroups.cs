@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -92,6 +90,7 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private MaterialPropertyConfig _materialPropertyConfig;
         
         public Dictionary<Renderer, MaterialStatusDictWrapper> MaterialStatusDictDict => _materialStatusDictDict.Dictionary;
+        public SerializedDictionary<Renderer, MaterialStatusDictWrapper> MaterialStatusDictWrapperSDict => _materialStatusDictDict;
         [SerializeField] private SerializedDictionary<Renderer, MaterialStatusDictWrapper> _materialStatusDictDict = new SerializedDictionary<Renderer, MaterialStatusDictWrapper>();
         
         public List<Renderer> Renderers => _renderers;

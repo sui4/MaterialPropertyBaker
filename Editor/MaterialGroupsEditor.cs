@@ -146,8 +146,9 @@ namespace sui4.MaterialPropertyBaker
             var hasValue = Target.MaterialStatusDictDict.TryGetValue(currentRenderer, out var materialStatusDictWrapper);
             if (hasValue)
             {
+                var index = Target.MaterialStatusDictWrapperSDict.Keys.IndexOf(currentRenderer);
                 var (_, materialStatusSDictWrapperProp) =
-                    SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(ri, rendererKeysProp, matStatusSDictWrapperListProps);
+                    SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(index, rendererKeysProp, matStatusSDictWrapperListProps);
                 var (matListProp, isTargetListProp) = GetSerializedPropertyFrom(materialStatusSDictWrapperProp);
                 
                 // foreachで回すと、要素の変更時にエラーが出るので、forで回す
@@ -177,8 +178,7 @@ namespace sui4.MaterialPropertyBaker
                     EditorGUILayout.PropertyField(isTarget, Styles.IsTargetLabel);
                     if (change.changed)
                     {
-                        materialStatusDictWrapper.MaterialStatusDict[(Material)materialProp.objectReferenceValue] = isTarget.boolValue;
-                        serializedObject.Update();
+                        serializedObject.ApplyModifiedProperties();
                         EditorUtility.SetDirty(Target);
                     }
                 }

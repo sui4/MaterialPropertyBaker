@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,12 +10,19 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class SerializedDictionary<TKey, TValue> : ISerializationCallbackReceiver
     {
+        public ReadOnlyCollection<TKey> Keys { get; }
         [SerializeField] private List<TKey> _keys = new List<TKey>();
+        public ReadOnlyCollection<TValue> Values { get; }
         [SerializeField] private List<TValue> _values = new List<TValue>();
 
+        public Dictionary<TKey, TValue> Dictionary => _dictionary;
         private readonly Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
 
-        public Dictionary<TKey, TValue> Dictionary => _dictionary;
+        public SerializedDictionary()
+        {
+            Keys = new ReadOnlyCollection<TKey>(_keys);
+            Values = new ReadOnlyCollection<TValue>(_values);
+        }
 
         public void OnBeforeSerialize()
         {
@@ -39,7 +47,7 @@ namespace sui4.MaterialPropertyBaker
 
     }
 
-    public class SerializedDictionaryUtil
+    public static class SerializedDictionaryUtil
     {
         public static (SerializedProperty keyListProp, SerializedProperty valueListProp) GetKeyValueListSerializedProperty(SerializedProperty serializedDictProp)
         {
