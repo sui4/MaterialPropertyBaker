@@ -100,13 +100,41 @@ namespace sui4.MaterialPropertyBaker
             _mpb = new MaterialPropertyBlock();
             if(Renderers.Count == 0)
                 Renderers.Add(null);
-            Debug.Log($"{Renderers.Count}");
         }
 
         private void OnValidate()
         {
             if(Renderers.Count == 0)
                 Renderers.Add(null);
+            foreach (var renderer in Renderers)
+            {
+                if (renderer == null)
+                    continue;
+                MaterialStatusDictDict.TryAdd(renderer, new MaterialStatusDictWrapper());
+                
+                var materialStatusDictWrapper = MaterialStatusDictDict[renderer];
+                if (materialStatusDictWrapper.MaterialStatusDict.Count != renderer.sharedMaterials.Length)
+                {
+                    // materialが減ってれば削除する
+                    var materialKeysToRemove = new List<Material>();
+                    foreach (var material in materialStatusDictWrapper.MaterialStatusDict.Keys)
+                    {
+                        if (!Array.Exists(renderer.sharedMaterials, m => m == material))
+                        {
+                            materialKeysToRemove.Add(material);
+                        }
+                    }
+                    foreach (var mat in materialKeysToRemove)
+                    {
+                        materialStatusDictWrapper.MaterialStatusDict.Remove(mat);
+                    }
+                    // materialが増えてれば追加する
+                    foreach (var material in renderer.sharedMaterials)
+                    {
+                        materialStatusDictWrapper.MaterialStatusDict.TryAdd(material, true);
+                    }
+                }
+            }
         }
 
         public void SetPropertyBlock(in MaterialProps materialProps)
