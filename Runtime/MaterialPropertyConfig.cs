@@ -7,23 +7,24 @@ namespace sui4.MaterialPropertyBaker
 {
     [Serializable]
     // Material Propsで扱うプロパティをユーザが選択的に追加できるように、shaderのプロパティを保持するクラス
-    public class MaterialPropertyConfig: ScriptableObject
+    public class MaterialPropertyConfig : ScriptableObject
     {
+        [SerializeField] private string _shaderName;
+        [SerializeField] private List<string> _propertyNames = new();
+        [SerializeField] private List<ShaderPropertyType> _propertyTypes = new();
+        [SerializeField] private List<bool> _editable = new();
+
         public string ShaderName
         {
             get => _shaderName;
             set => _shaderName = value;
         }
-        [SerializeField] private string _shaderName;
 
         public List<string> PropertyNames => _propertyNames;
-        [SerializeField] private List<string> _propertyNames = new List<string>();
 
         public List<ShaderPropertyType> PropertyTypes => _propertyTypes;
-        [SerializeField] private List<ShaderPropertyType> _propertyTypes = new List<ShaderPropertyType>();
 
         public List<bool> Editable => _editable;
-        [SerializeField] private List<bool> _editable = new List<bool>();
 
         public bool HasEditableProperty(string propName)
         {
@@ -32,27 +33,29 @@ namespace sui4.MaterialPropertyBaker
                 return false;
             return Editable[index];
         }
-        
+
         public void LoadProperties(Material mat)
         {
-            if(mat == null)
+            if (mat == null)
             {
                 Debug.LogError("Material is null");
                 return;
             }
+
             var shader = mat.shader;
             if (shader == null)
             {
                 Debug.LogError($"Shader of Material`{mat.name}` not found");
                 return;
             }
+
             LoadProperties(shader);
         }
 
         public void LoadProperties(string shaderName)
         {
             var shader = Shader.Find(shaderName);
-            if(shader == null)
+            if (shader == null)
             {
                 Debug.LogError("Shader is null");
                 return;
@@ -67,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
             _propertyTypes.Clear();
             _editable.Clear();
             _shaderName = shader.name;
-            for (int pi = 0; pi < shader.GetPropertyCount(); pi++)
+            for (var pi = 0; pi < shader.GetPropertyCount(); pi++)
             {
                 var propType = shader.GetPropertyType(pi);
                 var propName = shader.GetPropertyName(pi);
@@ -75,8 +78,8 @@ namespace sui4.MaterialPropertyBaker
                 _propertyTypes.Add(propType);
                 _editable.Add(false);
             }
+
             Debug.Log($"{_shaderName} has {_propertyNames.Count} properties");
         }
-        
     }
 }

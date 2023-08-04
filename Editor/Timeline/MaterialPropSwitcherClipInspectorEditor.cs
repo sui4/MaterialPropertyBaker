@@ -12,7 +12,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private SerializedProperty _presetRef;
         private SerializedProperty _editable;
         private SerializedProperty _props;
-        
+
         private BakedMaterialPropertiesEditor _editor;
         private MaterialPropSwitcherClip _targetClip;
 
@@ -21,7 +21,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void OnEnable()
         {
-            if(target == null)
+            if (target == null)
                 return;
             _targetClip = (MaterialPropSwitcherClip)target;
 
@@ -44,12 +44,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 _targetClip.Props = new MaterialProps();
             }
-            
+
             using (new EditorGUILayout.VerticalScope("box"))
             {
                 PresetRefGUI();
             }
-            
+
             EditorGUILayout.Separator();
 
             // Properties GUI
@@ -70,7 +70,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var tmp = GUI.backgroundColor;
             GUI.backgroundColor = Color.cyan;
             var label = _targetClip.PresetRef == null ? "Export" : "Save as";
-            if(GUILayout.Button(label))
+            if (GUILayout.Button(label))
             {
                 if (_targetClip.PresetRef != null)
                 {
@@ -81,9 +81,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     ExportProfile(_targetClip.Props);
                 }
             }
+
             GUI.backgroundColor = tmp;
         }
-        
+
         private void PresetRefGUI()
         {
             using (var changeCheck = new EditorGUI.ChangeCheckScope())
@@ -95,7 +96,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 {
                     EditorGUILayout.PropertyField(_editable, new GUIContent("Edit Preset"));
                 }
-                
+
                 if (changeCheck.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
@@ -104,10 +105,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     {
                         preset.UpdateShaderID();
                     }
-                    else if(_presetRefPrev != null)
+                    else if (_presetRefPrev != null)
                     {
-                        RenewValueFromPreset(_presetRefPrev); 
+                        RenewValueFromPreset(_presetRefPrev);
                     }
+
                     _presetRefPrev = preset;
                     EditorUtility.SetDirty(target);
 
@@ -143,23 +145,22 @@ namespace sui4.MaterialPropertyBaker.Timeline
                         EditorUtility.SetDirty(target);
                     }
                 }
-
             }
         }
 
         private void BakedPropertyGUI(BakedMaterialProperty bakedProperty)
         {
-            if(bakedProperty == null)
+            if (bakedProperty == null)
             {
                 EditorGUILayout.HelpBox("BakedProperties is null", MessageType.Error);
                 return;
             }
-            
+
             if (_editor == null)
             {
                 _editor = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperty);
             }
-            else if(_editor.target != bakedProperty)
+            else if (_editor.target != bakedProperty)
             {
                 DestroyImmediate(_editor);
                 _editor = null;
@@ -168,28 +169,29 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (_editor != null)
             {
-               _editor.OnInspectorGUI();
+                _editor.OnInspectorGUI();
                 EditorGUILayout.Separator();
             }
         }
-        
+
         #endregion //--- End GUI ---//
-        
+
         #region AssetsHandle
+
         //--- Property Assets Handle ---//
 
         private void RenewValueFromPreset(in BakedMaterialProperty presetRef)
         {
-            if(presetRef == null) return;
+            if (presetRef == null) return;
 
             _targetClip.Props.CopyValuesFromOther(presetRef.MaterialProps);
             Debug.Log($"BakedProperties renewed from Preset: {_targetClip.PresetRef.name}");
         }
-        
+
         private void ExportProfile(BakedMaterialProperty preset)
         {
             if (preset == null) return;
-            
+
             var assetName = target == null ? "defaultProfile" : $"BakedProperties_{target.name}";
 
             BakedMaterialProperty profileToSave = Instantiate(preset);
@@ -198,11 +200,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
             var defaultPath = Application.dataPath;
             var path = EditorUtility.SaveFilePanelInProject(
                 "Save profile",
-                assetName, 
+                assetName,
                 "asset",
                 "Save BakedProperties ScriptableObject",
                 defaultPath);
-            
+
             if (path.Length != 0)
             {
                 var fullPath = Path.Join(Application.dataPath, path.Replace("Assets/", "\\"));
@@ -211,6 +213,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     Debug.Log($"{GetType()}: delete existing: {fullPath}");
                     AssetDatabase.DeleteAsset(path);
                 }
+
                 AssetDatabase.CreateAsset(profileToSave, path);
                 _targetClip.PresetRef = profileToSave;
                 EditorUtility.SetDirty(target);
@@ -227,13 +230,12 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 return;
                 // throw new Exception("Failed to Export MaterialProps is null");
             }
-            
+
             var bakedProps = ScriptableObject.CreateInstance<BakedMaterialProperty>();
             bakedProps.MaterialProps.CopyValuesFromOther(props);
             ExportProfile(bakedProps);
         }
-        
+
         #endregion //--- End Property Assets Handle ---//
-        
     }
 }

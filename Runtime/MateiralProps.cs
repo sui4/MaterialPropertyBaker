@@ -9,28 +9,32 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialProps
     {
-        public List<MaterialProp<Color>> Colors
-        {
-            get => _colors;
-            set => _colors = value;
-        }
-        [SerializeField] private List<MaterialProp<Color>> _colors = new List<MaterialProp<Color>>();
+        [SerializeField] private List<MaterialProp<Color>> _colors = new();
+        [SerializeField] private List<MaterialProp<float>> _floats = new();
 
-        public List<MaterialProp<float>> Floats
+        public MaterialProps()
         {
-            get => _floats;
-            set => _floats = value;
         }
-        [SerializeField] private List<MaterialProp<float>> _floats = new List<MaterialProp<float>>();
 
-        public MaterialProps() { }
         public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f)
         {
             _colors.AddRange(c);
             _floats.AddRange(f);
             UpdateShaderID();
         }
-        
+
+        public List<MaterialProp<Color>> Colors
+        {
+            get => _colors;
+            set => _colors = value;
+        }
+
+        public List<MaterialProp<float>> Floats
+        {
+            get => _floats;
+            set => _floats = value;
+        }
+
         public bool IsEmpty()
         {
             return _colors.Count == 0 && _floats.Count == 0;
@@ -93,7 +97,7 @@ namespace sui4.MaterialPropertyBaker
             }
 
             return hasProp;
-        } 
+        }
 
         public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
         {
@@ -103,7 +107,7 @@ namespace sui4.MaterialPropertyBaker
             // Listになってる各MaterialPropがクラスのため、参照になっちゃう
             foreach (var colors in _colors)
             {
-                MaterialProp<Color> c = new MaterialProp<Color>
+                var c = new MaterialProp<Color>
                 {
                     Value = colors.Value,
                     Name = colors.Name,
@@ -111,9 +115,10 @@ namespace sui4.MaterialPropertyBaker
                 };
                 cList.Add(c);
             }
+
             foreach (var floats in _floats)
             {
-                MaterialProp<float> f = new MaterialProp<float>
+                var f = new MaterialProp<float>
                 {
                     Value = floats.Value,
                     Name = floats.Name,
@@ -130,43 +135,30 @@ namespace sui4.MaterialPropertyBaker
             _floats = outF;
         }
     }
-    
+
     // base class
     [Serializable]
     public class MaterialProp<T>
     {
-        [NonSerialized] public int ID;
-
         [SerializeField] private string _name;
         [SerializeField] private T _value;
-        
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                _name = value;
-                ID = Shader.PropertyToID(_name);
-            }
-        }
-        public T Value
-        {
-            get => _value;
-            set => _value = value;
-        }
-        
+        [NonSerialized] public int ID;
+
         public MaterialProp()
         {
             Name = "";
         }
+
         public MaterialProp(string propName)
         {
             Name = propName;
         }
-        public MaterialProp(string propName, T value) :this(propName)
+
+        public MaterialProp(string propName, T value) : this(propName)
         {
             Value = value;
         }
+
         public MaterialProp(string propName, Material mat) : this(propName)
         {
             Value = typeof(T) switch
@@ -179,10 +171,25 @@ namespace sui4.MaterialPropertyBaker
             };
         }
 
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                ID = Shader.PropertyToID(_name);
+            }
+        }
+
+        public T Value
+        {
+            get => _value;
+            set => _value = value;
+        }
+
         public void UpdateShaderID()
         {
             ID = Shader.PropertyToID(_name);
         }
     }
-
 }

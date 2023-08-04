@@ -4,23 +4,28 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [CustomEditor(typeof(MaterialGroups))]
-    public class MaterialGroupsEditor: Editor
+    [CustomEditor(typeof(MaterialGroup))]
+    public class MaterialGroupEditor : Editor
     {
-        // serialized property of MaterialGroups(target)
+        // serialized property of MaterialGroup(target)
         private SerializedProperty _renderersProp;
         private SerializedProperty _materialStatusSDictSDict;
         private SerializedProperty _defaultProfile;
         private SerializedProperty _materialPropertyConfig;
-        
+
         private static class Styles
         {
             public static readonly GUIContent MaterialPropertyConfigLabel = new GUIContent("Material Property Config");
-            public static readonly GUIContent OverrideDefaultProfileLabel = new GUIContent("Preset to Override Default");
+
+            public static readonly GUIContent
+                OverrideDefaultProfileLabel = new GUIContent("Preset to Override Default");
+
             public static readonly GUIContent MaterialLabel = GUIContent.none;
             public static readonly GUIContent IsTargetLabel = new GUIContent("Apply");
         }
-        private MaterialGroups Target => (MaterialGroups)target;
+
+        private MaterialGroup Target => (MaterialGroup)target;
+
         private void OnEnable()
         {
             _defaultProfile = serializedObject.FindProperty("_overrideDefaultPreset");
@@ -39,31 +44,34 @@ namespace sui4.MaterialPropertyBaker
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                // EditorGUILayout.PropertyField(_materialStatusSDictSDict);
                 EditorGUILayout.PropertyField(_materialPropertyConfig, Styles.MaterialPropertyConfigLabel);
-                EditorGUILayout.Separator();
-                
                 EditorGUILayout.PropertyField(_defaultProfile, Styles.OverrideDefaultProfileLabel);
 
                 if (change.changed)
                     serializedObject.ApplyModifiedProperties();
             }
+
             EditorGUILayout.Separator();
-            
+
             // renderer list
             using (new EditorGUILayout.VerticalScope("box"))
             {
                 EditorGUILayout.LabelField("Renderers", new GUIStyle("label"));
-                for(int ri=0; ri < _renderersProp.arraySize; ri++)
+                EditorGUI.indentLevel++;
+                for (int ri = 0; ri < _renderersProp.arraySize; ri++)
                 {
                     var rendererProp = _renderersProp.GetArrayElementAtIndex(ri);
-                    var (rendererKeysProp, matStatusSDictWrapperValuesProp ) = SerializedDictionaryUtil.GetKeyValueListSerializedProperty(_materialStatusSDictSDict);
+                    var (rendererKeysProp, matStatusSDictWrapperValuesProp) =
+                        SerializedDictionaryUtil.GetKeyValueListSerializedProperty(_materialStatusSDictSDict);
                     using (new EditorGUILayout.VerticalScope("box"))
                     {
                         RendererGUI(ri, rendererProp, rendererKeysProp, matStatusSDictWrapperValuesProp);
                     }
+
                     EditorGUILayout.Separator();
                 }
+
+                EditorGUI.indentLevel--;
 
                 using (new GUILayout.HorizontalScope())
                 {
@@ -71,6 +79,7 @@ namespace sui4.MaterialPropertyBaker
                     {
                         Target.OnValidate();
                     }
+
                     // Add Renderer button
                     if (GUILayout.Button("+"))
                     {
@@ -79,15 +88,15 @@ namespace sui4.MaterialPropertyBaker
                         serializedObject.Update();
                     }
                 }
-
             }
         }
-        
+
         // ri = renderer index
-        private void RendererGUI(int ri, SerializedProperty rendererProp, SerializedProperty rendererKeysProp, SerializedProperty matStatusSDictWrapperListProps)
+        private void RendererGUI(int ri, SerializedProperty rendererProp, SerializedProperty rendererKeysProp,
+            SerializedProperty matStatusSDictWrapperListProps)
         {
             var currentRenderer = rendererProp.objectReferenceValue as Renderer;
-            
+
             using (new GUILayout.HorizontalScope())
             {
                 using (var change = new EditorGUI.ChangeCheckScope())
@@ -100,12 +109,14 @@ namespace sui4.MaterialPropertyBaker
                         Target.OnValidate();
                     }
                 }
-                if(GUILayout.Button("-", GUILayout.Width(25)))
+
+                if (GUILayout.Button("-", GUILayout.Width(25)))
                 {
                     if (currentRenderer != null)
                     {
                         Target.MaterialStatusDictDict.Remove(currentRenderer);
                     }
+
                     Target.Renderers.RemoveAt(ri);
                     EditorUtility.SetDirty(Target);
                     serializedObject.Update();
@@ -114,17 +125,19 @@ namespace sui4.MaterialPropertyBaker
             }
 
             currentRenderer = rendererProp.objectReferenceValue as Renderer;
-            if(currentRenderer == null) return;
-            
+            if (currentRenderer == null) return;
+
             EditorGUI.indentLevel++;
-            var hasValue = Target.MaterialStatusDictDict.TryGetValue(currentRenderer, out var materialStatusDictWrapper);
+            var hasValue =
+                Target.MaterialStatusDictDict.TryGetValue(currentRenderer, out var materialStatusDictWrapper);
             if (hasValue)
             {
                 var index = Target.MaterialStatusDictWrapperSDict.Keys.IndexOf(currentRenderer);
                 var (_, materialStatusSDictWrapperProp) =
-                    SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(index, rendererKeysProp, matStatusSDictWrapperListProps);
+                    SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(index, rendererKeysProp,
+                        matStatusSDictWrapperListProps);
                 var (matListProp, isTargetListProp) = GetSerializedPropertyFrom(materialStatusSDictWrapperProp);
-                
+
                 // foreachで回すと、要素の変更時にエラーが出るので、forで回す
                 // 今回ここでは要素数を変えないため、index out of rangeは起きない
                 for (int mi = 0; mi < materialStatusDictWrapper.MaterialStatusDict.Count; mi++)
@@ -137,8 +150,10 @@ namespace sui4.MaterialPropertyBaker
             }
             else
             {
-                Debug.LogError("Renderer is not found in MaterialGroups. This should not happen. Data may be corrupted.");
+                Debug.LogError(
+                    "Renderer is not found in MaterialGroup. This should not happen. Data may be corrupted.");
             }
+
             EditorGUI.indentLevel--;
         }
 
@@ -149,7 +164,7 @@ namespace sui4.MaterialPropertyBaker
                 Target.OnValidate();
                 return;
             }
-            
+
             // when currentRenderer != newRenderer
             if (newRenderer == null)
             {
@@ -159,8 +174,8 @@ namespace sui4.MaterialPropertyBaker
             }
             else if (Target.MaterialStatusDictDict.ContainsKey(newRenderer))
             {
-                // すでにMaterialGroupsに追加されているRendererは追加しない
-                Debug.LogWarning($"this renderer is already added to MaterialGroups {target.name}. so skipped.");
+                // すでにMaterialGroupに追加されているRendererは追加しない
+                Debug.LogWarning($"this renderer is already added to MaterialGroup {target.name}. so skipped.");
                 return;
             }
             else
@@ -169,6 +184,7 @@ namespace sui4.MaterialPropertyBaker
                 {
                     Target.MaterialStatusDictDict.Remove(currentRenderer);
                 }
+
                 var materialStatusDictWrapperToAdd = new MaterialStatusDictWrapper();
 
                 foreach (var mat in newRenderer.sharedMaterials)
@@ -176,20 +192,23 @@ namespace sui4.MaterialPropertyBaker
                     if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
                     {
                         // failed to add
-                        Debug.LogWarning($"MaterialGroups: Failed to add material to MaterialStatusDict {target.name}");
+                        Debug.LogWarning($"MaterialGroup: Failed to add material to MaterialStatusDict {target.name}");
                     }
                 }
 
                 if (!Target.MaterialStatusDictDict.TryAdd(newRenderer, materialStatusDictWrapperToAdd))
                 {
-                    Debug.LogWarning($"MaterialGroups: Failed to add {newRenderer.name} to MaterialGroups {target.name}");
+                    Debug.LogWarning($"MaterialGroup: Failed to add {newRenderer.name} to MaterialGroup {target.name}");
                 }
                 else
                 {
-                    Debug.Log($"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroups of {target.name}");
+                    Debug.Log(
+                        $"Added {newRenderer.sharedMaterials.Length} materials to MaterialGroup of {target.name}");
                 }
+
                 Target.Renderers[ri] = newRenderer;
             }
+
             EditorUtility.SetDirty(Target);
             serializedObject.Update();
         }
@@ -215,9 +234,10 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        
+
         // utils
-        private static (SerializedProperty keyMaterialListProp, SerializedProperty valueIsTargetListProp) GetSerializedPropertyFrom(SerializedProperty materialStatusSDictWrapperProp)
+        private static (SerializedProperty keyMaterialListProp, SerializedProperty valueIsTargetListProp)
+            GetSerializedPropertyFrom(SerializedProperty materialStatusSDictWrapperProp)
         {
             if (materialStatusSDictWrapperProp == null)
                 throw new NullReferenceException("materialStatusSDictWrapperProp is null");
