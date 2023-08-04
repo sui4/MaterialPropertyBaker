@@ -161,6 +161,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 // すでにMaterialGroupsに追加されているRendererは追加しない
                 Debug.LogWarning($"this renderer is already added to MaterialGroups {target.name}. so skipped.");
+                return;
             }
             else
             {
