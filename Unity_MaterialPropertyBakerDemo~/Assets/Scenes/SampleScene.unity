@@ -832,7 +832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8129c37165282eb4e83d03bce2cf4ab0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _overrideOverrideDefaultPreset: {fileID: 11400000, guid: 230509335fbd71d4b9c0e0693dd9434e, type: 2}
+  _overrideDefaultPreset: {fileID: 0}
   _materialPropertyConfig: {fileID: 11400000, guid: 6cb7daa09dee1d04aab6087987b66c05, type: 2}
   _materialStatusDictDict:
     _keys:
@@ -851,7 +851,7 @@ MonoBehaviour:
     - _materialStatusDict:
         _keys:
         - {fileID: 2100000, guid: 254341974c0acbc4b8f48f0acae1f0b4, type: 2}
-        _values: 01
+        _values: 00
   _renderers:
   - {fileID: 1529053847}
   - {fileID: 2076508327}
@@ -1024,11 +1024,11 @@ PrefabInstance:
     - target: {fileID: 3045152378166969900, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}
       propertyPath: _renderers.Array.data[1]
       value: 
-      objectReference: {fileID: 222782361}
+      objectReference: {fileID: 1261367540}
     - target: {fileID: 3045152378166969900, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}
       propertyPath: _renderers.Array.data[2]
       value: 
-      objectReference: {fileID: 1261367540}
+      objectReference: {fileID: 222782361}
     - target: {fileID: 3045152378166969900, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}
       propertyPath: _materialStatusListList.Array.size
       value: 3
@@ -1119,7 +1119,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3045152378166969900, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}
       propertyPath: _materialStatusDictDict._values.Array.data[1]._materialStatusDict._values.Array.data[0]
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3045152378166969900, guid: c929b32ed7254b74fb6663ab2824c4bd, type: 3}
       propertyPath: _materialStatusDictDict._values.Array.data[2]._materialStatusDict._values.Array.data[0]
