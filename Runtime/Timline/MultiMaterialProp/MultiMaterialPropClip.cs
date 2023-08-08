@@ -6,15 +6,7 @@ using UnityEngine.Timeline;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {
-    [Serializable]
-    public class PresetIDPair
-    {
-        [SerializeField] private string _id;
-        [SerializeField] private BakedMaterialProperty _preset;
-        public string ID => _id;
-        public BakedMaterialProperty Preset => _preset;
-    }
-    
+   
     [Serializable]
     public class MultiMaterialPropClip : PlayableAsset, ITimelineClipAsset
     {
