@@ -7,9 +7,9 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(MaterialGroupList))]
     public class MaterialGroupListEditor : Editor
     {
-        private List<MaterialGroup> _materialGroupList = new List<MaterialGroup>();
-
         private SerializedProperty _materialGroupsListProp;
+
+        private bool _showMaterialGroupsInScene = false;
         private MaterialGroupList Target => (MaterialGroupList)target;
 
         private void OnEnable()
@@ -20,14 +20,7 @@ namespace sui4.MaterialPropertyBaker
 
         public override void OnInspectorGUI()
         {
-            using (new GUILayout.VerticalScope("box"))
-            {
-                MaterialGroupsInSceneGUI();
-            }
-
-            EditorGUILayout.Separator();
             // base.OnInspectorGUI();
-
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 MaterialGroupsListGUI();
@@ -36,22 +29,33 @@ namespace sui4.MaterialPropertyBaker
                     serializedObject.ApplyModifiedProperties();
                 }
             }
-        }
 
+            EditorGUILayout.Separator();
+
+            using (new GUILayout.VerticalScope("box"))
+            {
+                MaterialGroupsInSceneGUI();
+            }
+        }
 
         private void MaterialGroupsInSceneGUI()
         {
-            EditorGUILayout.LabelField("All Material Groups in Scene (For Reference)", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
+            _showMaterialGroupsInScene = EditorGUILayout.Foldout(_showMaterialGroupsInScene,
+                "All Material Groups in Scene (For Reference)");
+            if (!_showMaterialGroupsInScene) return;
+
+            EditorGUILayout.Separator();
             foreach (var materialGroup in Target.MaterialGroupsInScene)
             {
                 EditorGUILayout.ObjectField(materialGroup, typeof(MaterialGroup), true);
             }
 
-            EditorGUI.indentLevel--;
+            EditorGUILayout.Separator();
 
             if (GUILayout.Button("Fetch Material Groups in Scene"))
                 Target.FetchBakedPropertiesInScene();
+            EditorGUI.indentLevel--;
         }
 
         private void MaterialGroupsListGUI()
@@ -126,7 +130,7 @@ namespace sui4.MaterialPropertyBaker
             var addMaterialGroupMenu = new GenericMenu();
             foreach (var mg in Target.MaterialGroupsInScene)
             {
-                if(mgs.MaterialGroupList.Contains(mg)) continue;
+                if (mgs.MaterialGroupList.Contains(mg)) continue;
                 AddRecorderInfoToMenu(mg, mgs, addMaterialGroupMenu);
             }
 
