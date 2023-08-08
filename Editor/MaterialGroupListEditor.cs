@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -69,7 +70,14 @@ namespace sui4.MaterialPropertyBaker
                     var materialGroupsProp = _materialGroupsListProp.GetArrayElementAtIndex(i);
                     //EditorGUILayout.Foldout(true, materialGroups.ID);
 
-                    EditorGUILayout.LabelField(Target.MaterialGroupsList[i].ID);
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField(Target.MaterialGroupsList[i].ID);
+                        if (RemoveMaterialGroupsGUI(i, _materialGroupsListProp))
+                        {
+                            return;
+                        }
+                    }
                     EditorGUI.indentLevel++;
                     var idProp = materialGroupsProp.FindPropertyRelative("_id");
                     EditorGUILayout.PropertyField(idProp, new GUIContent("ID"));
@@ -79,7 +87,36 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
 
+            AddMaterialGroupsGUI(_materialGroupsListProp);
             EditorGUI.indentLevel--;
+        }
+
+        private static bool RemoveMaterialGroupsGUI(int index, SerializedProperty materialGroupsListProp)
+        {
+            var ret = false;
+            var tmp = GUI.backgroundColor;
+            GUI.backgroundColor = Color.red;
+            if (GUILayout.Button("-", GUILayout.Width(20)))
+            {
+                materialGroupsListProp.DeleteArrayElementAtIndex(index);
+                ret = true;
+            }
+            GUI.backgroundColor = tmp;
+            return ret;
+        }
+
+        private void AddMaterialGroupsGUI(SerializedProperty materialGroupsListProp)
+        {
+            var tmp = GUI.backgroundColor;
+            GUI.backgroundColor = Color.green;
+            if (GUILayout.Button("+"))
+            {
+                materialGroupsListProp.InsertArrayElementAtIndex(_materialGroupsListProp.arraySize);
+                serializedObject.ApplyModifiedProperties();
+                Target.MaterialGroupsList[^1].MaterialGroupList.Clear();
+                Target.MaterialGroupsList[^1].ID = "Default";
+            }
+            GUI.backgroundColor = tmp;
         }
 
         private void MaterialGroupListGUI(MaterialGroups materialGroups, SerializedProperty mgsProp)
