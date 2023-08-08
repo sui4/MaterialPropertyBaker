@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88684271e27adb843b6570957c9e7637, type: 3}
+  m_Name: _vrm1_
+  m_EditorClassIdentifier: 
+  m_prefab: {fileID: -1728013695380148634, guid: 7250cc3c4827f874c9520e346e8ddfbc, type: 3}
+  Meta:
+    Name: "\u305E\u3093\u5B50"
+    Version: 221128_00
+    Authors:
+    - ZONe ENERGY
+    CopyrightInformation: 
+    ContactInformation: 
+    References:
+    - "\xA9ZONe"
+    ThirdPartyLicenses: 
+    Thumbnail: {fileID: 2800000, guid: 4fc3c4fa1ab636d4d857831550b3a5ea, type: 3}
+    AvatarPermission: 0
+    ViolentUsage: 0
+    SexualUsage: 0
+    CommercialUsage: 0
+    PoliticalOrReligiousUsage: 0
+    AntisocialOrHateUsage: 0
+    CreditNotation: 0
+    Redistribution: 0
+    Modification: 0
+    OtherLicenseUrl: https://zonko.zone-energy.jp/
+  Expression:
+    Happy: {fileID: 11400000, guid: 12f4cf61d552d3a49a66a229ca98728c, type: 2}
+    Angry: {fileID: 11400000, guid: d87d396532805244db604445996fe868, type: 2}
+    Sad: {fileID: 11400000, guid: c80a48c49c08672498cf5f471890cbea, type: 2}
+    Relaxed: {fileID: 11400000, guid: 4a82b35f30ce46a4684ca50048f60539, type: 2}
+    Surprised: {fileID: 11400000, guid: 7834fbdcd94ee9d44a9a684e70e5fc10, type: 2}
+    Aa: {fileID: 11400000, guid: 9737057b11511834aaf417453ccd50aa, type: 2}
+    Ih: {fileID: 11400000, guid: 10e947ac98bd6114ea44880a6e44532c, type: 2}
+    Ou: {fileID: 11400000, guid: 24960c07ea8e2b146a81567ff1a8c8f5, type: 2}
+    Ee: {fileID: 11400000, guid: ddba270802b497d40a87a530ebb4e164, type: 2}
+    Oh: {fileID: 11400000, guid: 6f0088339d4f13b4f90664914ad12b94, type: 2}
+    Blink: {fileID: 11400000, guid: 6a4d1831c4dcd6540ab484ab0588a03a, type: 2}
+    BlinkLeft: {fileID: 11400000, guid: b7b08cfe583776344b91f1b1b6cf22f1, type: 2}
+    BlinkRight: {fileID: 11400000, guid: 76d08b314e8de544ca3df57dd58e8cb3, type: 2}
+    LookUp: {fileID: 11400000, guid: 0aa146dd988f78f47b1829d2d36ccd73, type: 2}
+    LookDown: {fileID: 11400000, guid: 519ae555068fc404b9583729a6e5828d, type: 2}
+    LookLeft: {fileID: 11400000, guid: 8edef0660c1b7514eb889c0a8ae0fcad, type: 2}
+    LookRight: {fileID: 11400000, guid: d387b2007f4b4dd49babfb823c659ac8, type: 2}
+    Neutral: {fileID: 11400000, guid: 6176b4fb941a77243804a2e5547a773d, type: 2}
+    CustomClips:
+    - {fileID: 11400000, guid: 5b94d0d8a40652e4daf09317ac22bcef, type: 2}
+    - {fileID: 11400000, guid: 234926fc11a610e45b459317c2291a56, type: 2}
+    - {fileID: 11400000, guid: 18e1ba1c8af9eea4c84175c3a809c783, type: 2}
+    - {fileID: 11400000, guid: 65135a99ed3130e44b49f16791bb8792, type: 2}
+    - {fileID: 11400000, guid: 509eb4bd78753af4fb00639d2d2e11d4, type: 2}
+    - {fileID: 11400000, guid: 5cdd5c341bb4fd949b7f2c9db8f75d71, type: 2}
+    - {fileID: 11400000, guid: 455be8b7af96ead4298d8c0e2c5263b1, type: 2}
+    - {fileID: 11400000, guid: 07f545341856d2241a3aadefabd3a575, type: 2}
+    - {fileID: 11400000, guid: 6a5a37c78bd3ae44e9455639cf9ecd47, type: 2}
+    - {fileID: 11400000, guid: 6791961c828864a4fb428698f326e0d8, type: 2}
+    - {fileID: 11400000, guid: b2df972d5146f1a4fbbba54f09ad96a8, type: 2}
+    - {fileID: 11400000, guid: 6b79e8ed4416b944fa451f2859dc18f4, type: 2}
+    - {fileID: 11400000, guid: a3c65b6d3cd84444aa9b3d04bd5c3bba, type: 2}
+    - {fileID: 11400000, guid: a35a9384c65bb0b44a492957bf7dc135, type: 2}
+  LookAt:
+    OffsetFromHead: {x: -0, y: 0.06, z: 0}
+    LookAtType: 0
+    HorizontalOuter:
+      CurveXRangeDegree: 90
+      CurveYRangeDegree: 10
+    HorizontalInner:
+      CurveXRangeDegree: 90
+      CurveYRangeDegree: 10
+    VerticalDown:
+      CurveXRangeDegree: 90
+      CurveYRangeDegree: 10
+    VerticalUp:
+      CurveXRangeDegree: 90
+      CurveYRangeDegree: 10
+  FirstPerson:
+    Renderers:
+    - Renderer: geo_grp/znk_A/body_geoGp/eyepatch_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/hair_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/hair_sdw_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/head_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/headphone_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/jacketB_Gp/jaketB_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/jacketB_Gp/luminousB_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/jacketB_Gp/bodyB_geo
+      FirstPersonFlag: 0
+    - Renderer: geo_grp/znk_A/body_geoGp/thunder_geo
+      FirstPersonFlag: 0

@@ -1,0 +1,302 @@
+fileFormatVersion: 2
+guid: 7250cc3c4827f874c9520e346e8ddfbc
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Ase
+    second: {fileID: 11400000, guid: 509eb4bd78753af4fb00639d2d2e11d4, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Aseri
+    second: {fileID: 11400000, guid: 07f545341856d2241a3aadefabd3a575, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: GuruGuru
+    second: {fileID: 11400000, guid: 65135a99ed3130e44b49f16791bb8792, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Item_HideEyePatch
+    second: {fileID: 11400000, guid: a3c65b6d3cd84444aa9b3d04bd5c3bba, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Item_HideHeadphone
+    second: {fileID: 11400000, guid: a35a9384c65bb0b44a492957bf7dc135, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Jitome
+    second: {fileID: 11400000, guid: 6791961c828864a4fb428698f326e0d8, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Kakusei
+    second: {fileID: 11400000, guid: 234926fc11a610e45b459317c2291a56, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Kazari
+    second: {fileID: 11400000, guid: 5cdd5c341bb4fd949b7f2c9db8f75d71, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: LookAtCamera
+    second: {fileID: 11400000, guid: 5b94d0d8a40652e4daf09317ac22bcef, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Pero
+    second: {fileID: 11400000, guid: 18e1ba1c8af9eea4c84175c3a809c783, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Puku
+    second: {fileID: 11400000, guid: 455be8b7af96ead4298d8c0e2c5263b1, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Tired
+    second: {fileID: 11400000, guid: 6a5a37c78bd3ae44e9455639cf9ecd47, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Wink_L
+    second: {fileID: 11400000, guid: b2df972d5146f1a4fbbba54f09ad96a8, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: Wink_R
+    second: {fileID: 11400000, guid: 6b79e8ed4416b944fa451f2859dc18f4, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: aa
+    second: {fileID: 11400000, guid: 9737057b11511834aaf417453ccd50aa, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: angry
+    second: {fileID: 11400000, guid: d87d396532805244db604445996fe868, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: blink
+    second: {fileID: 11400000, guid: 6a4d1831c4dcd6540ab484ab0588a03a, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: blinkLeft
+    second: {fileID: 11400000, guid: b7b08cfe583776344b91f1b1b6cf22f1, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: blinkRight
+    second: {fileID: 11400000, guid: 76d08b314e8de544ca3df57dd58e8cb3, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: ee
+    second: {fileID: 11400000, guid: ddba270802b497d40a87a530ebb4e164, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: happy
+    second: {fileID: 11400000, guid: 12f4cf61d552d3a49a66a229ca98728c, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: ih
+    second: {fileID: 11400000, guid: 10e947ac98bd6114ea44880a6e44532c, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: lookDown
+    second: {fileID: 11400000, guid: 519ae555068fc404b9583729a6e5828d, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: lookLeft
+    second: {fileID: 11400000, guid: 8edef0660c1b7514eb889c0a8ae0fcad, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: lookRight
+    second: {fileID: 11400000, guid: d387b2007f4b4dd49babfb823c659ac8, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: lookUp
+    second: {fileID: 11400000, guid: 0aa146dd988f78f47b1829d2d36ccd73, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: neutral
+    second: {fileID: 11400000, guid: 6176b4fb941a77243804a2e5547a773d, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: oh
+    second: {fileID: 11400000, guid: 6f0088339d4f13b4f90664914ad12b94, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: ou
+    second: {fileID: 11400000, guid: 24960c07ea8e2b146a81567ff1a8c8f5, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: relaxed
+    second: {fileID: 11400000, guid: 4a82b35f30ce46a4684ca50048f60539, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: sad
+    second: {fileID: 11400000, guid: c80a48c49c08672498cf5f471890cbea, type: 2}
+  - first:
+      type: UniVRM10:VRM10Expression
+      assembly: VRM10
+      name: surprised
+    second: {fileID: 11400000, guid: 7834fbdcd94ee9d44a9a684e70e5fc10, type: 2}
+  - first:
+      type: UniVRM10:VRM10Object
+      assembly: VRM10
+      name: _vrm1_
+    second: {fileID: 11400000, guid: f6339ed2ec580804fa90fa5ebc6367ac, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bodyA_mtoon
+    second: {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bodyB_eyepatch_mtoon
+    second: {fileID: 2100000, guid: f3b67743523d08c4ba0cf3bcd43cfe67, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bodyB_mtoon
+    second: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: emissionA_NoOutline_mtoon
+    second: {fileID: 2100000, guid: 595924341ce0d544eaee0ead9a192943, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: emissionB_mtoon
+    second: {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: eyeGuruguru_mtoon
+    second: {fileID: 2100000, guid: cfaaf8aceb6e2f846b0da533890b9928, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: eyeKakusei_mtoon
+    second: {fileID: 2100000, guid: ab5fefbb4ef03534b87b0c88231a0391, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: eye_mtoon
+    second: {fileID: 2100000, guid: 67d3c62cc58bb664297076c2a8afc92d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: face_mtoon
+    second: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glowA_mtoon
+    second: {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: glowB_mtoon
+    second: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: hair_mtoon
+    second: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: skinB_mtoon
+    second: {fileID: 2100000, guid: 636913b334b91d94f8894a4e962bf8b7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: thunder_mtoon
+    second: {fileID: 2100000, guid: d42901c7bacb4df4e81658c82da712c4, type: 2}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: thumbnail__VRM10
+    second: {fileID: 2800000, guid: 4fc3c4fa1ab636d4d857831550b3a5ea, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_bodyA
+    second: {fileID: 2800000, guid: 07234c73134289540a45ba87379d6fd6, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_bodyB
+    second: {fileID: 2800000, guid: cf268847180f79f4385d2ba9e2a33ea6, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_eye_guruguru
+    second: {fileID: 2800000, guid: d46d029c10b239f419596cf78256f223, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_eye_kakusei
+    second: {fileID: 2800000, guid: bc82c28e0591e77448b3b8281f175f35, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_face
+    second: {fileID: 2800000, guid: 291a4c4b6d6eb754aafe0d99584b5ca6, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_face_msk.linear
+    second: {fileID: 2800000, guid: 3c380dbe4d280dc4898095bfc0942f90, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_hair
+    second: {fileID: 2800000, guid: 4d37e9fb537944742a08f2c42ef23652, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_hair_msk.linear
+    second: {fileID: 2800000, guid: dc1fb9acec5b67748983a36f43d2c7b3, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_skinB
+    second: {fileID: 2800000, guid: 3147ddfcbb40b7a45b80afdefc3aefcc, type: 3}
+  - first:
+      type: UnityEngine:Texture
+      assembly: UnityEngine.CoreModule
+      name: znk_skin_msk.linear
+    second: {fileID: 2800000, guid: 71abad9372e2fe64f841e84717cc2d97, type: 3}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: f66ead3390398f443aa127b741826ad9, type: 3}
+  MigrateToVrm1: 1
+  RenderPipeline: 0
