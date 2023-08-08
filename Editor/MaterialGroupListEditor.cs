@@ -123,16 +123,29 @@ namespace sui4.MaterialPropertyBaker
 
         private void ShowNewRecorderMenu(MaterialGroups mgs)
         {
-            var newRecordMenu = new GenericMenu();
+            var addMaterialGroupMenu = new GenericMenu();
             foreach (var mg in Target.MaterialGroupsInScene)
-                AddRecorderInfoToMenu(mg, mgs, newRecordMenu);
+            {
+                if(mgs.MaterialGroupList.Contains(mg)) continue;
+                AddRecorderInfoToMenu(mg, mgs, addMaterialGroupMenu);
+            }
 
-            newRecordMenu.ShowAsContext();
+            if (addMaterialGroupMenu.GetItemCount() == 0)
+            {
+                addMaterialGroupMenu.AddDisabledItem(new GUIContent("No Material Group to Add"));
+            }
+
+            addMaterialGroupMenu.ShowAsContext();
         }
 
         private void OnAddMaterialGroup(MaterialGroup materialGroup, in MaterialGroups mgs)
         {
             mgs.MaterialGroupList.Add(materialGroup);
+            foreach (var materialGroups in Target.MaterialGroupsList)
+            {
+                if (materialGroups == mgs) continue;
+                materialGroups.MaterialGroupList.Remove(materialGroup);
+            }
         }
     }
 }
