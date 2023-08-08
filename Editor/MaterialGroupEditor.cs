@@ -9,9 +9,10 @@ namespace sui4.MaterialPropertyBaker
     {
         // serialized property of MaterialGroup(target)
         private SerializedProperty _renderersProp;
-        private SerializedProperty _materialStatusSDictSDict;
-        private SerializedProperty _defaultProfile;
-        private SerializedProperty _materialPropertyConfig;
+        private SerializedProperty _materialStatusSDictSDictProp;
+        private SerializedProperty _defaultProfileProp;
+        private SerializedProperty _materialPropertyConfigProp;
+        private SerializedProperty _idProp;
 
         private static class Styles
         {
@@ -22,16 +23,18 @@ namespace sui4.MaterialPropertyBaker
 
             public static readonly GUIContent MaterialLabel = GUIContent.none;
             public static readonly GUIContent IsTargetLabel = new GUIContent("Apply");
+            public static readonly GUIContent IDLabel = new GUIContent("ID");
         }
 
         private MaterialGroup Target => (MaterialGroup)target;
 
         private void OnEnable()
         {
-            _defaultProfile = serializedObject.FindProperty("_overrideDefaultPreset");
-            _materialPropertyConfig = serializedObject.FindProperty("_materialPropertyConfig");
-            _materialStatusSDictSDict = serializedObject.FindProperty("_materialStatusDictDict");
+            _defaultProfileProp = serializedObject.FindProperty("_overrideDefaultPreset");
+            _materialPropertyConfigProp = serializedObject.FindProperty("_materialPropertyConfig");
+            _materialStatusSDictSDictProp = serializedObject.FindProperty("_materialStatusDictDict");
             _renderersProp = serializedObject.FindProperty("_renderers");
+            _idProp = serializedObject.FindProperty("_id");
         }
 
         public override void OnInspectorGUI()
@@ -44,8 +47,9 @@ namespace sui4.MaterialPropertyBaker
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.PropertyField(_materialPropertyConfig, Styles.MaterialPropertyConfigLabel);
-                EditorGUILayout.PropertyField(_defaultProfile, Styles.OverrideDefaultProfileLabel);
+                EditorGUILayout.PropertyField(_idProp, Styles.IDLabel);
+                EditorGUILayout.PropertyField(_materialPropertyConfigProp, Styles.MaterialPropertyConfigLabel);
+                EditorGUILayout.PropertyField(_defaultProfileProp, Styles.OverrideDefaultProfileLabel);
 
                 if (change.changed)
                     serializedObject.ApplyModifiedProperties();
@@ -62,7 +66,7 @@ namespace sui4.MaterialPropertyBaker
                 {
                     var rendererProp = _renderersProp.GetArrayElementAtIndex(ri);
                     var (rendererKeysProp, matStatusSDictWrapperValuesProp) =
-                        SerializedDictionaryUtil.GetKeyValueListSerializedProperty(_materialStatusSDictSDict);
+                        SerializedDictionaryUtil.GetKeyValueListSerializedProperty(_materialStatusSDictSDictProp);
                     using (new EditorGUILayout.VerticalScope("box"))
                     {
                         RendererGUI(ri, rendererProp, rendererKeysProp, matStatusSDictWrapperValuesProp);

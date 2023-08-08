@@ -20,6 +20,7 @@ namespace sui4.MaterialPropertyBaker
         private SerializedDictionary<Renderer, MaterialStatusDictWrapper> _materialStatusDictDict = new();
 
         [SerializeField] private List<Renderer> _renderers = new();
+        [SerializeField] private string _id;
 
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         private MaterialPropertyBlock _mpb;
@@ -44,6 +45,12 @@ namespace sui4.MaterialPropertyBaker
 
         public List<Renderer> Renderers => _renderers;
 
+        public string ID
+        {
+            get => _id;
+            set => _id = value;
+        }
+
         private void OnEnable()
         {
             _mpb = new MaterialPropertyBlock();
@@ -53,6 +60,10 @@ namespace sui4.MaterialPropertyBaker
 
         public void OnValidate()
         {
+            if (string.IsNullOrWhiteSpace(ID))
+            {
+                ID = "Group_" + Guid.NewGuid().ToString();
+            }
             if (Renderers.Count == 0)
                 Renderers.Add(null);
             foreach (var renderer in Renderers)

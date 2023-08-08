@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
@@ -22,6 +20,7 @@ namespace sui4.MaterialPropertyBaker
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
+            serializedObject.Update();
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 MaterialGroupsListGUI();
@@ -49,7 +48,7 @@ namespace sui4.MaterialPropertyBaker
             EditorGUILayout.Separator();
             foreach (var materialGroup in Target.MaterialGroupsInScene)
             {
-                EditorGUILayout.ObjectField(materialGroup, typeof(MaterialGroup), true);
+                EditorGUILayout.ObjectField(new GUIContent(materialGroup.ID), materialGroup, typeof(MaterialGroup), true);
             }
 
             EditorGUILayout.Separator();
@@ -135,7 +134,7 @@ namespace sui4.MaterialPropertyBaker
                 using (new GUILayout.HorizontalScope())
                 {
                     var materialGroupProp = mgListProp.GetArrayElementAtIndex(i);
-                    EditorGUILayout.PropertyField(materialGroupProp, GUIContent.none);
+                    EditorGUILayout.PropertyField(materialGroupProp, new GUIContent(materialGroups.MaterialGroupList[i].ID));
                     if (GUILayout.Button("-", GUILayout.Width(20)))
                         mgListProp.DeleteArrayElementAtIndex(i);
                 }
@@ -159,7 +158,7 @@ namespace sui4.MaterialPropertyBaker
 
         private void AddRecorderInfoToMenu(MaterialGroup mg, MaterialGroups mgs, GenericMenu menu)
         {
-            menu.AddItem(new GUIContent(mg.name), false, data => OnAddMaterialGroup((MaterialGroup)data, mgs), mg);
+            menu.AddItem(new GUIContent(mg.ID), false, data => OnAddMaterialGroup((MaterialGroup)data, mgs), mg);
         }
 
         private void ShowNewRecorderMenu(MaterialGroups mgs)
