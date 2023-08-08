@@ -20,6 +20,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private MaterialGroupList _trackBinding;
         public MultiMaterialPropTrack ParentSwitcherTrack;
+        private Dictionary<int , bool> _isWarningLogged = new();
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
@@ -35,18 +36,26 @@ namespace sui4.MaterialPropertyBaker.Timeline
             for (var i = 0; i < inputCount; i++)
             {
                 var inputWeight = playable.GetInputWeight(i);
-                
                 // 各paramの重み付き和
                 if (inputWeight > 0)
                 {
                     var sp = (ScriptPlayable<MultiMaterialPropBehaviour>)playable.GetInput(i);
                     var clip = sp.GetBehaviour().Clip;
+                    if (clip.BakedPropertyGroup == null)
+                    {
+                        if (inputWeight < 1 && !_isWarningLogged[i])
+                        {
+                            Debug.LogWarning($"{clip.name} has no BakedPropertyGroup.\n This can lead to unexpected behavior when blending.");
+                            _isWarningLogged[i] = true;
+                        }
+                        continue;
+                    }
                     totalWeight += inputWeight;
                     
-                    foreach (var presetIDPair in clip.PresetIDPairs)
+                    foreach (var presetIDPair in clip.BakedPropertyGroup.PresetIDPairs)
                     {
                         var preset = presetIDPair.Preset;
-                        if(preset == null) continue;
+                        if(preset == null || string.IsNullOrWhiteSpace(presetIDPair.ID)) continue;
                         if (!_propDict.TryGetValue(presetIDPair.ID, out var propShaderIDDict))
                         {
                             propShaderIDDict = new PropShaderIDDict();
@@ -90,12 +99,15 @@ namespace sui4.MaterialPropertyBaker.Timeline
         public override void OnGraphStart(Playable playable)
         {
             var inputCount = playable.GetInputCount();
+            _isWarningLogged.Clear();
 
             for (var i = 0; i < inputCount; i++)
             {
+                _isWarningLogged.Add(i, false);
                 var sp = (ScriptPlayable<MultiMaterialPropBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
-                foreach (var presetIDPair in clip.PresetIDPairs)
+                if (clip.BakedPropertyGroup == null) continue;
+                foreach (var presetIDPair in clip.BakedPropertyGroup.PresetIDPairs)
                 {
                     if(presetIDPair.Preset != null)
                         presetIDPair.Preset?.UpdateShaderID();

@@ -12,7 +12,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private MultiMaterialPropTrack _parentTrack;
         private MultiMaterialPropBehaviour _template = new();
-        [SerializeField] private List<PresetIDPair> _presetIDPairs = new List<PresetIDPair>();
+        // [SerializeField] private List<PresetIDPair> _presetIDPairs = new List<PresetIDPair>();
+        [SerializeField] private BakedPropertyGroup _bakedPropertyGroup;
 
         public MultiMaterialPropTrack ParentTrack
         {
@@ -20,13 +21,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
             set => _parentTrack = value;
         }
         
-        public List<PresetIDPair> PresetIDPairs
-        {
-            get => _presetIDPairs;
-            set => _presetIDPairs = value;
-        }
+        // public List<PresetIDPair> PresetIDPairs
+        // {
+        //     get => _presetIDPairs;
+        //     set => _presetIDPairs = value;
+        // }
 
         public MaterialGroup BindingMaterialGroup { get; private set; }
+        public BakedPropertyGroup BakedPropertyGroup => _bakedPropertyGroup;
 
         public ClipCaps clipCaps => ClipCaps.Blending;
 
