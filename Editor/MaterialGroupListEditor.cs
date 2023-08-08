@@ -48,7 +48,8 @@ namespace sui4.MaterialPropertyBaker
             EditorGUILayout.Separator();
             foreach (var materialGroup in Target.MaterialGroupsInScene)
             {
-                EditorGUILayout.ObjectField(new GUIContent(materialGroup.ID), materialGroup, typeof(MaterialGroup), true);
+                EditorGUILayout.ObjectField(new GUIContent(materialGroup.ID), materialGroup, typeof(MaterialGroup),
+                    true);
             }
 
             EditorGUILayout.Separator();
@@ -66,10 +67,11 @@ namespace sui4.MaterialPropertyBaker
             {
                 EditorGUILayout.LabelField("List is Empty");
             }
+
             for (int i = 0; i < _materialGroupsProp.arraySize; i++)
             {
                 var materialGroupProp = _materialGroupsProp.GetArrayElementAtIndex(i);
-               
+
                 using (new EditorGUILayout.VerticalScope())
                 {
                     using (new GUILayout.HorizontalScope())
@@ -77,13 +79,13 @@ namespace sui4.MaterialPropertyBaker
                         if (materialGroupProp.objectReferenceValue != null)
                         {
                             var mg = materialGroupProp.objectReferenceValue as MaterialGroup;
-                            EditorGUILayout.PropertyField(materialGroupProp, new GUIContent(mg? mg.ID : ""));
+                            EditorGUILayout.PropertyField(materialGroupProp, new GUIContent(mg ? mg.ID : ""));
                         }
                         else
                         {
                             EditorGUILayout.PropertyField(materialGroupProp);
-
                         }
+
                         if (GUILayout.Button("-", GUILayout.Width(20)))
                         {
                             _materialGroupsProp.DeleteArrayElementAtIndex(i);
@@ -93,6 +95,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                 }
             }
+
             AddMaterialGroupGUI();
 
             EditorGUI.indentLevel--;
@@ -135,7 +138,6 @@ namespace sui4.MaterialPropertyBaker
         private void OnAddMaterialGroup(MaterialGroup materialGroup)
         {
             Target.MaterialGroups.Add(materialGroup);
-
         }
     }
 }

@@ -9,9 +9,9 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(BakedPropertyGroup))]
     public class BakedPropertyGroupEditor : Editor
     {
-        private BakedPropertyGroup Target => (BakedPropertyGroup) target;
+        private BakedPropertyGroup Target => (BakedPropertyGroup)target;
         private List<string> _warnings = new List<string>();
-        
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -20,9 +20,8 @@ namespace sui4.MaterialPropertyBaker
 
         private void PairGUI()
         {
-            
         }
-        
+
         private void WarningGUI(List<string> warnings)
         {
             // helpBox
@@ -34,7 +33,5 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-
-
     }
 }

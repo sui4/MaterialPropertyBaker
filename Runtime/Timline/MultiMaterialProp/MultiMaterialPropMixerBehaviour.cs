@@ -9,17 +9,18 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         public readonly Dictionary<int, MaterialProp<Color>> ColorPropDict = new();
         public readonly Dictionary<int, MaterialProp<float>> FloatPropDict = new();
-        
+
         public List<MaterialProp<Color>> ColorProps => ColorPropDict.Values.ToList();
         public List<MaterialProp<float>> FloatProps => FloatPropDict.Values.ToList();
     }
+
     public class MultiMaterialPropMixerBehaviour : PlayableBehaviour
     {
         private readonly Dictionary<string, PropShaderIDDict> _propDict = new();
 
         private MaterialGroupList _trackBinding;
         public MultiMaterialPropTrack ParentSwitcherTrack;
-        private Dictionary<int , bool> _isWarningLogged = new();
+        private Dictionary<int, bool> _isWarningLogged = new();
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
@@ -29,7 +30,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             var inputCount = playable.GetInputCount();
             float totalWeight = 0;
-            
+
             _propDict.Clear();
 
             for (var i = 0; i < inputCount; i++)
@@ -44,17 +45,20 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     {
                         if (inputWeight < 1 && !_isWarningLogged[i])
                         {
-                            Debug.LogWarning($"{clip.name} has no BakedPropertyGroup.\n This can lead to unexpected behavior when blending.");
+                            Debug.LogWarning(
+                                $"{clip.name} has no BakedPropertyGroup.\n This can lead to unexpected behavior when blending.");
                             _isWarningLogged[i] = true;
                         }
+
                         continue;
                     }
+
                     totalWeight += inputWeight;
-                    
+
                     foreach (var presetIDPair in clip.BakedPropertyGroup.PresetIDPairs)
                     {
                         var preset = presetIDPair.Preset;
-                        if(preset == null || string.IsNullOrWhiteSpace(presetIDPair.ID)) continue;
+                        if (preset == null || string.IsNullOrWhiteSpace(presetIDPair.ID)) continue;
                         if (!_propDict.TryGetValue(presetIDPair.ID, out var propShaderIDDict))
                         {
                             propShaderIDDict = new PropShaderIDDict();
@@ -65,16 +69,19 @@ namespace sui4.MaterialPropertyBaker.Timeline
                             if (propShaderIDDict.ColorPropDict.ContainsKey(cProp.ID))
                                 propShaderIDDict.ColorPropDict[cProp.ID].Value += cProp.Value * inputWeight;
                             else
-                                propShaderIDDict.ColorPropDict.Add(cProp.ID ,new MaterialProp<Color>(cProp.Name, cProp.Value * inputWeight));
+                                propShaderIDDict.ColorPropDict.Add(cProp.ID,
+                                    new MaterialProp<Color>(cProp.Name, cProp.Value * inputWeight));
                         }
 
                         foreach (var fProps in preset.MaterialProps.Floats)
                         {
-                            if(propShaderIDDict.FloatPropDict.ContainsKey(fProps.ID))
+                            if (propShaderIDDict.FloatPropDict.ContainsKey(fProps.ID))
                                 propShaderIDDict.FloatPropDict[fProps.ID].Value += fProps.Value * inputWeight;
                             else
-                                propShaderIDDict.FloatPropDict.Add(fProps.ID, new MaterialProp<float>(fProps.Name ,fProps.Value * inputWeight));
+                                propShaderIDDict.FloatPropDict.Add(fProps.ID,
+                                    new MaterialProp<float>(fProps.Name, fProps.Value * inputWeight));
                         }
+
                         _propDict.TryAdd(presetIDPair.ID, propShaderIDDict);
                     }
                 }
@@ -83,10 +90,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (totalWeight > 0f)
             {
                 var prop = new Dictionary<string, MaterialProps>();
-                foreach (var (presetID, propShaderIDDict ) in _propDict)
+                foreach (var (presetID, propShaderIDDict) in _propDict)
                 {
                     prop.Add(presetID, new MaterialProps(propShaderIDDict.ColorProps, propShaderIDDict.FloatProps));
                 }
+
                 _trackBinding.SetPropertyBlock(prop);
             }
             else
@@ -108,7 +116,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 if (clip.BakedPropertyGroup == null) continue;
                 foreach (var presetIDPair in clip.BakedPropertyGroup.PresetIDPairs)
                 {
-                    if(presetIDPair.Preset != null)
+                    if (presetIDPair.Preset != null)
                         presetIDPair.Preset?.UpdateShaderID();
                 }
             }

@@ -6,16 +6,15 @@ namespace sui4.MaterialPropertyBaker
 {
     public class MaterialGroupList : MonoBehaviour
     {
-        [SerializeField]
-        private List<MaterialGroup> _materialGroups = new List<MaterialGroup>();
-        
+        [SerializeField] private List<MaterialGroup> _materialGroups = new List<MaterialGroup>();
+
         private List<MaterialGroup> _materialGroupsInScene = new();
         private bool _isInitialized = false;
 
         public List<MaterialGroup> MaterialGroups => _materialGroups;
         public List<MaterialGroup> MaterialGroupsInScene => _materialGroupsInScene;
 
-        
+
         private void OnValidate()
         {
             if (!_isInitialized)
@@ -51,10 +50,11 @@ namespace sui4.MaterialPropertyBaker
                 materialGroup.ResetDefaultPropertyBlock();
             }
         }
-        
+
         public void FetchBakedPropertiesInScene()
         {
-            var materialGroups = FindObjectsByType<MaterialGroup>(findObjectsInactive: FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var materialGroups = FindObjectsByType<MaterialGroup>(findObjectsInactive: FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
             _materialGroupsInScene = new List<MaterialGroup>(materialGroups);
         }
     }

@@ -11,7 +11,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private SerializedProperty _bakedPropertyGroupProp;
         private bool _editable;
         private BakedPropertyGroupEditor _presetEditor;
-        private MultiMaterialPropClip Target => (MultiMaterialPropClip) target;
+        private MultiMaterialPropClip Target => (MultiMaterialPropClip)target;
 
         private void OnEnable()
         {
@@ -53,7 +53,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void PropertyGroupEditor(BakedPropertyGroup bakedPropertyGroup)
         {
-            if(bakedPropertyGroup == null)
+            if (bakedPropertyGroup == null)
                 return;
             if (_presetEditor == null)
             {

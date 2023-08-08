@@ -64,6 +64,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 ID = "Group_" + Guid.NewGuid().ToString();
             }
+
             if (Renderers.Count == 0)
                 Renderers.Add(null);
             foreach (var renderer in Renderers)

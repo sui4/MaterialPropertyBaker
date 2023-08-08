@@ -12,8 +12,8 @@ namespace sui4.MaterialPropertyBaker
         public string ID => _id;
         public BakedMaterialProperty Preset => _preset;
     }
-    
-    [CreateAssetMenu(menuName = "MaterialPropertyBaker/BakedPropertyGroup", order=1)]
+
+    [CreateAssetMenu(menuName = "MaterialPropertyBaker/BakedPropertyGroup", order = 1)]
     public class BakedPropertyGroup : ScriptableObject
     {
         [SerializeField] private List<PresetIDPair> _presetIDPairs = new();
@@ -29,12 +29,13 @@ namespace sui4.MaterialPropertyBaker
             {
                 if (ids.Contains(pair.ID))
                     warnings.Add($"Duplicate ID: {pair.ID}");
-                else if (string.IsNullOrWhiteSpace(pair.ID) )
+                else if (string.IsNullOrWhiteSpace(pair.ID))
                     emptyIDNum++;
                 else
                     ids.Add(pair.ID);
             }
-            if(emptyIDNum > 0)
+
+            if (emptyIDNum > 0)
                 warnings.Add($"There are {emptyIDNum} Empty ID");
         }
 
