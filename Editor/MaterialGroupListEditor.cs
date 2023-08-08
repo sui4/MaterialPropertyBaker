@@ -116,17 +116,6 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        private string[] GetMaterialGroupNames()
-        {
-            var names = new List<string>();
-            foreach (var materialGroup in Target.MaterialGroupsInScene)
-            {
-                names.Add(materialGroup.name);
-            }
-
-            return names.ToArray();
-        }
-
         private void AddRecorderInfoToMenu(MaterialGroup mg, MaterialGroups mgs, GenericMenu menu)
         {
             menu.AddItem(new GUIContent(mg.name), false, data => OnAddMaterialGroup((MaterialGroup)data, mgs), mg);
@@ -135,7 +124,6 @@ namespace sui4.MaterialPropertyBaker
         private void ShowNewRecorderMenu(MaterialGroups mgs)
         {
             var newRecordMenu = new GenericMenu();
-            var names = GetMaterialGroupNames();
             foreach (var mg in Target.MaterialGroupsInScene)
                 AddRecorderInfoToMenu(mg, mgs, newRecordMenu);
 
