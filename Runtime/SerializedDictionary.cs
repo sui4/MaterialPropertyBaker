@@ -45,6 +45,7 @@ namespace sui4.MaterialPropertyBaker
         }
     }
 
+#if UNITY_EDITOR
     public static class SerializedDictionaryUtil
     {
         public static (SerializedProperty keyListProp, SerializedProperty valueListProp)
@@ -60,4 +61,5 @@ namespace sui4.MaterialPropertyBaker
             return (keyListProp.GetArrayElementAtIndex(index), valueListProp.GetArrayElementAtIndex(index));
         }
     }
+#endif
 }
