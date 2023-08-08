@@ -9,7 +9,7 @@
     "Unity"
   ],
   "license": "MIT",
-  "name":  "jp.sui4.materialpropertybaker",
+  "name": "jp.sui4.materialpropertybaker",
   "repository": "github:sui4/MaterialPropertyBaker",
   "unity": "2021.3",
   "version": "0.1.0",

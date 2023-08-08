@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 namespace sui4.MaterialPropertyBaker
 {
     [Serializable]
-    [CreateAssetMenu(menuName = "MaterialPropertyBaker/BakedProperties")]
+    [CreateAssetMenu(menuName = "MaterialPropertyBaker/BakedProperty")]
     public class BakedMaterialProperty : ScriptableObject
     {
         [SerializeField] private string _shaderName;

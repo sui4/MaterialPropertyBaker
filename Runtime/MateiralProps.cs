@@ -152,6 +152,7 @@ namespace sui4.MaterialPropertyBaker
         public MaterialProp(string propName)
         {
             Name = propName;
+            UpdateShaderID();
         }
 
         public MaterialProp(string propName, T value) : this(propName)
