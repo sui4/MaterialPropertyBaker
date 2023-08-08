@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -26,6 +25,32 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField]
         private List<MaterialGroups> _materialGroupsList = new List<MaterialGroups>();
+        
+        private List<MaterialGroup> _materialGroupsInScene = new();
+        [SerializeField, HideInInspector] private bool _onCreate = true;
+
+        public List<MaterialGroups> MaterialGroupsList => _materialGroupsList;
+        public List<MaterialGroup> MaterialGroupsInScene => _materialGroupsInScene;
+
+        private void OnValidate()
+        {
+            if (_onCreate)
+            {
+                OnCreate();
+            }
+        }
+
+        private void OnCreate()
+        {
+            FetchBakedPropertiesInScene();
+            var materialGroups = new MaterialGroups
+            {
+                ID = "Default"
+            };
+            materialGroups.MaterialGroupList.AddRange(MaterialGroupsInScene);
+            _materialGroupsList.Add(materialGroups);
+            _onCreate = false;
+        }
 
         // <MaterialGroupsID, MaterialProps>
         public void SetPropertyBlock(Dictionary<string, MaterialProps> materialPropsDict)
@@ -60,5 +85,37 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
+        
+        public void FetchBakedPropertiesInScene()
+        {
+            var materialGroups = FindObjectsByType<MaterialGroup>(findObjectsInactive: FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _materialGroupsInScene = new List<MaterialGroup>(materialGroups);
+        }
+
+        private void GetWarnings()
+        {
+            var materialGroupSet = new HashSet<MaterialGroup>();
+            foreach (var materialGroups in _materialGroupsList)
+            {
+                foreach (var mg in materialGroups.MaterialGroupList)
+                {
+                    if (materialGroupSet.Contains(mg))
+                    {
+                        
+                    }
+                    else if (mg == null)
+                    {
+                        
+                    }
+                    else
+                    {
+                        materialGroupSet.Add(mg);
+                    }
+
+                }
+            }
+        }
+        
+        
     }
 }
