@@ -8,7 +8,8 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [EditorWindowTitle(title = "Material Property Baker")]
+    // old version: not used
+    [EditorWindowTitle(title = "Material Property Baker (Old)")]
     public class MaterialPropsExporter : EditorWindow
     {
         [SerializeField] private List<Material> _targets = new List<Material>();
