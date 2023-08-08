@@ -4,85 +4,51 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [Serializable]
-    public class MaterialGroups
-    {
-        [SerializeField] private string _id;
-        [SerializeField] private List<MaterialGroup> _materialGroupList = new List<MaterialGroup>();
-
-        public string ID
-        {
-            get => _id;
-            set => _id = value;
-        }
-        public List<MaterialGroup> MaterialGroupList
-        {
-            get => _materialGroupList;
-            set => _materialGroupList = value;
-        }
-    }
     public class MaterialGroupList : MonoBehaviour
     {
         [SerializeField]
-        private List<MaterialGroups> _materialGroupsList = new List<MaterialGroups>();
+        private List<MaterialGroup> _materialGroups = new List<MaterialGroup>();
         
         private List<MaterialGroup> _materialGroupsInScene = new();
-        [SerializeField, HideInInspector] private bool _onCreate = true;
+        private bool _isInitialized = false;
 
-        public List<MaterialGroups> MaterialGroupsList => _materialGroupsList;
+        public List<MaterialGroup> MaterialGroups => _materialGroups;
         public List<MaterialGroup> MaterialGroupsInScene => _materialGroupsInScene;
 
+        
         private void OnValidate()
         {
-            if (_onCreate)
+            if (!_isInitialized)
             {
-                OnCreate();
+                FetchBakedPropertiesInScene();
+                _materialGroups = new List<MaterialGroup>(MaterialGroupsInScene);
+                _isInitialized = true;
             }
-        }
-
-        private void OnCreate()
-        {
-            FetchBakedPropertiesInScene();
-            var materialGroups = new MaterialGroups
-            {
-                ID = "Default"
-            };
-            materialGroups.MaterialGroupList.AddRange(MaterialGroupsInScene);
-            _materialGroupsList.Add(materialGroups);
-            _onCreate = false;
         }
 
         // <MaterialGroupsID, MaterialProps>
         public void SetPropertyBlock(Dictionary<string, MaterialProps> materialPropsDict)
         {
-            foreach (var materialGroups in _materialGroupsList)
+            foreach (var materialGroup in _materialGroups)
             {
-                var materialGroupList = materialGroups.MaterialGroupList;
-                if (materialGroupList == null)
+                if (materialGroup == null)
                     continue;
 
-                if (materialPropsDict.TryGetValue(materialGroups.ID, out var materialProps))
+                if (materialPropsDict.TryGetValue(materialGroup.ID, out var materialProps))
                 {
-                    foreach (var materialGroup in materialGroupList)
-                    {
-                        materialGroup.SetPropertyBlock(materialProps);
-                    }
+                    materialGroup.SetPropertyBlock(materialProps);
                 }
             }
         }
 
         public void ResetPropertyBlockToDefault()
         {
-            foreach (var materialGroups in _materialGroupsList)
+            foreach (var materialGroup in _materialGroups)
             {
-                var materialGroupList = materialGroups.MaterialGroupList;
-                if (materialGroupList == null)
+                if (materialGroup == null)
                     continue;
 
-                foreach (var materialGroup in materialGroupList)
-                {
-                    materialGroup.ResetDefaultPropertyBlock();
-                }
+                materialGroup.ResetDefaultPropertyBlock();
             }
         }
         
@@ -91,31 +57,5 @@ namespace sui4.MaterialPropertyBaker
             var materialGroups = FindObjectsByType<MaterialGroup>(findObjectsInactive: FindObjectsInactive.Include, FindObjectsSortMode.None);
             _materialGroupsInScene = new List<MaterialGroup>(materialGroups);
         }
-
-        private void GetWarnings()
-        {
-            var materialGroupSet = new HashSet<MaterialGroup>();
-            foreach (var materialGroups in _materialGroupsList)
-            {
-                foreach (var mg in materialGroups.MaterialGroupList)
-                {
-                    if (materialGroupSet.Contains(mg))
-                    {
-                        
-                    }
-                    else if (mg == null)
-                    {
-                        
-                    }
-                    else
-                    {
-                        materialGroupSet.Add(mg);
-                    }
-
-                }
-            }
-        }
-        
-        
     }
 }

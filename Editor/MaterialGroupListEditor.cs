@@ -6,7 +6,7 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(MaterialGroupList))]
     public class MaterialGroupListEditor : Editor
     {
-        private SerializedProperty _materialGroupsListProp;
+        private SerializedProperty _materialGroupsProp;
 
         private bool _showMaterialGroupsInScene = false;
         private MaterialGroupList Target => (MaterialGroupList)target;
@@ -14,7 +14,7 @@ namespace sui4.MaterialPropertyBaker
         private void OnEnable()
         {
             Target.FetchBakedPropertiesInScene();
-            _materialGroupsListProp = serializedObject.FindProperty("_materialGroupsList");
+            _materialGroupsProp = serializedObject.FindProperty("_materialGroups");
         }
 
         public override void OnInspectorGUI()
@@ -23,7 +23,7 @@ namespace sui4.MaterialPropertyBaker
             serializedObject.Update();
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                MaterialGroupsListGUI();
+                MaterialGroupListGUI();
                 if (change.changed)
                 {
                     serializedObject.ApplyModifiedProperties();
@@ -58,116 +58,70 @@ namespace sui4.MaterialPropertyBaker
             EditorGUI.indentLevel--;
         }
 
-        private void MaterialGroupsListGUI()
+        private void MaterialGroupListGUI()
         {
             EditorGUILayout.LabelField("Material Group List", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
-            for (int i = 0; i < _materialGroupsListProp.arraySize; i++)
-            {
-                using (new EditorGUILayout.VerticalScope("box"))
-                {
-                    var materialGroupsProp = _materialGroupsListProp.GetArrayElementAtIndex(i);
-                    //EditorGUILayout.Foldout(true, materialGroups.ID);
-
-                    using (new GUILayout.HorizontalScope())
-                    {
-                        EditorGUILayout.LabelField(Target.MaterialGroupsList[i].ID);
-                        if (RemoveMaterialGroupsGUI(i, _materialGroupsListProp))
-                        {
-                            return;
-                        }
-                    }
-                    EditorGUI.indentLevel++;
-                    var idProp = materialGroupsProp.FindPropertyRelative("_id");
-                    EditorGUILayout.PropertyField(idProp, new GUIContent("ID"));
-
-                    MaterialGroupListGUI(Target.MaterialGroupsList[i], materialGroupsProp);
-                    EditorGUI.indentLevel--;
-                }
-            }
-
-            AddMaterialGroupsGUI(_materialGroupsListProp);
-            EditorGUI.indentLevel--;
-        }
-
-        private static bool RemoveMaterialGroupsGUI(int index, SerializedProperty materialGroupsListProp)
-        {
-            var ret = false;
-            var tmp = GUI.backgroundColor;
-            GUI.backgroundColor = Color.red;
-            if (GUILayout.Button("-", GUILayout.Width(20)))
-            {
-                materialGroupsListProp.DeleteArrayElementAtIndex(index);
-                ret = true;
-            }
-            GUI.backgroundColor = tmp;
-            return ret;
-        }
-
-        private void AddMaterialGroupsGUI(SerializedProperty materialGroupsListProp)
-        {
-            var tmp = GUI.backgroundColor;
-            GUI.backgroundColor = Color.green;
-            if (GUILayout.Button("+"))
-            {
-                materialGroupsListProp.InsertArrayElementAtIndex(_materialGroupsListProp.arraySize);
-                serializedObject.ApplyModifiedProperties();
-                Target.MaterialGroupsList[^1].MaterialGroupList.Clear();
-                Target.MaterialGroupsList[^1].ID = "Default";
-            }
-            GUI.backgroundColor = tmp;
-        }
-
-        private void MaterialGroupListGUI(MaterialGroups materialGroups, SerializedProperty mgsProp)
-        {
-            EditorGUILayout.LabelField("Material Group List", EditorStyles.boldLabel);
-            var mgListProp = mgsProp.FindPropertyRelative("_materialGroupList");
-            EditorGUI.indentLevel++;
-
-            if (mgListProp.arraySize == 0)
+            if (_materialGroupsProp.arraySize == 0)
             {
                 EditorGUILayout.LabelField("List is Empty");
             }
-
-            for (int i = 0; i < mgListProp.arraySize; i++)
+            for (int i = 0; i < _materialGroupsProp.arraySize; i++)
             {
-                using (new GUILayout.HorizontalScope())
+                var materialGroupProp = _materialGroupsProp.GetArrayElementAtIndex(i);
+               
+                using (new EditorGUILayout.VerticalScope())
                 {
-                    var materialGroupProp = mgListProp.GetArrayElementAtIndex(i);
-                    EditorGUILayout.PropertyField(materialGroupProp, new GUIContent(materialGroups.MaterialGroupList[i].ID));
-                    if (GUILayout.Button("-", GUILayout.Width(20)))
-                        mgListProp.DeleteArrayElementAtIndex(i);
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        if (materialGroupProp.objectReferenceValue != null)
+                        {
+                            var mg = materialGroupProp.objectReferenceValue as MaterialGroup;
+                            EditorGUILayout.PropertyField(materialGroupProp, new GUIContent(mg? mg.ID : ""));
+                        }
+                        else
+                        {
+                            EditorGUILayout.PropertyField(materialGroupProp);
+
+                        }
+                        if (GUILayout.Button("-", GUILayout.Width(20)))
+                        {
+                            _materialGroupsProp.DeleteArrayElementAtIndex(i);
+                            serializedObject.ApplyModifiedProperties();
+                            return;
+                        }
+                    }
                 }
             }
+            AddMaterialGroupGUI();
 
-            AddMaterialGroupGUI(materialGroups);
             EditorGUI.indentLevel--;
         }
 
-        private void AddMaterialGroupGUI(MaterialGroups mgs)
+        private void AddMaterialGroupGUI()
         {
             using (new GUILayout.HorizontalScope())
             {
                 EditorGUILayout.Separator();
                 if (GUILayout.Button("+", GUILayout.Width(20)))
                 {
-                    ShowNewRecorderMenu(mgs);
+                    ShowNewRecorderMenu();
                 }
             }
         }
 
-        private void AddRecorderInfoToMenu(MaterialGroup mg, MaterialGroups mgs, GenericMenu menu)
+        private void AddRecorderInfoToMenu(MaterialGroup mg, GenericMenu menu)
         {
-            menu.AddItem(new GUIContent(mg.ID), false, data => OnAddMaterialGroup((MaterialGroup)data, mgs), mg);
+            menu.AddItem(new GUIContent(mg.ID), false, data => OnAddMaterialGroup((MaterialGroup)data), mg);
         }
 
-        private void ShowNewRecorderMenu(MaterialGroups mgs)
+        private void ShowNewRecorderMenu()
         {
             var addMaterialGroupMenu = new GenericMenu();
             foreach (var mg in Target.MaterialGroupsInScene)
             {
-                if (mgs.MaterialGroupList.Contains(mg)) continue;
-                AddRecorderInfoToMenu(mg, mgs, addMaterialGroupMenu);
+                if (Target.MaterialGroups.Contains(mg)) continue;
+                AddRecorderInfoToMenu(mg, addMaterialGroupMenu);
             }
 
             if (addMaterialGroupMenu.GetItemCount() == 0)
@@ -178,14 +132,10 @@ namespace sui4.MaterialPropertyBaker
             addMaterialGroupMenu.ShowAsContext();
         }
 
-        private void OnAddMaterialGroup(MaterialGroup materialGroup, in MaterialGroups mgs)
+        private void OnAddMaterialGroup(MaterialGroup materialGroup)
         {
-            mgs.MaterialGroupList.Add(materialGroup);
-            foreach (var materialGroups in Target.MaterialGroupsList)
-            {
-                if (materialGroups == mgs) continue;
-                materialGroups.MaterialGroupList.Remove(materialGroup);
-            }
+            Target.MaterialGroups.Add(materialGroup);
+
         }
     }
 }
