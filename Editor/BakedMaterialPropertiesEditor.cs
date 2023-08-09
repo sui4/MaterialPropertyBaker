@@ -104,15 +104,14 @@ namespace sui4.MaterialPropertyBaker
                         EditorGUILayout.PropertyField(_value, new GUIContent(label));
                     }
 
-                    // remove button
-                    var tmp = GUI.backgroundColor;
-                    GUI.backgroundColor = Color.red;
-                    if (GUILayout.Button("-", GUILayout.Width(30)))
-                    {
-                        props.DeleteArrayElementAtIndex(pi);
-                    }
-
-                    GUI.backgroundColor = tmp;
+                    // // remove button
+                    // var tmp = GUI.backgroundColor;
+                    // GUI.backgroundColor = Color.red;
+                    // if (GUILayout.Button("-", GUILayout.Width(30)))
+                    // {
+                    //     props.DeleteArrayElementAtIndex(pi);
+                    // }
+                    // GUI.backgroundColor = tmp;
                 }
             }
 
