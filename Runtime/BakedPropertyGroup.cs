@@ -11,6 +11,16 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private BakedMaterialProperty _preset;
         public string ID => _id;
         public BakedMaterialProperty Preset => _preset;
+
+        public PresetIDPair()
+        {
+            
+        }
+        public PresetIDPair(string id, BakedMaterialProperty preset)
+        {
+            _id = id;
+            _preset = preset;
+        }
     }
 
     [CreateAssetMenu(menuName = "MaterialPropertyBaker/BakedPropertyGroup", order = 1)]

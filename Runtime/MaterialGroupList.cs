@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
@@ -57,5 +58,28 @@ namespace sui4.MaterialPropertyBaker
                 FindObjectsSortMode.None);
             _materialGroupsInScene = new List<MaterialGroup>(materialGroups);
         }
+        
+#if UNITY_EDITOR
+        [ContextMenu("Create Baked Property Group Asset")]
+        private void CreateBakedPropertyGroupAsset()
+        {
+            var propertyGroup = ScriptableObject.CreateInstance<BakedPropertyGroup>();
+            foreach (var mg in MaterialGroups)
+            {
+                var presetIDPairs = new PresetIDPair(mg.ID, null);
+                propertyGroup.PresetIDPairs.Add(presetIDPairs);
+            }
+            var defaultName = $"New BakedPropertyGroup";
+            var path = EditorUtility.SaveFilePanelInProject("Create BakedPropertyGroup", defaultName, "asset",
+                "BakedPropertyGroup");
+            if (string.IsNullOrEmpty(path))
+            {
+                Debug.LogError("Failed to Create BakedPropertyGroup: Invalid Path");
+                return;
+            }
+            AssetDatabase.CreateAsset(propertyGroup, path);
+            AssetDatabase.SaveAssets();
+        }
+#endif
     }
 }
