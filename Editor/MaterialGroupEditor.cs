@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -93,6 +94,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                 }
             }
+            WarningGUI(Target.Warnings);
         }
 
         // ri = renderer index
@@ -238,7 +240,17 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-
+        private void WarningGUI(List<string> warnings)
+        {
+            // helpBox
+            if (warnings.Count > 0)
+            {
+                foreach (var warning in warnings)
+                {
+                    EditorGUILayout.HelpBox(warning, MessageType.Warning);
+                }
+            }
+        }
         // utils
         private static (SerializedProperty keyMaterialListProp, SerializedProperty valueIsTargetListProp)
             GetSerializedPropertyFrom(SerializedProperty materialStatusSDictWrapperProp)
