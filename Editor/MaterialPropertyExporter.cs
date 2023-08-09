@@ -56,7 +56,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                     else
                     {
-                        DestryAssets();
+                        DestroyAssets();
                     }
                 }
             }
@@ -177,7 +177,7 @@ namespace sui4.MaterialPropertyBaker
             GenerateBakedMaterialProperty(_targetMaterial);
         }
 
-        private void DestryAssets()
+        private void DestroyAssets()
         {
             DestroyConfigIfExist();
             DestroyBakedMaterialPropertyIfExist();
