@@ -126,6 +126,33 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
+        // shaderがconfigと違う場合はisTargetをfalseにする
+        [ContextMenu("Disable UnMatch Material")]
+        private void UnTargetUnMatchMaterial()
+        {
+            if(MaterialPropertyConfig == null) return;
+
+            var shaderName = MaterialPropertyConfig.ShaderName;
+            
+            foreach (var (_, materialStatusDictWrapper) in MaterialStatusDictDict)
+            {
+                List<Material> materialsToDisable = new();
+                foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
+                {
+                    if (isTarget && material.shader.name != shaderName)
+                    {
+                        materialsToDisable.Add(material);
+                    }
+                }
+
+                foreach (var mat in materialsToDisable)
+                {
+                    materialStatusDictWrapper.MaterialStatusDict[mat] = false;
+                }
+            }
+            OnValidate();
+        }
+
         public void SetPropertyBlock(in MaterialProps materialProps)
         {
             _mpb = new MaterialPropertyBlock();
