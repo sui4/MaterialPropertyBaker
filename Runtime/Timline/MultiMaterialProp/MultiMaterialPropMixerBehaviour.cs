@@ -9,9 +9,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         public readonly Dictionary<int, MaterialProp<Color>> ColorPropDict = new();
         public readonly Dictionary<int, MaterialProp<float>> FloatPropDict = new();
+        public readonly Dictionary<int, MaterialProp<Texture>> TexturePropDict = new();
 
         public List<MaterialProp<Color>> ColorProps => ColorPropDict.Values.ToList();
         public List<MaterialProp<float>> FloatProps => FloatPropDict.Values.ToList();
+        public List<MaterialProp<Texture>> TextureProps => TexturePropDict.Values.ToList();
     }
 
     public class MultiMaterialPropMixerBehaviour : PlayableBehaviour
@@ -82,6 +84,23 @@ namespace sui4.MaterialPropertyBaker.Timeline
                                     new MaterialProp<float>(fProps.Name, fProps.Value * inputWeight));
                         }
 
+                        // textureはblendingできない
+                        foreach (var tProps in preset.MaterialProps.Textures)
+                        {
+                            if (propShaderIDDict.TexturePropDict.ContainsKey(tProps.ID))
+                            {
+                                if (inputWeight > 0.5)
+                                {
+                                    propShaderIDDict.TexturePropDict[tProps.ID].Value = tProps.Value;
+                                }
+                            }
+                            else
+                            {
+                                propShaderIDDict.TexturePropDict.Add(tProps.ID,
+                                    new MaterialProp<Texture>(tProps.Name, tProps.Value));
+                            }
+                        }
+
                         _propDict.TryAdd(presetIDPair.ID, propShaderIDDict);
                     }
                 }
@@ -92,7 +111,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var prop = new Dictionary<string, MaterialProps>();
                 foreach (var (presetID, propShaderIDDict) in _propDict)
                 {
-                    prop.Add(presetID, new MaterialProps(propShaderIDDict.ColorProps, propShaderIDDict.FloatProps));
+                    prop.Add(presetID, new MaterialProps(propShaderIDDict.ColorProps, propShaderIDDict.FloatProps, propShaderIDDict.TextureProps));
                 }
 
                 _trackBinding.SetPropertyBlock(prop);

@@ -82,7 +82,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
                 else
                 {
-                    clip.Props.UpdateShaderID();
+                    clip.Props.UpdateShaderIDs();
                 }
             }
 
