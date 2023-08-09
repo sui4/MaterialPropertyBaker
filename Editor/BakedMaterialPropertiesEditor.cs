@@ -40,7 +40,6 @@ namespace sui4.MaterialPropertyBaker
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 EditorGUILayout.LabelField("Shader", _shaderName.stringValue, EditorStyles.boldLabel);
-                EditorGUILayout.Separator();
 
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
@@ -50,7 +49,6 @@ namespace sui4.MaterialPropertyBaker
                     EditorGUI.indentLevel--;
                 }
 
-                EditorGUILayout.Separator();
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
                     EditorGUILayout.LabelField("Floats", EditorStyles.boldLabel);
