@@ -13,6 +13,7 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _materialProps;
         private SerializedProperty _colors;
         private SerializedProperty _floats;
+        private SerializedProperty _textures;
 
 
         private MaterialPropertyConfig _materialPropertyConfig;
@@ -31,6 +32,7 @@ namespace sui4.MaterialPropertyBaker
             _materialProps = serializedObject.FindProperty("_materialProps");
             _colors = _materialProps.FindPropertyRelative("_colors");
             _floats = _materialProps.FindPropertyRelative("_floats");
+            _textures = _materialProps.FindPropertyRelative("_textures");
         }
 
         public override void OnInspectorGUI()
@@ -54,6 +56,14 @@ namespace sui4.MaterialPropertyBaker
                     EditorGUILayout.LabelField("Floats", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
                     PropsGUI(_floats, ShaderPropertyType.Float);
+                    EditorGUI.indentLevel--;
+                }
+                
+                using (new EditorGUILayout.VerticalScope("box"))
+                {
+                    EditorGUILayout.LabelField("Textures", EditorStyles.boldLabel);
+                    EditorGUI.indentLevel++;
+                    PropsGUI(_textures, ShaderPropertyType.Texture);
                     EditorGUI.indentLevel--;
                 }
 
