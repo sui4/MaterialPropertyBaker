@@ -16,9 +16,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private BakedMaterialPropertiesEditor _editor;
         private MaterialPropSwitcherClip _targetClip;
 
-        // プリセットが外れたときに、プリセットの値を_bakedPropertyに引き継ぐための変数
-        private BakedMaterialProperty _presetRefPrev;
-
         private void OnEnable()
         {
             if (target == null)
@@ -36,7 +33,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             // base.OnInspectorGUI();
             if (target == null) return;
-            _presetRefPrev = _targetClip.PresetRef;
             serializedObject.Update();
 
             // initialize
@@ -89,6 +85,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             using (var changeCheck = new EditorGUI.ChangeCheckScope())
             {
+                var prevPresetRef = _presetRef.objectReferenceValue as BakedMaterialProperty;
                 EditorGUILayout.PropertyField(_presetRef, new GUIContent("Preset Profile"));
 
                 // Load Save buttons
@@ -99,18 +96,17 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
                 if (changeCheck.changed)
                 {
-                    serializedObject.ApplyModifiedProperties();
                     var preset = (BakedMaterialProperty)_presetRef.objectReferenceValue;
                     if (preset != null)
                     {
                         preset.UpdateShaderID();
                     }
-                    else if (_presetRefPrev != null)
+                    else if (prevPresetRef != null)
                     {
-                        RenewValueFromPreset(_presetRefPrev);
+                        RenewValueFromPreset(prevPresetRef);
                     }
+                    serializedObject.ApplyModifiedProperties();
 
-                    _presetRefPrev = preset;
                     EditorUtility.SetDirty(target);
 
                     serializedObject.Update();
