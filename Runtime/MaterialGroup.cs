@@ -181,7 +181,7 @@ namespace sui4.MaterialPropertyBaker
                 }
         }
 
-        public void SetPropertyBlock(in Dictionary<int, Color> cPropMap, in Dictionary<int, float> fPropMap)
+        public void SetPropertyBlock(in Dictionary<int, Color> cPropMap, in Dictionary<int, float> fPropMap, in Dictionary<int, Texture> tPropMap)
         {
             _mpb = new MaterialPropertyBlock();
             foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
@@ -202,7 +202,7 @@ namespace sui4.MaterialPropertyBaker
                         }
 
                         // property blockに値をセットし、rendererにproperty blockをセットする
-                        Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap);
+                        Utils.UpdatePropertyBlockFromDict(ref _mpb, cPropMap, fPropMap, tPropMap);
                         renderer.SetPropertyBlock(_mpb, mi);
                     }
                 }

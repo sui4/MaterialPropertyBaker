@@ -8,6 +8,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private readonly Dictionary<int, Color> _cMap = new();
         private readonly Dictionary<int, float> _fMap = new();
+        private readonly Dictionary<int, Texture> _tMap = new();
 
         private MaterialProps _matProps;
         private MaterialGroup _trackBinding;
@@ -24,6 +25,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             _cMap.Clear();
             _fMap.Clear();
+            _tMap.Clear();
             for (var i = 0; i < inputCount; i++)
             {
                 var inputWeight = playable.GetInputWeight(i);
@@ -48,21 +50,34 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     totalWeight += inputWeight;
                     // 重み付き和じゃないといけないので、CreatePropertyBlockFromProfile は使えない
                     foreach (var cProp in _matProps.Colors)
+                    {
                         if (_cMap.ContainsKey(cProp.ID))
                             _cMap[cProp.ID] += cProp.Value * inputWeight;
                         else
                             _cMap.Add(cProp.ID, cProp.Value * inputWeight);
-
+                    }
+                    
                     foreach (var fProp in _matProps.Floats)
+                    {
                         if (_fMap.ContainsKey(fProp.ID))
                             _fMap[fProp.ID] += fProp.Value * inputWeight;
                         else
                             _fMap.Add(fProp.ID, fProp.Value * inputWeight);
+                    }
+
+
+                    foreach (var tProp in _matProps.Textures)
+                    {
+                        if (_tMap.ContainsKey(tProp.ID))
+                            _tMap[tProp.ID] = inputWeight > 0.5 ? tProp.Value : _tMap[tProp.ID];
+                        else
+                            _tMap.Add(tProp.ID, tProp.Value);
+                    }
                 }
             }
 
             if (totalWeight > 0f)
-                _trackBinding.SetPropertyBlock(_cMap, _fMap);
+                _trackBinding.SetPropertyBlock(_cMap, _fMap, _tMap);
             else
                 _trackBinding.ResetDefaultPropertyBlock();
         }

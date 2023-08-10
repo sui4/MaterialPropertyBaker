@@ -27,14 +27,23 @@ namespace sui4.MaterialPropertyBaker
                 mpb.SetColor(c.ID, c.Value);
             foreach (var f in props.Floats)
                 mpb.SetFloat(f.ID, f.Value);
+            foreach (var t in props.Textures)
+            {
+                if(t.Value != null)
+                    mpb.SetTexture(t.ID, t.Value);
+            }
         }
 
         public static void UpdatePropertyBlockFromDict(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropMap,
-            Dictionary<int, float> fPropMap)
+            Dictionary<int, float> fPropMap, Dictionary<int, Texture> tPropMap)
         {
             foreach (var (shaderID, value) in cPropMap) mpb.SetColor(shaderID, value);
-
             foreach (var (shaderID, value) in fPropMap) mpb.SetFloat(shaderID, value);
+            foreach (var (shaderID, value) in tPropMap)
+            {
+                if(value != null)
+                    mpb.SetTexture(shaderID, value);
+            }
         }
 
         public static string UnderscoresToSpaces(string input)
