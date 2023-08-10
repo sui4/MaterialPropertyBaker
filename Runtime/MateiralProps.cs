@@ -35,14 +35,17 @@ namespace sui4.MaterialPropertyBaker
                 switch (propType)
                 {
                     case ShaderPropertyType.Color:
-                        Colors.Add(new MaterialProp<Color>(propName, mat));
+                        var colorValue = mat.GetColor(propName);
+                        Colors.Add(new MaterialProp<Color>(propName, colorValue));
                         break;
                     case ShaderPropertyType.Float:
                     case ShaderPropertyType.Range:
-                        Floats.Add(new MaterialProp<float>(propName, mat));
+                        var floatValue = mat.GetFloat(propName);
+                        Floats.Add(new MaterialProp<float>(propName, floatValue));
                         break;
                     case ShaderPropertyType.Texture:
-                        Textures.Add(new MaterialProp<Texture>(propName, mat));
+                        var texValue = mat.GetTexture(propName);
+                        Textures.Add(new MaterialProp<Texture>(propName, texValue));
                         break;
                     case ShaderPropertyType.Int:
                     case ShaderPropertyType.Vector:
@@ -214,17 +217,17 @@ namespace sui4.MaterialPropertyBaker
             Value = value;
         }
 
-        public MaterialProp(string propName, Material mat) : this(propName)
-        {
-            Value = typeof(T) switch
-            {
-                { } t when t == typeof(Color) => (T)Convert.ChangeType(mat.GetColor(ID), typeof(T)),
-                { } t when t == typeof(Vector4) => (T)Convert.ChangeType(mat.GetVector(ID), typeof(T)),
-                { } t when t == typeof(float) => (T)Convert.ChangeType(mat.GetFloat(ID), typeof(T)),
-                { } t when t == typeof(Texture) => (T)Convert.ChangeType(mat.GetTexture(ID), typeof(T)),
-                _ => Value
-            };
-        }
+        // public MaterialProp(string propName, Material mat) : this(propName)
+        // {
+        //     Value = typeof(T) switch
+        //     {
+        //         { } t when t == typeof(Color) => (T)Convert.ChangeType(mat.GetColor(ID), typeof(T)),
+        //         { } t when t == typeof(Vector4) => (T)Convert.ChangeType(mat.GetVector(ID), typeof(T)),
+        //         { } t when t == typeof(float) => (T)Convert.ChangeType(mat.GetFloat(ID), typeof(T)),
+        //         { } t when t == typeof(Texture) => (T)Convert.ChangeType(mat.GetTexture(ID), typeof(T)), // textureはIConvertibleじゃないので、Convert.ChangeTypeできない
+        //         _ => Value
+        //     };
+        // }
 
         public string Name
         {
