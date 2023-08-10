@@ -23,6 +23,35 @@ namespace sui4.MaterialPropertyBaker
             UpdateShaderID();
         }
 
+        public MaterialProps(Material mat)
+        {
+            for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
+            {
+                var propType = mat.shader.GetPropertyType(pi);
+                var propName = mat.shader.GetPropertyName(pi);
+
+                switch (propType)
+                {
+                    case ShaderPropertyType.Color:
+                        var c = mat.GetColor(propName);
+                        Colors.Add(new MaterialProp<Color>(propName, c));
+                        break;
+                    case ShaderPropertyType.Float:
+                    case ShaderPropertyType.Range:
+                        var f = mat.GetFloat(propName);
+                        Floats.Add(new MaterialProp<float>(propName, f));
+                        break;
+                    case ShaderPropertyType.Int:
+                    case ShaderPropertyType.Vector:
+                    case ShaderPropertyType.Texture:
+                    default:
+                        Debug.LogError("Not supported property type. " + propType);
+                        throw new NotImplementedException();
+                        break;
+                }
+            }
+        }
+
         public List<MaterialProp<Color>> Colors
         {
             get => _colors;
@@ -160,17 +189,18 @@ namespace sui4.MaterialPropertyBaker
             Value = value;
         }
 
-        public MaterialProp(string propName, Material mat) : this(propName)
-        {
-            Value = typeof(T) switch
-            {
-                { } t when t == typeof(Color) => (T)Convert.ChangeType(mat.GetColor(ID), typeof(T)),
-                { } t when t == typeof(Vector4) => (T)Convert.ChangeType(mat.GetVector(ID), typeof(T)),
-                { } t when t == typeof(float) => (T)Convert.ChangeType(mat.GetFloat(ID), typeof(T)),
-                { } t when t == typeof(Texture) => (T)Convert.ChangeType(mat.GetTexture(ID), typeof(T)),
-                _ => Value
-            };
-        }
+        // TextureがIConvertibleを実装していないので、以下のコードは使えない
+        // public MaterialProp(string propName, Material mat) : this(propName)
+        // {
+        //     Value = typeof(T) switch
+        //     {
+        //         { } t when t == typeof(Color) => (T)Convert.ChangeType(mat.GetColor(ID), typeof(T)),
+        //         { } t when t == typeof(Vector4) => (T)Convert.ChangeType(mat.GetVector(ID), typeof(T)),
+        //         { } t when t == typeof(float) => (T)Convert.ChangeType(mat.GetFloat(ID), typeof(T)),
+        //         { } t when t == typeof(Texture) => (T)Convert.ChangeType(mat.GetTexture(ID), typeof(T)),
+        //         _ => Value
+        //     };
+        // }
 
         public string Name
         {
