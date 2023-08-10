@@ -46,7 +46,8 @@ namespace sui4.MaterialPropertyBaker
             _materialProps.CopyValuesFromOther(matProps);
         }
 
-        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList, out List<MaterialProp<Texture>> tList)
+        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList,
+            out List<MaterialProp<Texture>> tList)
         {
             MaterialProps.GetCopyProperties(out cList, out fList, out tList);
         }
@@ -63,33 +64,44 @@ namespace sui4.MaterialPropertyBaker
         {
             if (config == null) return;
 
-            var colorDeleteIndex = new List<int>();
-            var floatDeleteIndex = new List<int>();
-
+            var colorToDelete = new List<MaterialProp<Color>>();
+            var floatToDelete = new List<MaterialProp<float>>();
+            var textureToDelete = new List<MaterialProp<Texture>>();
             // 含まれないプロパティを探す
-            for (var ci = 0; ci < _materialProps.Colors.Count; ci++)
+            foreach (var colorProp in _materialProps.Colors)
             {
-                var colorProp = _materialProps.Colors[ci];
                 var index = config.PropertyNames.IndexOf(colorProp.Name);
                 if (index == -1)
-                    colorDeleteIndex.Add(ci);
-                else if (config.Editable[index] == false) colorDeleteIndex.Add(ci);
+                    colorToDelete.Add(colorProp);
+                else if (config.Editable[index] == false)
+                    colorToDelete.Add(colorProp);
             }
 
-            for (var fi = 0; fi < _materialProps.Floats.Count; fi++)
+            foreach (var floatProp in _materialProps.Floats)
             {
-                var floatProp = _materialProps.Floats[fi];
                 var index = config.PropertyNames.IndexOf(floatProp.Name);
                 if (index == -1)
-                    floatDeleteIndex.Add(fi);
-                else if (config.Editable[index] == false) floatDeleteIndex.Add(fi);
+                    floatToDelete.Add(floatProp);
+                else if (config.Editable[index] == false)
+                    floatToDelete.Add(floatProp);
             }
 
-            // 後ろから削除
-            for (var di = colorDeleteIndex.Count - 1; di >= 0; di--)
-                _materialProps.Colors.RemoveAt(colorDeleteIndex[di]);
-            for (var di = floatDeleteIndex.Count - 1; di >= 0; di--)
-                _materialProps.Floats.RemoveAt(floatDeleteIndex[di]);
+            foreach (var textureProp in _materialProps.Textures)
+            {
+                var index = config.PropertyNames.IndexOf(textureProp.Name);
+                if (index == -1)
+                    textureToDelete.Add(textureProp);
+                else if (config.Editable[index] == false)
+                    textureToDelete.Add(textureProp);
+            }
+
+            // 該当プロパティを削除
+            foreach (var c in colorToDelete)
+                _materialProps.Colors.Remove(c);
+            foreach (var f in floatToDelete)
+                _materialProps.Floats.Remove(f);
+            foreach (var t in textureToDelete)
+                _materialProps.Textures.Remove(t);
         }
     }
 }
