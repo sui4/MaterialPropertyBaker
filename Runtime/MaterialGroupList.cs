@@ -58,7 +58,7 @@ namespace sui4.MaterialPropertyBaker
                 FindObjectsSortMode.None);
             _materialGroupsInScene = new List<MaterialGroup>(materialGroups);
         }
-        
+
 #if UNITY_EDITOR
         [ContextMenu("Create Baked Property Group Asset")]
         private void CreateBakedPropertyGroupAsset()
@@ -69,6 +69,7 @@ namespace sui4.MaterialPropertyBaker
                 var presetIDPairs = new PresetIDPair(mg.ID, null);
                 propertyGroup.PresetIDPairs.Add(presetIDPairs);
             }
+
             var defaultName = $"New BakedPropertyGroup";
             var path = EditorUtility.SaveFilePanelInProject("Create BakedPropertyGroup", defaultName, "asset",
                 "BakedPropertyGroup");
@@ -77,6 +78,7 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogError("Failed to Create BakedPropertyGroup: Invalid Path");
                 return;
             }
+
             AssetDatabase.CreateAsset(propertyGroup, path);
             AssetDatabase.SaveAssets();
         }

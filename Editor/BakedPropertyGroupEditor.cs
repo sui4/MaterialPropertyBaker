@@ -16,6 +16,7 @@ namespace sui4.MaterialPropertyBaker
         private List<bool> _foldouts = new List<bool>();
 
         private List<BakedMaterialPropertiesEditor> _bakedPropertyEditors = new List<BakedMaterialPropertiesEditor>();
+
         private void OnEnable()
         {
             _presetIDPairsProp = serializedObject.FindProperty("_presetIDPairs");
@@ -31,12 +32,12 @@ namespace sui4.MaterialPropertyBaker
             SessionState.SetBool("foldout" + index, state);
             _foldouts[index] = state;
         }
-        
+
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-            if(Target == null) return;
-            
+            if (Target == null) return;
+
             serializedObject.Update();
             using (var change = new EditorGUI.ChangeCheckScope())
             {
@@ -65,21 +66,22 @@ namespace sui4.MaterialPropertyBaker
                     _foldouts[pi] = tmp;
                     SaveFoldoutState(pi, _foldouts[pi]);
                 }
+
                 if (!_foldouts[pi]) continue;
-                
+
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.PropertyField(idProp);
                     EditorGUILayout.PropertyField(presetProp);
-                
+
                     var preset = presetProp.objectReferenceValue as BakedMaterialProperty;
                     using (new EditorGUILayout.VerticalScope("box"))
                     {
                         BakedPropertyEditorGUI(preset, pi);
                     }
                 }
-
             }
+
             EditorGUI.indentLevel--;
         }
 
@@ -89,7 +91,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 return;
             }
-            
+
             if (_bakedPropertyEditors[index] == null)
             {
                 _bakedPropertyEditors[index] = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperty);
@@ -107,7 +109,6 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUI.indentLevel++;
                 _bakedPropertyEditors[index].OnInspectorGUI();
                 EditorGUI.indentLevel--;
-
             }
         }
 

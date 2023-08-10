@@ -14,8 +14,8 @@ namespace sui4.MaterialPropertyBaker
 
         public PresetIDPair()
         {
-            
         }
+
         public PresetIDPair(string id, BakedMaterialProperty preset)
         {
             _id = id;

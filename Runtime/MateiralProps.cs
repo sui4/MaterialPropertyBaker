@@ -143,7 +143,8 @@ namespace sui4.MaterialPropertyBaker
             return hasProp;
         }
 
-        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList, out List<MaterialProp<Texture>> tList)
+        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList,
+            out List<MaterialProp<Texture>> tList)
         {
             cList = new List<MaterialProp<Color>>();
             fList = new List<MaterialProp<float>>();

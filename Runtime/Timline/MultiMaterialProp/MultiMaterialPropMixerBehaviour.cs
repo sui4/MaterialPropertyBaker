@@ -111,7 +111,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var prop = new Dictionary<string, MaterialProps>();
                 foreach (var (presetID, propShaderIDDict) in _propDict)
                 {
-                    prop.Add(presetID, new MaterialProps(propShaderIDDict.ColorProps, propShaderIDDict.FloatProps, propShaderIDDict.TextureProps));
+                    prop.Add(presetID,
+                        new MaterialProps(propShaderIDDict.ColorProps, propShaderIDDict.FloatProps,
+                            propShaderIDDict.TextureProps));
                 }
 
                 _trackBinding.SetPropertyBlock(prop);

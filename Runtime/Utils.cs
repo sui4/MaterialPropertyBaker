@@ -29,7 +29,7 @@ namespace sui4.MaterialPropertyBaker
                 mpb.SetFloat(f.ID, f.Value);
             foreach (var t in props.Textures)
             {
-                if(t.Value != null)
+                if (t.Value != null)
                     mpb.SetTexture(t.ID, t.Value);
             }
         }
@@ -41,7 +41,7 @@ namespace sui4.MaterialPropertyBaker
             foreach (var (shaderID, value) in fPropMap) mpb.SetFloat(shaderID, value);
             foreach (var (shaderID, value) in tPropMap)
             {
-                if(value != null)
+                if (value != null)
                     mpb.SetTexture(shaderID, value);
             }
         }

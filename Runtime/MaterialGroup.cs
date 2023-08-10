@@ -63,7 +63,7 @@ namespace sui4.MaterialPropertyBaker
         public void OnValidate()
         {
             _warnings.Clear();
-            
+
             if (string.IsNullOrWhiteSpace(ID))
             {
                 ID = "Group_" + Guid.NewGuid().ToString();
@@ -71,7 +71,7 @@ namespace sui4.MaterialPropertyBaker
 
             if (Renderers.Count == 0)
                 Renderers.Add(null);
-            
+
             SyncMaterial();
             ValidateShaderName();
         }
@@ -111,7 +111,7 @@ namespace sui4.MaterialPropertyBaker
 
         private void ValidateShaderName()
         {
-            if(MaterialPropertyConfig == null) return;
+            if (MaterialPropertyConfig == null) return;
 
             var shaderName = MaterialPropertyConfig.ShaderName;
             foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
@@ -120,7 +120,8 @@ namespace sui4.MaterialPropertyBaker
                 {
                     if (isTarget && material.shader.name != shaderName)
                     {
-                        _warnings.Add($"Material({material.name}) of Renderer({renderer.name}) use different shader from config({shaderName})");
+                        _warnings.Add(
+                            $"Material({material.name}) of Renderer({renderer.name}) use different shader from config({shaderName})");
                     }
                 }
             }
@@ -130,10 +131,10 @@ namespace sui4.MaterialPropertyBaker
         [ContextMenu("Disable UnMatch Material")]
         private void UnTargetUnMatchMaterial()
         {
-            if(MaterialPropertyConfig == null) return;
+            if (MaterialPropertyConfig == null) return;
 
             var shaderName = MaterialPropertyConfig.ShaderName;
-            
+
             foreach (var (_, materialStatusDictWrapper) in MaterialStatusDictDict)
             {
                 List<Material> materialsToDisable = new();
@@ -150,6 +151,7 @@ namespace sui4.MaterialPropertyBaker
                     materialStatusDictWrapper.MaterialStatusDict[mat] = false;
                 }
             }
+
             OnValidate();
         }
 
@@ -181,7 +183,8 @@ namespace sui4.MaterialPropertyBaker
                 }
         }
 
-        public void SetPropertyBlock(in Dictionary<int, Color> cPropMap, in Dictionary<int, float> fPropMap, in Dictionary<int, Texture> tPropMap)
+        public void SetPropertyBlock(in Dictionary<int, Color> cPropMap, in Dictionary<int, float> fPropMap,
+            in Dictionary<int, Texture> tPropMap)
         {
             _mpb = new MaterialPropertyBlock();
             foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)

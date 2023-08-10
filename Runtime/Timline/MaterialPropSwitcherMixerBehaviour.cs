@@ -56,7 +56,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                         else
                             _cMap.Add(cProp.ID, cProp.Value * inputWeight);
                     }
-                    
+
                     foreach (var fProp in _matProps.Floats)
                     {
                         if (_fMap.ContainsKey(fProp.ID))

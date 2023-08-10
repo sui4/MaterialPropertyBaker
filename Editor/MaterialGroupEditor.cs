@@ -94,6 +94,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                 }
             }
+
             WarningGUI(Target.Warnings);
         }
 
@@ -240,6 +241,7 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
+
         private void WarningGUI(List<string> warnings)
         {
             // helpBox
@@ -251,6 +253,7 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
+
         // utils
         private static (SerializedProperty keyMaterialListProp, SerializedProperty valueIsTargetListProp)
             GetSerializedPropertyFrom(SerializedProperty materialStatusSDictWrapperProp)

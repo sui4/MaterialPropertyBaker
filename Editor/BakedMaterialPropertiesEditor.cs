@@ -58,7 +58,7 @@ namespace sui4.MaterialPropertyBaker
                     PropsGUI(_floats, ShaderPropertyType.Float);
                     EditorGUI.indentLevel--;
                 }
-                
+
                 using (new EditorGUILayout.VerticalScope("box"))
                 {
                     EditorGUILayout.LabelField("Textures", EditorStyles.boldLabel);
