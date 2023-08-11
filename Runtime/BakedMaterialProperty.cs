@@ -97,5 +97,22 @@ namespace sui4.MaterialPropertyBaker
             for (var di = floatDeleteIndex.Count - 1; di >= 0; di--)
                 _materialProps.Floats.RemoveAt(floatDeleteIndex[di]);
         }
+
+        public void SyncPropertyWithConfig(MaterialPropertyConfig config)
+        {
+            DeleteUnEditableProperties(config);
+
+            for (var pi = 0; pi < config.PropertyNames.Count; pi++)
+            {
+                var editable = config.Editable[pi];
+                var propType = config.PropertyTypes[pi];
+                if(!editable || !MaterialProps.IsSupportedType(propType)) continue;
+                var propName = config.PropertyNames[pi];
+                if (!MaterialProps.HasProperties(propName, propType))
+                {
+                    _materialProps.AddProperty(propName, propType);
+                }
+            }
+        }
     }
 }

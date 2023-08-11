@@ -70,15 +70,7 @@ namespace sui4.MaterialPropertyBaker
                 propertyGroup.PresetIDPairs.Add(presetIDPairs);
             }
             var defaultName = $"New BakedPropertyGroup";
-            var path = EditorUtility.SaveFilePanelInProject("Create BakedPropertyGroup", defaultName, "asset",
-                "BakedPropertyGroup");
-            if (string.IsNullOrEmpty(path))
-            {
-                Debug.LogError("Failed to Create BakedPropertyGroup: Invalid Path");
-                return;
-            }
-            AssetDatabase.CreateAsset(propertyGroup, path);
-            AssetDatabase.SaveAssets();
+            Utils.CreateAsset(propertyGroup, defaultName, "Create BakedPropertyGroup", "BakedPropertyGroup");
         }
 #endif
     }
