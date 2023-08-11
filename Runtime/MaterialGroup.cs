@@ -58,6 +58,8 @@ namespace sui4.MaterialPropertyBaker
             _mpb = new MaterialPropertyBlock();
             if (Renderers.Count == 0)
                 Renderers.Add(null);
+            
+            OnValidate();
         }
 
         public void OnValidate()
