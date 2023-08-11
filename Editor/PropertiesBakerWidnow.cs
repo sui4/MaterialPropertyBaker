@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using System;
 using System.Collections.Generic;
@@ -440,7 +440,7 @@ namespace sui4.MaterialPropertyBaker
             preset = CreateInstance<BakedMaterialProperty>();
             preset.name = mat.name;
             preset.ShaderName = mat.shader.name;
-            preset.CreatePropsFromMaterial(mat);
+            preset.CreatePropsFrom(mat);
         }
     }
 }

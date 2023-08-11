@@ -33,14 +33,20 @@ namespace sui4.MaterialPropertyBaker
                 _materialProps.UpdateShaderID();
         }
 
-        public void CreatePropsFromMaterial(in Material mat)
+        public void CreatePropsFrom(in Material mat)
         {
             _shaderName = mat.shader.name;
             _materialProps = new MaterialProps(mat);
             UpdateShaderID();
         }
 
-        public void CreatePropsFromOther(in MaterialProps matProps)
+        public void CreatePropsFrom(in Material mat, in MaterialPropertyConfig config)
+        {
+            _shaderName = mat.shader.name;
+            _materialProps = new MaterialProps(mat, config);
+            UpdateShaderID();
+        }
+        public void CreatePropsFrom(in MaterialProps matProps)
         {
             _materialProps ??= new MaterialProps();
             _materialProps.CopyValuesFromOther(matProps);
