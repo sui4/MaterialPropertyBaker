@@ -18,8 +18,8 @@ namespace sui4.MaterialPropertyBaker
 
         public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f)
         {
-            _colors.AddRange(c);
-            _floats.AddRange(f);
+            Colors.AddRange(c);
+            Floats.AddRange(f);
             UpdateShaderID();
         }
 
@@ -93,7 +93,7 @@ namespace sui4.MaterialPropertyBaker
 
         public bool IsEmpty()
         {
-            return _colors.Count == 0 && _floats.Count == 0;
+            return Colors.Count == 0 && Floats.Count == 0;
         }
 
         public static bool IsSupportedType(ShaderPropertyType type)
@@ -112,10 +112,10 @@ namespace sui4.MaterialPropertyBaker
 
         public void UpdateShaderID()
         {
-            foreach (var c in _colors)
+            foreach (var c in Colors)
                 c.UpdateShaderID();
 
-            foreach (var f in _floats)
+            foreach (var f in Floats)
                 f.UpdateShaderID();
         }
 
@@ -124,17 +124,15 @@ namespace sui4.MaterialPropertyBaker
             switch (spType)
             {
                 case ShaderPropertyType.Color:
-                    _colors.Add(new MaterialProp<Color>(propName));
+                    Colors.Add(new MaterialProp<Color>(propName));
                     break;
                 case ShaderPropertyType.Float:
                 case ShaderPropertyType.Range:
-                    _floats.Add(new MaterialProp<float>(propName));
+                    Floats.Add(new MaterialProp<float>(propName));
                     break;
                 case ShaderPropertyType.Int:
                 case ShaderPropertyType.Vector:
                 case ShaderPropertyType.Texture:
-                    Debug.LogWarning($"Not supported property type. {spType}");
-                    break;
                 default:
                     Debug.LogWarning($"Not supported property type. {spType}");
                     break;
@@ -143,30 +141,21 @@ namespace sui4.MaterialPropertyBaker
 
         public bool HasProperties(string propName, ShaderPropertyType spType)
         {
-            var hasProp = false;
-            switch (spType)
+            if (!IsSupportedType(spType))
             {
-                case ShaderPropertyType.Color:
-                    // var foundMaterialProp = _colors.FirstOrDefault(materialProp => materialProp.Name == propName);
-                    hasProp = _colors.Any(materialProp => materialProp.Name == propName);
-                    break;
-                case ShaderPropertyType.Float:
-                case ShaderPropertyType.Range:
-                    hasProp = _floats.Any(materialProp => materialProp.Name == propName);
-                    break;
-                case ShaderPropertyType.Int:
-                case ShaderPropertyType.Vector:
-                case ShaderPropertyType.Texture:
-                    hasProp = false;
-                    Debug.LogWarning($"Not supported property type. {spType}");
-                    break;
-                default:
-                    hasProp = false;
-                    Debug.LogWarning($"Not supported property type. {spType}");
-                    break;
+                Debug.LogWarning($"{spType.ToString()} is not supported type.");
+                return false;
             }
-
-            return hasProp;
+            return spType switch
+            {
+                ShaderPropertyType.Color => Colors.Any(materialProp => materialProp.Name == propName),
+                ShaderPropertyType.Float => Floats.Any(materialProp => materialProp.Name == propName),
+                ShaderPropertyType.Range => Floats.Any(materialProp => materialProp.Name == propName),
+                ShaderPropertyType.Int => false,
+                ShaderPropertyType.Vector => false,
+                ShaderPropertyType.Texture => false,
+                _ => false
+            };
         }
 
         public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
@@ -175,7 +164,7 @@ namespace sui4.MaterialPropertyBaker
             fList = new List<MaterialProp<float>>();
             // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
             // Listになってる各MaterialPropがクラスのため、参照になっちゃう
-            foreach (var colors in _colors)
+            foreach (var colors in Colors)
             {
                 var c = new MaterialProp<Color>
                 {
@@ -186,7 +175,7 @@ namespace sui4.MaterialPropertyBaker
                 cList.Add(c);
             }
 
-            foreach (var floats in _floats)
+            foreach (var floats in Floats)
             {
                 var f = new MaterialProp<float>
                 {
@@ -201,8 +190,8 @@ namespace sui4.MaterialPropertyBaker
         public void CopyValuesFromOther(in MaterialProps other)
         {
             other.GetCopyProperties(out var outC, out var outF);
-            _colors = outC;
-            _floats = outF;
+            Colors = outC;
+            Floats = outF;
         }
     }
 
