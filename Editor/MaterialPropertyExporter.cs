@@ -11,12 +11,11 @@ namespace sui4.MaterialPropertyBaker
         private const string WindowTitle = "Material Property Exporter";
 
         private MaterialPropertyConfig _materialPropertyConfig;
+        private MaterialPropertyConfig _existingConfigAsset;
         private MaterialPropertyConfigEditor _editor;
         private bool _useExistingConfig = false;
-        private bool _useExistingConfigPrev = false;
 
         private Material _targetMaterial;
-        private Material _targetMaterialPrev;
 
         private BakedMaterialProperty _bakedMaterialProperty;
 
@@ -32,74 +31,62 @@ namespace sui4.MaterialPropertyBaker
 
         private void OnGUI()
         {
-            _targetMaterial =
-                EditorGUILayout.ObjectField("Target Material", _targetMaterial, typeof(Material), false) as Material;
-
-            if (_targetMaterial != null)
+            using (var change = new EditorGUI.ChangeCheckScope())
             {
-                EditorGUILayout.LabelField("Target Shader", _targetMaterial.shader.name);
-                if (_targetMaterial != _targetMaterialPrev)
+                _targetMaterial =
+                    EditorGUILayout.ObjectField("Target Material", _targetMaterial, typeof(Material),
+                        false) as Material;
+                if (change.changed && _targetMaterial != null)
                 {
                     GenerateConfig(_targetMaterial.shader);
-
-                    _useExistingConfig = false;
-                    _useExistingConfigPrev = false;
-                    _targetMaterialPrev = _targetMaterial;
                 }
+            }
 
-                if (_useExistingConfig != _useExistingConfigPrev)
-                {
-                    _useExistingConfigPrev = _useExistingConfig;
-                    if (_useExistingConfig == false)
-                    {
-                        GenerateConfig(_targetMaterial.shader);
-                    }
-                    else
-                    {
-                        DestroyConfigIfExist();
-                    }
-                }
+            var isTargetMaterialExist = _targetMaterial != null;
+            if (isTargetMaterialExist)
+            {
+                EditorGUILayout.LabelField("Target Shader", _targetMaterial.shader.name);
             }
 
             EditorGUILayout.Separator();
 
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                using (new EditorGUILayout.HorizontalScope())
+                using (var change = new EditorGUI.ChangeCheckScope())
                 {
-                    EditorGUILayout.LabelField("Material Property Config", EditorStyles.boldLabel);
-                    _useExistingConfig = EditorGUILayout.ToggleLeft("Use Existing Config", _useExistingConfig);
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField("Material Property Config", EditorStyles.boldLabel);
+                        _useExistingConfig = EditorGUILayout.ToggleLeft("Use Existing Config", _useExistingConfig);
+                    }
+
+                    if (change.changed && !_useExistingConfig)
+                    {
+                        _existingConfigAsset = null;
+                    }
                 }
 
                 if (_useExistingConfig)
                 {
-                    _materialPropertyConfig =
-                        EditorGUILayout.ObjectField("Config", _materialPropertyConfig, typeof(MaterialPropertyConfig),
+                    _existingConfigAsset =
+                        EditorGUILayout.ObjectField("Config", _existingConfigAsset, typeof(MaterialPropertyConfig),
                             false) as MaterialPropertyConfig;
-                    if (_materialPropertyConfig != null && _targetMaterial != null)
+                    if (isTargetMaterialExist && _existingConfigAsset != null &&
+                        _existingConfigAsset.ShaderName != _targetMaterial.shader.name)
                     {
-                        if (_materialPropertyConfig.ShaderName != _targetMaterial.shader.name)
-                        {
-                            EditorGUILayout.HelpBox("Shader is not matched.", MessageType.Error);
-                        }
-                        else
-                        {
-                            ConfigGUI(_materialPropertyConfig);
-                        }
+                        EditorGUILayout.HelpBox("Shader is not matched.", MessageType.Error);
                     }
                 }
-                else
-                {
-                    ConfigGUI(_materialPropertyConfig);
-                }
+
+                ConfigGUI(_useExistingConfig ? _existingConfigAsset : _materialPropertyConfig);
             }
 
             EditorGUILayout.Separator();
-            var isValid = _targetMaterial != null && _materialPropertyConfig != null;
-            isValid = isValid && _materialPropertyConfig.ShaderName == _targetMaterial.shader.name;
-            GUI.enabled = isValid;
-            ExportButtonGUI();
-            GUI.enabled = true;
+
+            using (new EditorGUI.DisabledScope(!IsValid()))
+            {
+                ExportButtonGUI();
+            }
         }
 
         private void ExportButtonGUI()
@@ -136,6 +123,14 @@ namespace sui4.MaterialPropertyBaker
 
         #endregion
 
+        private bool IsValid()
+        {
+            var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
+            return _targetMaterial != null &&
+                   config != null &&
+                   config.ShaderName == _targetMaterial.shader.name;
+        }
+
         # region Event
 
         private void OnExportButtonClicked()
@@ -147,8 +142,9 @@ namespace sui4.MaterialPropertyBaker
 
             // folderPathの.assetを"_config.asset"に置き換える
             var configPath = $"{folderPath.Replace(".asset", "")}_config.asset";
-            ExportConfig(_materialPropertyConfig, configPath, out var exportedConfig);
-            
+            var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
+            ExportConfig(config, configPath, out var exportedConfig);
+
             GenerateBakedMaterialProperty(_targetMaterial);
             _bakedMaterialProperty.DeleteUnEditableProperties(exportedConfig);
             // folderPathの.assetを"_properties.asset"に置き換える
@@ -181,7 +177,6 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        // 直接呼ばない。GenerateAssetsを使う
         private void GenerateBakedMaterialProperty(Material targetMaterial)
         {
             DestroyBakedMaterialPropertyIfExist();
@@ -203,8 +198,7 @@ namespace sui4.MaterialPropertyBaker
                 _bakedMaterialProperty = null;
             }
         }
-
-
+        
         // path: Assets以下のパス, ファイル名込み
         private bool ExportConfig(in MaterialPropertyConfig materialPropertyConfig, string path,
             out MaterialPropertyConfig exported, bool refresh = true)
