@@ -40,7 +40,7 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUILayout.LabelField("Target Shader", _targetMaterial.shader.name);
                 if (_targetMaterial != _targetMaterialPrev)
                 {
-                    GenerateAssets();
+                    GenerateConfig(_targetMaterial.shader);
 
                     _useExistingConfig = false;
                     _useExistingConfigPrev = false;
@@ -52,11 +52,11 @@ namespace sui4.MaterialPropertyBaker
                     _useExistingConfigPrev = _useExistingConfig;
                     if (_useExistingConfig == false)
                     {
-                        GenerateAssets();
+                        GenerateConfig(_targetMaterial.shader);
                     }
                     else
                     {
-                        DestroyAssets();
+                        DestroyConfigIfExist();
                     }
                 }
             }
@@ -95,7 +95,7 @@ namespace sui4.MaterialPropertyBaker
             }
 
             EditorGUILayout.Separator();
-            var isValid = _targetMaterial != null && _materialPropertyConfig != null && _bakedMaterialProperty != null;
+            var isValid = _targetMaterial != null && _materialPropertyConfig != null;
             isValid = isValid && _materialPropertyConfig.ShaderName == _targetMaterial.shader.name;
             GUI.enabled = isValid;
             ExportButtonGUI();
@@ -116,26 +116,15 @@ namespace sui4.MaterialPropertyBaker
 
         private void ConfigGUI(MaterialPropertyConfig materialPropertyConfig)
         {
+            if (materialPropertyConfig == null) return;
             if (_editor == null)
             {
-                if (_materialPropertyConfig == null)
-                {
-                    if (_targetMaterial == null)
-                    {
-                        return;
-                    }
-
-                    GenerateAssets();
-                }
-
                 _editor = (MaterialPropertyConfigEditor)Editor.CreateEditor(materialPropertyConfig);
             }
             else if (_editor.target != materialPropertyConfig)
             {
                 DestroyImmediate(_editor);
                 _editor = null;
-                if (_materialPropertyConfig == null)
-                    return;
                 _editor = (MaterialPropertyConfigEditor)Editor.CreateEditor(materialPropertyConfig);
             }
 
@@ -152,7 +141,6 @@ namespace sui4.MaterialPropertyBaker
         private void OnExportButtonClicked()
         {
             var defaultName = Utils.MakeFileNameSafe(_targetMaterial.name);
-            defaultName = $"{defaultName}";
             var folderPath = EditorUtility.SaveFilePanelInProject("Save Config and Properties", defaultName, "asset",
                 "MaterialPropertyBakerData");
             if (string.IsNullOrEmpty(folderPath)) return;
@@ -160,7 +148,8 @@ namespace sui4.MaterialPropertyBaker
             // folderPathの.assetを"_config.asset"に置き換える
             var configPath = $"{folderPath.Replace(".asset", "")}_config.asset";
             ExportConfig(_materialPropertyConfig, configPath, out var exportedConfig);
-
+            
+            GenerateBakedMaterialProperty(_targetMaterial);
             _bakedMaterialProperty.DeleteUnEditableProperties(exportedConfig);
             // folderPathの.assetを"_properties.asset"に置き換える
             var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
@@ -171,19 +160,6 @@ namespace sui4.MaterialPropertyBaker
 
         #region Assets
 
-        private void GenerateAssets()
-        {
-            GenerateConfig(_targetMaterial.shader);
-            GenerateBakedMaterialProperty(_targetMaterial);
-        }
-
-        private void DestroyAssets()
-        {
-            DestroyConfigIfExist();
-            DestroyBakedMaterialPropertyIfExist();
-        }
-
-        // 直接呼ばない。GenerateAssetsを使う
         private void GenerateConfig(Shader shader)
         {
             DestroyConfigIfExist();
