@@ -158,44 +158,29 @@ namespace sui4.MaterialPropertyBaker
 
         private void GenerateConfig(Shader shader)
         {
-            DestroyConfigIfExist();
-
+            DestroyScriptableObjectIfExist(ref _materialPropertyConfig);
             _materialPropertyConfig = CreateInstance<MaterialPropertyConfig>();
             _materialPropertyConfig.LoadProperties(shader);
         }
 
-        private void DestroyConfigIfExist()
-        {
-            if (_materialPropertyConfig != null)
-            {
-                if (!AssetDatabase.IsMainAsset(_materialPropertyConfig))
-                {
-                    DestroyImmediate(_materialPropertyConfig);
-                }
-
-                _materialPropertyConfig = null;
-            }
-        }
-
         private void GenerateBakedMaterialProperty(Material targetMaterial)
         {
-            DestroyBakedMaterialPropertyIfExist();
-
+            DestroyScriptableObjectIfExist(ref _bakedMaterialProperty);
             _bakedMaterialProperty = CreateInstance<BakedMaterialProperty>();
             _bakedMaterialProperty.ShaderName = _targetMaterial.shader.name;
             _bakedMaterialProperty.CreatePropsFrom(targetMaterial);
         }
 
-        private void DestroyBakedMaterialPropertyIfExist()
+        private static void DestroyScriptableObjectIfExist<T>(ref T scriptableObject) where T : ScriptableObject
         {
-            if (_bakedMaterialProperty != null)
+            if (scriptableObject != null)
             {
-                if (!AssetDatabase.IsMainAsset(_bakedMaterialProperty))
+                if (!AssetDatabase.IsMainAsset(scriptableObject))
                 {
-                    DestroyImmediate(_bakedMaterialProperty);
+                    DestroyImmediate(scriptableObject);
                 }
 
-                _bakedMaterialProperty = null;
+                scriptableObject = null;
             }
         }
 
