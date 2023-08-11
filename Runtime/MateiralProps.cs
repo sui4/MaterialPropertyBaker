@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -28,6 +28,7 @@ namespace sui4.MaterialPropertyBaker
             for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
             {
                 var propType = mat.shader.GetPropertyType(pi);
+                if(!IsSupportedType(propType)) continue;
                 var propName = mat.shader.GetPropertyName(pi);
 
                 switch (propType)
@@ -67,6 +68,20 @@ namespace sui4.MaterialPropertyBaker
         public bool IsEmpty()
         {
             return _colors.Count == 0 && _floats.Count == 0;
+        }
+
+        public static bool IsSupportedType(ShaderPropertyType type)
+        {
+            return type switch
+            {
+                ShaderPropertyType.Color => true,
+                ShaderPropertyType.Float => true,
+                ShaderPropertyType.Range => true,
+                ShaderPropertyType.Int => false,
+                ShaderPropertyType.Vector => false,
+                ShaderPropertyType.Texture => false,
+                _ => false
+            };
         }
 
         public void UpdateShaderID()
