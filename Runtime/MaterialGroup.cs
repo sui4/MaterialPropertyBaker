@@ -24,7 +24,7 @@ namespace sui4.MaterialPropertyBaker
 
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         private MaterialPropertyBlock _mpb;
-        private List<string> _warnings = new();
+        private readonly List<string> _warnings = new();
 
         public BakedMaterialProperty OverrideDefaultPreset
         {
@@ -58,12 +58,14 @@ namespace sui4.MaterialPropertyBaker
             _mpb = new MaterialPropertyBlock();
             if (Renderers.Count == 0)
                 Renderers.Add(null);
+            
+            OnValidate();
         }
 
         public void OnValidate()
         {
             _warnings.Clear();
-            
+
             if (string.IsNullOrWhiteSpace(ID))
             {
                 ID = "Group_" + Guid.NewGuid().ToString();
@@ -71,7 +73,11 @@ namespace sui4.MaterialPropertyBaker
 
             if (Renderers.Count == 0)
                 Renderers.Add(null);
-            
+
+            if (MaterialPropertyConfig == null)
+            {
+                Warnings.Add("MaterialPropertyConfig should be set");
+            }
             SyncMaterial();
             ValidateShaderName();
         }
@@ -93,17 +99,13 @@ namespace sui4.MaterialPropertyBaker
                         if (!Array.Exists(renderer.sharedMaterials, m => m == material))
                             materialKeysToRemove.Add(material);
                     foreach (var mat in materialKeysToRemove) materialStatusDictWrapper.MaterialStatusDict.Remove(mat);
-                    // materialが増えてれば追加する. shaderが違う場合はisTargetをfalseにする
+                    // materialが増えてれば追加する. shaderがconfigと一致していればtargetにする
                     foreach (var material in renderer.sharedMaterials)
                     {
-                        if (MaterialPropertyConfig != null && material.shader.name != MaterialPropertyConfig.ShaderName)
-                        {
-                            materialStatusDictWrapper.MaterialStatusDict.TryAdd(material, false);
-                        }
-                        else
-                        {
-                            materialStatusDictWrapper.MaterialStatusDict.TryAdd(material, true);
-                        }
+                        var isTarget = MaterialPropertyConfig != null &&
+                                       material.shader.name == MaterialPropertyConfig.ShaderName;
+
+                        materialStatusDictWrapper.MaterialStatusDict.TryAdd(material, isTarget);
                     }
                 }
             }
@@ -111,29 +113,35 @@ namespace sui4.MaterialPropertyBaker
 
         private void ValidateShaderName()
         {
-            if(MaterialPropertyConfig == null) return;
+            var hasConfig = MaterialPropertyConfig != null;
 
-            var shaderName = MaterialPropertyConfig.ShaderName;
+            var shaders = new HashSet<string>();
             foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
             {
                 foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
                 {
-                    if (isTarget && material.shader.name != shaderName)
+                    if (!isTarget) continue;
+                    shaders.Add(material.shader.name);
+                    if (hasConfig && material.shader.name != MaterialPropertyConfig.ShaderName)
                     {
-                        _warnings.Add($"Material({material.name}) of Renderer({renderer.name}) use different shader from config({shaderName})");
+                        _warnings.Add(
+                            $"Material({material.name}) of Renderer({renderer.name}) use different shader from config({MaterialPropertyConfig.ShaderName})");
                     }
                 }
             }
+
+            if (!hasConfig && shaders.Count > 1)
+                _warnings.Add($"MaterialGroup({ID}) has multiple shaders({string.Join(", ", shaders)})");
         }
 
         // shaderがconfigと違う場合はisTargetをfalseにする
         [ContextMenu("Disable UnMatch Material")]
         private void UnTargetUnMatchMaterial()
         {
-            if(MaterialPropertyConfig == null) return;
+            if (MaterialPropertyConfig == null) return;
 
             var shaderName = MaterialPropertyConfig.ShaderName;
-            
+
             foreach (var (_, materialStatusDictWrapper) in MaterialStatusDictDict)
             {
                 List<Material> materialsToDisable = new();
@@ -150,6 +158,7 @@ namespace sui4.MaterialPropertyBaker
                     materialStatusDictWrapper.MaterialStatusDict[mat] = false;
                 }
             }
+
             OnValidate();
         }
 

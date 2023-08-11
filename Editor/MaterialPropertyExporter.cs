@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -19,11 +20,23 @@ namespace sui4.MaterialPropertyBaker
 
         private BakedMaterialProperty _bakedMaterialProperty;
 
+        private event Action<MaterialPropertyConfig> actionOnExported;
+
         [MenuItem("MaterialPropertyBaker/Material Property Exporter")]
         public static void Init()
         {
             var window = (MaterialPropertyExporter)GetWindow(typeof(MaterialPropertyExporter));
             window.titleContent = new GUIContent(WindowTitle);
+            window.Show();
+        }
+
+        public static void Init(Material target, Action<MaterialPropertyConfig> onExported)
+        {
+            var window = (MaterialPropertyExporter)GetWindow(typeof(MaterialPropertyExporter));
+            window.titleContent = new GUIContent(WindowTitle);
+            window._targetMaterial = target;
+            window.actionOnExported = onExported;
+            window.GenerateConfig(target.shader);
             window.Show();
         }
 
@@ -150,6 +163,13 @@ namespace sui4.MaterialPropertyBaker
             // folderPathの.assetを"_properties.asset"に置き換える
             var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
             ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var exportedProperty);
+
+            if (actionOnExported != null)
+            {
+                actionOnExported?.Invoke(exportedConfig as MaterialPropertyConfig);
+                actionOnExported = null;
+                this.Close();
+            }
         }
 
         #endregion // event

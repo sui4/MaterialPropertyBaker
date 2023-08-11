@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEditor;
 using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
@@ -58,5 +59,20 @@ namespace sui4.MaterialPropertyBaker
             // 正規表現を使って、指定した記号をハイフンに置き換える
             return Regex.Replace(fileName, pattern, "-");
         }
+
+#if UNITY_EDITOR
+        public static void CreateAsset(ScriptableObject assetToSave, string defaultName, string title, string message)
+        {
+            var path = EditorUtility.SaveFilePanelInProject(title, defaultName, "asset",
+                message);
+            if (string.IsNullOrEmpty(path))
+            {
+                Debug.LogError("Failed to Create Asset: Invalid Path");
+                return;
+            }
+            AssetDatabase.CreateAsset(assetToSave, path);
+            AssetDatabase.SaveAssets();
+        }
+#endif
     }
 }

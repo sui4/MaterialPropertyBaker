@@ -81,5 +81,15 @@ namespace sui4.MaterialPropertyBaker
 
             Debug.Log($"{_shaderName} has {_propertyNames.Count} properties");
         }
+#if UNITY_EDITOR
+        [ContextMenu("CreateBakedMaterialProperty")]
+        private void CreateBakedProperty()
+        {
+            var bakedProp = CreateInstance<BakedMaterialProperty>();
+            bakedProp.SyncPropertyWithConfig(this);
+            var defaultName = $"{ShaderName}_properties";
+            Utils.CreateAsset(bakedProp, defaultName, "Create BakedMaterialProperty", "BakedMaterialProperty");
+        }
+#endif
     }
 }

@@ -49,7 +49,14 @@ namespace sui4.MaterialPropertyBaker
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 EditorGUILayout.PropertyField(_idProp, Styles.IDLabel);
-                EditorGUILayout.PropertyField(_materialPropertyConfigProp, Styles.MaterialPropertyConfigLabel);
+                using (new GUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.PropertyField(_materialPropertyConfigProp, Styles.MaterialPropertyConfigLabel);
+                    if (GUILayout.Button("New", GUILayout.Width(50)))
+                    {
+                        CreateConfigAsset();
+                    }
+                }
                 EditorGUILayout.PropertyField(_defaultProfileProp, Styles.OverrideDefaultProfileLabel);
 
                 if (change.changed)
@@ -112,7 +119,6 @@ namespace sui4.MaterialPropertyBaker
                     {
                         var newRenderer = rendererProp.objectReferenceValue as Renderer;
                         OnRendererChanging(currentRenderer, newRenderer, ri);
-                        Target.OnValidate();
                     }
                 }
 
@@ -122,8 +128,8 @@ namespace sui4.MaterialPropertyBaker
                     {
                         Target.MaterialStatusDictDict.Remove(currentRenderer);
                     }
-
                     Target.Renderers.RemoveAt(ri);
+                    Target.OnValidate();
                     EditorUtility.SetDirty(Target);
                     serializedObject.Update();
                     return;
@@ -195,7 +201,9 @@ namespace sui4.MaterialPropertyBaker
 
                 foreach (var mat in newRenderer.sharedMaterials)
                 {
-                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
+                    var isTarget = Target.MaterialPropertyConfig != null &&
+                                   Target.MaterialPropertyConfig.ShaderName == mat.shader.name;
+                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, isTarget))
                     {
                         // failed to add
                         Debug.LogWarning($"MaterialGroup: Failed to add material to MaterialStatusDict {target.name}");
@@ -214,7 +222,7 @@ namespace sui4.MaterialPropertyBaker
 
                 Target.Renderers[ri] = newRenderer;
             }
-
+            Target.OnValidate();
             EditorUtility.SetDirty(Target);
             serializedObject.Update();
         }
@@ -240,7 +248,7 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        private void WarningGUI(List<string> warnings)
+        private static void WarningGUI(List<string> warnings)
         {
             // helpBox
             if (warnings.Count > 0)
@@ -251,6 +259,43 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
+
+        private void CreateConfigAsset()
+        {
+            // get any material from any renderer that is target
+            Material mat = GetAnyTargetMaterial();
+            if (mat == null)
+            {
+                Debug.LogWarning("MaterialGroup: No target material found. Please add a material to MaterialGroup.");
+                return;
+            }
+            
+            MaterialPropertyExporter.Init(mat, OnExported);
+        }
+
+        private void OnExported(MaterialPropertyConfig config)
+        {
+            Target.MaterialPropertyConfig = config;
+            Target.OnValidate();
+            EditorUtility.SetDirty(Target);
+        }
+
+        private Material GetAnyTargetMaterial()
+        {
+            foreach (var (ren, materialStatusDictWrapper) in Target.MaterialStatusDictDict)
+            {
+                foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
+                {
+                    if(isTarget)
+                    {
+                        return material;
+                    }
+                }
+            }
+
+            return null;
+        }
+        
         // utils
         private static (SerializedProperty keyMaterialListProp, SerializedProperty valueIsTargetListProp)
             GetSerializedPropertyFrom(SerializedProperty materialStatusSDictWrapperProp)
