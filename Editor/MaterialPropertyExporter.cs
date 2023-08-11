@@ -236,13 +236,13 @@ namespace sui4.MaterialPropertyBaker
             exported = null;
             if (string.IsNullOrEmpty(path))
             {
-                Debug.LogError($"Failed to export ShaderProperties: path is null or empty.");
+                Debug.LogError($"Failed to export Baked Property Config: path is null or empty.");
                 return false;
             }
 
             if (materialPropertyConfig == null)
             {
-                Debug.LogError("Failed to export ShaderProperties: shaderProperties is null.");
+                Debug.LogError("Failed to export Baked Property Config: Baked Property Config is null.");
             }
 
             exported = Instantiate(materialPropertyConfig);
@@ -292,8 +292,8 @@ namespace sui4.MaterialPropertyBaker
             if (File.Exists(path))
             {
                 Debug.Log($"{GetType()}: delete existing: {path}");
-                var sucess = AssetDatabase.DeleteAsset(path);
-                if (!sucess)
+                var success = AssetDatabase.DeleteAsset(path);
+                if (!success)
                 {
                     Debug.LogError($"{GetType()}: failed to delete existing: {path}");
                     return false;
