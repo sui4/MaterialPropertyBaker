@@ -154,7 +154,9 @@ PlayableDirector:
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
-  m_SceneBindings: []
+  m_SceneBindings:
+  - key: {fileID: -306108171692625359, guid: 79591e58db659a647b4be8102d825e3a, type: 2}
+    value: {fileID: 0}
   m_ExposedReferences:
     m_References: []
 --- !u!4 &276830326
@@ -208,7 +210,7 @@ MonoBehaviour:
     _values: []
   _renderers:
   - {fileID: 0}
-  _id: Group_ad3b700a-6532-499b-bbc8-6bf3fecd182b
+  _id: Eye
 --- !u!4 &280343277
 Transform:
   m_ObjectHideFlags: 0
@@ -260,7 +262,7 @@ MonoBehaviour:
     _values: []
   _renderers:
   - {fileID: 0}
-  _id: Group_109f0fd4-f3f2-4def-8b21-38c2e93b4eab
+  _id: Face
 --- !u!4 &519973630
 Transform:
   m_ObjectHideFlags: 0
@@ -493,8 +495,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _materialGroups:
   - {fileID: 519973629}
-  - {fileID: 1950335770}
   - {fileID: 280343276}
+  - {fileID: 1950335770}
 --- !u!4 &1299734792
 Transform:
   m_ObjectHideFlags: 0
@@ -549,7 +551,7 @@ MonoBehaviour:
     _values: []
   _renderers:
   - {fileID: 0}
-  _id: Group_59a933c7-11de-43da-bf9a-6b9a133d580c
+  _id: Body
 --- !u!4 &1950335771
 Transform:
   m_ObjectHideFlags: 0

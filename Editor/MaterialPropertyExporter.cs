@@ -20,7 +20,7 @@ namespace sui4.MaterialPropertyBaker
 
         private BakedMaterialProperty _bakedMaterialProperty;
 
-        [MenuItem("tools/Material Property Baker/Material Property Exporter")]
+        [MenuItem("MaterialPropertyBaker/Material Property Exporter")]
         public static void Init()
         {
             var window = (MaterialPropertyExporter)GetWindow(typeof(MaterialPropertyExporter));
@@ -56,7 +56,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                     else
                     {
-                        DestryAssets();
+                        DestroyAssets();
                     }
                 }
             }
@@ -177,7 +177,7 @@ namespace sui4.MaterialPropertyBaker
             GenerateBakedMaterialProperty(_targetMaterial);
         }
 
-        private void DestryAssets()
+        private void DestroyAssets()
         {
             DestroyConfigIfExist();
             DestroyBakedMaterialPropertyIfExist();

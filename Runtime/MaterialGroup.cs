@@ -24,6 +24,7 @@ namespace sui4.MaterialPropertyBaker
 
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         private MaterialPropertyBlock _mpb;
+        private List<string> _warnings = new();
 
         public BakedMaterialProperty OverrideDefaultPreset
         {
@@ -44,6 +45,7 @@ namespace sui4.MaterialPropertyBaker
             _materialStatusDictDict;
 
         public List<Renderer> Renderers => _renderers;
+        public List<string> Warnings => _warnings;
 
         public string ID
         {
@@ -60,6 +62,8 @@ namespace sui4.MaterialPropertyBaker
 
         public void OnValidate()
         {
+            _warnings.Clear();
+            
             if (string.IsNullOrWhiteSpace(ID))
             {
                 ID = "Group_" + Guid.NewGuid().ToString();
@@ -67,6 +71,13 @@ namespace sui4.MaterialPropertyBaker
 
             if (Renderers.Count == 0)
                 Renderers.Add(null);
+            
+            SyncMaterial();
+            ValidateShaderName();
+        }
+
+        private void SyncMaterial()
+        {
             foreach (var renderer in Renderers)
             {
                 if (renderer == null)
@@ -82,11 +93,64 @@ namespace sui4.MaterialPropertyBaker
                         if (!Array.Exists(renderer.sharedMaterials, m => m == material))
                             materialKeysToRemove.Add(material);
                     foreach (var mat in materialKeysToRemove) materialStatusDictWrapper.MaterialStatusDict.Remove(mat);
-                    // materialが増えてれば追加する
+                    // materialが増えてれば追加する. shaderが違う場合はisTargetをfalseにする
                     foreach (var material in renderer.sharedMaterials)
-                        materialStatusDictWrapper.MaterialStatusDict.TryAdd(material, true);
+                    {
+                        if (MaterialPropertyConfig != null && material.shader.name != MaterialPropertyConfig.ShaderName)
+                        {
+                            materialStatusDictWrapper.MaterialStatusDict.TryAdd(material, false);
+                        }
+                        else
+                        {
+                            materialStatusDictWrapper.MaterialStatusDict.TryAdd(material, true);
+                        }
+                    }
                 }
             }
+        }
+
+        private void ValidateShaderName()
+        {
+            if(MaterialPropertyConfig == null) return;
+
+            var shaderName = MaterialPropertyConfig.ShaderName;
+            foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
+            {
+                foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
+                {
+                    if (isTarget && material.shader.name != shaderName)
+                    {
+                        _warnings.Add($"Material({material.name}) of Renderer({renderer.name}) use different shader from config({shaderName})");
+                    }
+                }
+            }
+        }
+
+        // shaderがconfigと違う場合はisTargetをfalseにする
+        [ContextMenu("Disable UnMatch Material")]
+        private void UnTargetUnMatchMaterial()
+        {
+            if(MaterialPropertyConfig == null) return;
+
+            var shaderName = MaterialPropertyConfig.ShaderName;
+            
+            foreach (var (_, materialStatusDictWrapper) in MaterialStatusDictDict)
+            {
+                List<Material> materialsToDisable = new();
+                foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
+                {
+                    if (isTarget && material.shader.name != shaderName)
+                    {
+                        materialsToDisable.Add(material);
+                    }
+                }
+
+                foreach (var mat in materialsToDisable)
+                {
+                    materialStatusDictWrapper.MaterialStatusDict[mat] = false;
+                }
+            }
+            OnValidate();
         }
 
         public void SetPropertyBlock(in MaterialProps materialProps)

@@ -36,26 +36,7 @@ namespace sui4.MaterialPropertyBaker
         public void CreatePropsFromMaterial(in Material mat)
         {
             _shaderName = mat.shader.name;
-            var colors = new List<MaterialProp<Color>>();
-            var floats = new List<MaterialProp<float>>();
-            for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
-            {
-                var propType = mat.shader.GetPropertyType(pi);
-                var propName = mat.shader.GetPropertyName(pi);
-
-                switch (propType)
-                {
-                    case ShaderPropertyType.Color:
-                        colors.Add(new MaterialProp<Color>(propName, mat));
-                        break;
-                    case ShaderPropertyType.Float:
-                    case ShaderPropertyType.Range:
-                        floats.Add(new MaterialProp<float>(propName, mat));
-                        break;
-                }
-            }
-
-            _materialProps = new MaterialProps(colors, floats);
+            _materialProps = new MaterialProps(mat);
             UpdateShaderID();
         }
 
