@@ -13,13 +13,14 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _presetIDPairsProp;
         private BakedPropertyGroup Target => (BakedPropertyGroup)target;
         private List<string> _warnings = new List<string>();
-        private List<bool> _foldouts = new List<bool>();
+        private readonly List<bool> _foldouts = new();
 
-        private List<BakedMaterialPropertiesEditor> _bakedPropertyEditors = new List<BakedMaterialPropertiesEditor>();
+        private readonly List<BakedMaterialPropertiesEditor> _bakedPropertyEditors = new();
         private void OnEnable()
         {
+            if(target == null) return;
             _presetIDPairsProp = serializedObject.FindProperty("_presetIDPairs");
-            for (int pi = 0; pi < _presetIDPairsProp.arraySize; pi++)
+            for (var pi = 0; pi < _presetIDPairsProp.arraySize; pi++)
             {
                 _bakedPropertyEditors.Add(null);
                 _foldouts.Add(SessionState.GetBool("foldout" + pi, true));
