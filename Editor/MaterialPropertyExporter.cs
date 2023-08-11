@@ -143,13 +143,13 @@ namespace sui4.MaterialPropertyBaker
             // folderPathの.assetを"_config.asset"に置き換える
             var configPath = $"{folderPath.Replace(".asset", "")}_config.asset";
             var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
-            ExportConfig(config, configPath, out var exportedConfig);
+            ExportScriptableObject(config, configPath, out var exportedConfig);
 
             GenerateBakedMaterialProperty(_targetMaterial);
-            _bakedMaterialProperty.DeleteUnEditableProperties(exportedConfig);
+            _bakedMaterialProperty.DeleteUnEditableProperties(exportedConfig as MaterialPropertyConfig);
             // folderPathの.assetを"_properties.asset"に置き換える
             var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
-            ExportBakedProperty(_bakedMaterialProperty, propertyPath, out var exportedProperty);
+            ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var exportedProperty);
         }
 
         #endregion // event
@@ -198,65 +198,24 @@ namespace sui4.MaterialPropertyBaker
                 _bakedMaterialProperty = null;
             }
         }
-        
+
         // path: Assets以下のパス, ファイル名込み
-        private bool ExportConfig(in MaterialPropertyConfig materialPropertyConfig, string path,
-            out MaterialPropertyConfig exported, bool refresh = true)
+        private bool ExportScriptableObject(in ScriptableObject scriptableObject, string path,
+            out ScriptableObject exported, bool refresh = true)
         {
             exported = null;
             if (string.IsNullOrEmpty(path))
             {
-                Debug.LogError($"Failed to export Baked Property Config: path is null or empty.");
+                Debug.LogError($"Failed to export : path is null or empty.");
                 return false;
             }
 
-            if (materialPropertyConfig == null)
+            if (scriptableObject == null)
             {
-                Debug.LogError("Failed to export Baked Property Config: Baked Property Config is null.");
+                Debug.LogError("Failed to export : target object is null.");
             }
 
-            exported = Instantiate(materialPropertyConfig);
-            EditorUtility.SetDirty(exported);
-
-            if (File.Exists(path))
-            {
-                Debug.Log($"{GetType()}: delete existing: {path}");
-                var sucess = AssetDatabase.DeleteAsset(path);
-                if (!sucess)
-                {
-                    Debug.LogError($"{GetType()}: failed to delete existing: {path}");
-                    return false;
-                }
-            }
-
-            AssetDatabase.CreateAsset(exported, path);
-            if (refresh)
-            {
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
-
-            Debug.Log($"Saved : {path}");
-            return true;
-        }
-
-        // path: Assets以下のパス, ファイル名込み
-        private bool ExportBakedProperty(in BakedMaterialProperty bakedProperty, string path,
-            out BakedMaterialProperty exported, bool refresh = true)
-        {
-            exported = null;
-            if (string.IsNullOrEmpty(path))
-            {
-                Debug.LogError($"Failed to export ShaderProperties: path is null or empty.");
-                return false;
-            }
-
-            if (bakedProperty == null)
-            {
-                Debug.LogError("Failed to export ShaderProperties: shaderProperties is null.");
-            }
-
-            exported = Instantiate(bakedProperty);
+            exported = Instantiate(scriptableObject);
             EditorUtility.SetDirty(exported);
 
             if (File.Exists(path))
