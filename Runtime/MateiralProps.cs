@@ -46,8 +46,34 @@ namespace sui4.MaterialPropertyBaker
                     case ShaderPropertyType.Vector:
                     case ShaderPropertyType.Texture:
                     default:
-                        Debug.LogError("Not supported property type. " + propType);
-                        throw new NotImplementedException();
+                        break;
+                }
+            }
+        }
+        public MaterialProps(Material mat, MaterialPropertyConfig config)
+        {
+            for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
+            {
+                var propType = mat.shader.GetPropertyType(pi);
+                if(!IsSupportedType(propType)) continue;
+                var propName = mat.shader.GetPropertyName(pi);
+                if (!config.HasEditableProperty(propName)) continue;
+                
+                switch (propType)
+                {
+                    case ShaderPropertyType.Color:
+                        var c = mat.GetColor(propName);
+                        Colors.Add(new MaterialProp<Color>(propName, c));
+                        break;
+                    case ShaderPropertyType.Float:
+                    case ShaderPropertyType.Range:
+                        var f = mat.GetFloat(propName);
+                        Floats.Add(new MaterialProp<float>(propName, f));
+                        break;
+                    case ShaderPropertyType.Int:
+                    case ShaderPropertyType.Vector:
+                    case ShaderPropertyType.Texture:
+                    default:
                         break;
                 }
             }
