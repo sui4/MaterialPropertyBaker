@@ -11,6 +11,7 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private string _shaderName;
         [SerializeField] private MaterialProps _materialProps;
+        [SerializeField] private MaterialPropertyConfig _config;
 
         public string ShaderName
         {
@@ -19,6 +20,12 @@ namespace sui4.MaterialPropertyBaker
         }
 
         public MaterialProps MaterialProps => _materialProps;
+        
+        public MaterialPropertyConfig Config
+        {
+            get => _config;
+            set => _config = value;
+        }
 
         private void OnEnable()
         {
