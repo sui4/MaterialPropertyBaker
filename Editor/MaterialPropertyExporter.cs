@@ -212,7 +212,7 @@ namespace sui4.MaterialPropertyBaker
 
             _bakedMaterialProperty = CreateInstance<BakedMaterialProperty>();
             _bakedMaterialProperty.ShaderName = _targetMaterial.shader.name;
-            _bakedMaterialProperty.CreatePropsFromMaterial(targetMaterial);
+            _bakedMaterialProperty.CreatePropsFrom(targetMaterial);
         }
 
         private void DestroyBakedMaterialPropertyIfExist()
