@@ -95,8 +95,8 @@ namespace sui4.MaterialPropertyBaker
             }
 
             EditorGUILayout.Separator();
-            var isValid = _materialPropertyConfig != null && _bakedMaterialProperty != null;
-            isValid = isValid && _materialPropertyConfig.ShaderName == _targetMaterial?.shader.name;
+            var isValid = _targetMaterial != null && _materialPropertyConfig != null && _bakedMaterialProperty != null;
+            isValid = isValid && _materialPropertyConfig.ShaderName == _targetMaterial.shader.name;
             GUI.enabled = isValid;
             ExportButtonGUI();
             GUI.enabled = true;
