@@ -31,6 +31,10 @@ namespace sui4.MaterialPropertyBaker
             }
 
             EditorGUILayout.Separator();
+            
+            CreateBakedPropertyGroupGUI();
+            
+            EditorGUILayout.Separator();
 
             using (new GUILayout.VerticalScope("box"))
             {
@@ -101,6 +105,14 @@ namespace sui4.MaterialPropertyBaker
             EditorGUI.indentLevel--;
         }
 
+        private void CreateBakedPropertyGroupGUI()
+        {
+            if (GUILayout.Button("Create Baked Property Group"))
+            {
+                Target.CreateBakedPropertyGroupAsset();
+            }
+        }
+
         private void AddMaterialGroupGUI()
         {
             using (new GUILayout.HorizontalScope())
@@ -111,11 +123,6 @@ namespace sui4.MaterialPropertyBaker
                     ShowNewRecorderMenu();
                 }
             }
-        }
-
-        private void AddRecorderInfoToMenu(MaterialGroup mg, GenericMenu menu)
-        {
-            menu.AddItem(new GUIContent(mg.ID), false, data => OnAddMaterialGroup((MaterialGroup)data), mg);
         }
 
         private void ShowNewRecorderMenu()
@@ -133,6 +140,11 @@ namespace sui4.MaterialPropertyBaker
             }
 
             addMaterialGroupMenu.ShowAsContext();
+        }
+        
+        private void AddRecorderInfoToMenu(MaterialGroup mg, GenericMenu menu)
+        {
+            menu.AddItem(new GUIContent(mg.ID), false, data => OnAddMaterialGroup((MaterialGroup)data), mg);
         }
 
         private void OnAddMaterialGroup(MaterialGroup materialGroup)

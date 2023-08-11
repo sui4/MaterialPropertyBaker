@@ -61,7 +61,7 @@ namespace sui4.MaterialPropertyBaker
         
 #if UNITY_EDITOR
         [ContextMenu("Create Baked Property Group Asset")]
-        private void CreateBakedPropertyGroupAsset()
+        public void CreateBakedPropertyGroupAsset()
         {
             var propertyGroup = ScriptableObject.CreateInstance<BakedPropertyGroup>();
             foreach (var mg in MaterialGroups)
