@@ -112,7 +112,6 @@ namespace sui4.MaterialPropertyBaker
                     {
                         var newRenderer = rendererProp.objectReferenceValue as Renderer;
                         OnRendererChanging(currentRenderer, newRenderer, ri);
-                        Target.OnValidate();
                     }
                 }
 
@@ -122,8 +121,8 @@ namespace sui4.MaterialPropertyBaker
                     {
                         Target.MaterialStatusDictDict.Remove(currentRenderer);
                     }
-
                     Target.Renderers.RemoveAt(ri);
+                    Target.OnValidate();
                     EditorUtility.SetDirty(Target);
                     serializedObject.Update();
                     return;
@@ -195,7 +194,9 @@ namespace sui4.MaterialPropertyBaker
 
                 foreach (var mat in newRenderer.sharedMaterials)
                 {
-                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, true))
+                    var isTarget = Target.MaterialPropertyConfig != null &&
+                                   Target.MaterialPropertyConfig.ShaderName == mat.shader.name;
+                    if (!materialStatusDictWrapperToAdd.MaterialStatusDict.TryAdd(mat, isTarget))
                     {
                         // failed to add
                         Debug.LogWarning($"MaterialGroup: Failed to add material to MaterialStatusDict {target.name}");
@@ -214,7 +215,7 @@ namespace sui4.MaterialPropertyBaker
 
                 Target.Renderers[ri] = newRenderer;
             }
-
+            Target.OnValidate();
             EditorUtility.SetDirty(Target);
             serializedObject.Update();
         }
@@ -240,7 +241,7 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        private void WarningGUI(List<string> warnings)
+        private static void WarningGUI(List<string> warnings)
         {
             // helpBox
             if (warnings.Count > 0)
