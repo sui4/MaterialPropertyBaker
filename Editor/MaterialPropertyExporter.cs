@@ -158,8 +158,7 @@ namespace sui4.MaterialPropertyBaker
             var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
             ExportScriptableObject(config, configPath, out var exportedConfig);
 
-            GenerateBakedMaterialProperty(_targetMaterial);
-            _bakedMaterialProperty.DeleteUnEditableProperties(exportedConfig as MaterialPropertyConfig);
+            GenerateBakedMaterialProperty(_targetMaterial, exportedConfig as MaterialPropertyConfig);
             // folderPathの.assetを"_properties.asset"に置き換える
             var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
             ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var exportedProperty);
@@ -183,12 +182,15 @@ namespace sui4.MaterialPropertyBaker
             _materialPropertyConfig.LoadProperties(shader);
         }
 
-        private void GenerateBakedMaterialProperty(Material targetMaterial)
+        private void GenerateBakedMaterialProperty(Material targetMaterial, MaterialPropertyConfig config)
         {
             DestroyScriptableObjectIfExist(ref _bakedMaterialProperty);
             _bakedMaterialProperty = CreateInstance<BakedMaterialProperty>();
             _bakedMaterialProperty.ShaderName = _targetMaterial.shader.name;
+            _bakedMaterialProperty.Config = config;
             _bakedMaterialProperty.CreatePropsFrom(targetMaterial);
+            _bakedMaterialProperty.DeleteUnEditableProperties(config);
+
         }
 
         private static void DestroyScriptableObjectIfExist<T>(ref T scriptableObject) where T : ScriptableObject
