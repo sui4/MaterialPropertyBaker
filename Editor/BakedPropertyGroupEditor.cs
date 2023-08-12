@@ -14,6 +14,7 @@ namespace sui4.MaterialPropertyBaker
         private BakedPropertyGroup Target => (BakedPropertyGroup)target;
         private List<string> _warnings = new List<string>();
         private readonly List<bool> _foldouts = new();
+        private readonly List<bool> _foldoutsPreset = new();
 
         private readonly List<BakedMaterialPropertiesEditor> _bakedPropertyEditors = new();
         private void OnEnable()
@@ -24,6 +25,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 _bakedPropertyEditors.Add(null);
                 _foldouts.Add(SessionState.GetBool("foldout" + pi, true));
+                _foldoutsPreset.Add(SessionState.GetBool("foldoutPreset" + pi, true));
             }
         }
 
@@ -31,6 +33,12 @@ namespace sui4.MaterialPropertyBaker
         {
             SessionState.SetBool("foldout" + index, state);
             _foldouts[index] = state;
+        }
+        
+        private void SavePresetFoldoutState(int index, bool state)
+        {
+            SessionState.SetBool("foldoutPreset" + index, state);
+            _foldoutsPreset[index] = state;
         }
         
         public override void OnInspectorGUI()
@@ -74,15 +82,14 @@ namespace sui4.MaterialPropertyBaker
                     EditorGUILayout.PropertyField(idProp);
                     EditorGUILayout.PropertyField(configProp);
                     EditorGUILayout.PropertyField(presetProp);
-                    _warnings.Clear();
-                    Target.PresetIDPairs[pi].GetWarnings(_warnings);
-                    EditorUtils.WarningGUI(_warnings);
-
                     var preset = presetProp.objectReferenceValue as BakedMaterialProperty;
-                    using (new EditorGUILayout.VerticalScope("box"))
+                    using (new EditorGUI.IndentLevelScope())
                     {
                         BakedPropertyEditorGUI(preset, pi);
                     }
+                    _warnings.Clear();
+                    Target.PresetIDPairs[pi].GetWarnings(_warnings);
+                    EditorUtils.WarningGUI(_warnings);
                 }
             }
             EditorGUI.indentLevel--;
@@ -94,7 +101,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 return;
             }
-            
+
             if (_bakedPropertyEditors[index] == null)
             {
                 _bakedPropertyEditors[index] = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperty);
@@ -108,7 +115,14 @@ namespace sui4.MaterialPropertyBaker
 
             if (_bakedPropertyEditors[index] != null)
             {
-                EditorGUILayout.LabelField($"{bakedProperty.name}", EditorStyles.boldLabel);
+                var tmp = EditorGUILayout.Foldout(_foldoutsPreset[index], $"{bakedProperty.name}");
+                if (tmp != _foldoutsPreset[index])
+                {
+                    _foldoutsPreset[index] = tmp;
+                    SavePresetFoldoutState(index, _foldoutsPreset[index]);
+                }
+                if (!_foldoutsPreset[index]) return;
+                // EditorGUILayout.LabelField(, EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
                 _bakedPropertyEditors[index].OnInspectorGUI();
                 EditorGUI.indentLevel--;
