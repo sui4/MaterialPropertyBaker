@@ -51,11 +51,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
             // Properties GUI
             using (new EditorGUILayout.VerticalScope("box"))
             {
+                // Export button
+                ExportButtonGUI();
                 using (new EditorGUI.DisabledScope(_targetClip.PresetRef != null && !_editable.boolValue))
                 {
-                    // Export button
-                    ExportButtonGUI();
-
                     PropertiesGUI();
                 }
             }
@@ -121,7 +120,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 if (_targetClip.PresetRef != null)
                 {
                     var so = new SerializedObject(_presetRef.objectReferenceValue);
+                    var configProp = so.FindProperty("_config");
                     var presetProps = so.FindProperty("_materialProps");
+                    EditorGUILayout.PropertyField(configProp);
                     EditorGUILayout.PropertyField(presetProps);
                     if (change.changed)
                     {
