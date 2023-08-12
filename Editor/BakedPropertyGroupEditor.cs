@@ -87,15 +87,28 @@ namespace sui4.MaterialPropertyBaker
                 {
                     EditorGUILayout.PropertyField(idProp, Styles.IDLabel);
                     EditorGUILayout.PropertyField(configProp);
-                    EditorGUILayout.PropertyField(presetProp, Styles.PresetLabel);
+                    
                     var preset = presetProp.objectReferenceValue as BakedMaterialProperty;
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.PropertyField(presetProp, Styles.PresetLabel);
+                        if (presetProp.objectReferenceValue != null)
+                        {
+                            ClonePresetButtonGUI(preset, pi);
+                        }
+                        else
+                        {
+                            NewPresetButtonGUI(pi);
+                        }
+                    }
                     using (new EditorGUI.IndentLevelScope())
                     {
                         BakedPropertyEditorGUI(preset, pi);
                     }
                     _warnings.Clear();
-                    Target.PresetIDPairs[pi].GetWarnings(_warnings);
-                    EditorUtils.WarningGUI(_warnings);
+                    var warnings = new List<string>(); 
+                    Target.PresetIDPairs[pi].GetWarnings(warnings);
+                    EditorUtils.WarningGUI(warnings);
                 }
             }
             EditorGUI.indentLevel--;
@@ -136,6 +149,40 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
+        private void ClonePresetButtonGUI(BakedMaterialProperty preset, int index)
+        {
+            if (GUILayout.Button("Clone", GUILayout.Width(50)))
+            {
+                var clone = Instantiate(preset);
+                clone.name = preset.name + "_Clone";
+                
+                EditorUtils.CreateAsset(clone, out var saved, GetType(), clone.name, $"Clone {preset.name}", "");
+                if(saved == null) return;
+                
+                Target.PresetIDPairs[index].Preset = saved as BakedMaterialProperty;
+                EditorUtility.SetDirty(Target);
+                AssetDatabase.SaveAssetIfDirty(Target);
+                serializedObject.Update();
+            }
+        }
+
+        private void NewPresetButtonGUI(int index)
+        {
+            if(GUILayout.Button("New", GUILayout.Width(50)))
+            {
+                var preset = CreateInstance<BakedMaterialProperty>();
+                preset.name = $"{Target.PresetIDPairs[index].ID}_Property";
+                preset.SyncPropertyWithConfig(Target.PresetIDPairs[index].Config);
+                preset.Config = Target.PresetIDPairs[index].Config;
+                EditorUtils.CreateAsset(preset, out var saved, GetType(), preset.name, $"New Baked Property", "");
+                if(saved == null) return;
+                
+                Target.PresetIDPairs[index].Preset = saved as BakedMaterialProperty;
+                EditorUtility.SetDirty(Target);
+                AssetDatabase.SaveAssetIfDirty(Target);
+                serializedObject.Update();
+            }
+        }
 
     }
 }

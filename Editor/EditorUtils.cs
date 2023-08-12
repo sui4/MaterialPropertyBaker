@@ -19,7 +19,7 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        
+
         public static void DestroyScriptableObjectIfExist<T>(ref T scriptableObject) where T : ScriptableObject
         {
             if (scriptableObject != null)
@@ -32,7 +32,15 @@ namespace sui4.MaterialPropertyBaker
                 scriptableObject = null;
             }
         }
-        
+
+        public static void CreateAsset(in ScriptableObject assetToSave, out ScriptableObject saved, Type type,
+            string defaultName, string title, string message)
+        {
+            var path = EditorUtility.SaveFilePanelInProject(title, defaultName, "asset",
+                message);
+            ExportScriptableObject(assetToSave, path, out saved, type);
+        }
+
         // path: Assets以下のパス, ファイル名込み
         public static bool ExportScriptableObject(in ScriptableObject scriptableObject, string path,
             out ScriptableObject exported, Type type, bool refresh = true)

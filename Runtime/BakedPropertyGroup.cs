@@ -11,7 +11,12 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private BakedMaterialProperty _preset;
         [SerializeField] private MaterialPropertyConfig _config;
         public string ID => _id;
-        public BakedMaterialProperty Preset => _preset;
+
+        public BakedMaterialProperty Preset
+        {
+            get => _preset;
+            set => _preset = value;
+        }
 
         public MaterialPropertyConfig Config
         {
@@ -34,7 +39,7 @@ namespace sui4.MaterialPropertyBaker
             //     warnings.Add("Empty Preset");
             // if (_config == null)
             //     warnings.Add("Empty Config");
-            if (Preset != null && Config != null && Config != Preset.Config)
+            if (Config && Preset && Preset.Config && Config != Preset.Config)
                 warnings.Add($"{ID}'s Preset has different config. Should be {Config.name} but {Preset.Config.name}");
         }
     }
