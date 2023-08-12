@@ -33,11 +33,8 @@ namespace sui4.MaterialPropertyBaker
             //     warnings.Add("Empty Preset");
             // if (_config == null)
             //     warnings.Add("Empty Config");
-            if (Preset != null && Config != null && Config.ShaderName != Preset.ShaderName)
-            {
-                // shader name check
-                warnings.Add($"ShaderName of {ID} is different from the preset's shader name");
-            }
+            if (Preset != null && Config != null && Config != Preset.Config)
+                warnings.Add($"{ID}'s Preset has different config. Should be {Config.name} but {Preset.Config.name}");
         }
     }
 

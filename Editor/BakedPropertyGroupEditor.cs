@@ -17,6 +17,12 @@ namespace sui4.MaterialPropertyBaker
         private readonly List<bool> _foldoutsPreset = new();
 
         private readonly List<BakedMaterialPropertiesEditor> _bakedPropertyEditors = new();
+
+        private static class Styles
+        {
+            public static readonly GUIContent IDLabel = new GUIContent("ID");
+            public static readonly GUIContent PresetLabel = new GUIContent("Preset Property");
+        }
         private void OnEnable()
         {
             if(target == null) return;
@@ -79,9 +85,9 @@ namespace sui4.MaterialPropertyBaker
                 
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.PropertyField(idProp);
+                    EditorGUILayout.PropertyField(idProp, Styles.IDLabel);
                     EditorGUILayout.PropertyField(configProp);
-                    EditorGUILayout.PropertyField(presetProp);
+                    EditorGUILayout.PropertyField(presetProp, Styles.PresetLabel);
                     var preset = presetProp.objectReferenceValue as BakedMaterialProperty;
                     using (new EditorGUI.IndentLevelScope())
                     {
