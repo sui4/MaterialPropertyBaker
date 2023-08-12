@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -9,6 +9,7 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(BakedMaterialProperty))]
     public class BakedMaterialPropertiesEditor : Editor
     {
+        private SerializedProperty _config;
         private SerializedProperty _shaderName;
         private SerializedProperty _materialProps;
         private SerializedProperty _colors;
@@ -27,6 +28,7 @@ namespace sui4.MaterialPropertyBaker
         {
             if (target == null)
                 return;
+            _config = serializedObject.FindProperty("_config");
             _shaderName = serializedObject.FindProperty("_shaderName");
             _materialProps = serializedObject.FindProperty("_materialProps");
             _colors = _materialProps.FindPropertyRelative("_colors");
@@ -39,6 +41,7 @@ namespace sui4.MaterialPropertyBaker
             serializedObject.Update();
             using (var change = new EditorGUI.ChangeCheckScope())
             {
+                EditorGUILayout.PropertyField(_config, new GUIContent("Config"));
                 EditorGUILayout.LabelField("Shader", _shaderName.stringValue, EditorStyles.boldLabel);
 
                 using (new EditorGUILayout.VerticalScope("box"))
