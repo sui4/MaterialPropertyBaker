@@ -37,8 +37,10 @@ namespace sui4.MaterialPropertyBaker
         {
             // base.OnInspectorGUI();
             if(Target == null) return;
-            
+
             serializedObject.Update();
+            EditorUtils.WarningGUI(Target.Warnings);
+
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 PairsGUI();
@@ -47,8 +49,6 @@ namespace sui4.MaterialPropertyBaker
                     serializedObject.ApplyModifiedProperties();
                 }
             }
-
-            WarningGUI(Target.Warnings);
         }
 
         private void PairsGUI()
@@ -60,6 +60,7 @@ namespace sui4.MaterialPropertyBaker
                 var pairProp = _presetIDPairsProp.GetArrayElementAtIndex(pi);
                 var presetProp = pairProp.FindPropertyRelative("_preset");
                 var idProp = pairProp.FindPropertyRelative("_id");
+                var configProp = pairProp.FindPropertyRelative("_config");
                 var tmp = EditorGUILayout.Foldout(_foldouts[pi], idProp.stringValue);
                 if (tmp != _foldouts[pi])
                 {
@@ -71,15 +72,18 @@ namespace sui4.MaterialPropertyBaker
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.PropertyField(idProp);
+                    EditorGUILayout.PropertyField(configProp);
                     EditorGUILayout.PropertyField(presetProp);
-                
+                    _warnings.Clear();
+                    Target.PresetIDPairs[pi].GetWarnings(_warnings);
+                    EditorUtils.WarningGUI(_warnings);
+
                     var preset = presetProp.objectReferenceValue as BakedMaterialProperty;
                     using (new EditorGUILayout.VerticalScope("box"))
                     {
                         BakedPropertyEditorGUI(preset, pi);
                     }
                 }
-
             }
             EditorGUI.indentLevel--;
         }
@@ -112,16 +116,6 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        private void WarningGUI(List<string> warnings)
-        {
-            // helpBox
-            if (warnings.Count > 0)
-            {
-                foreach (var warning in warnings)
-                {
-                    EditorGUILayout.HelpBox(warning, MessageType.Warning);
-                }
-            }
-        }
+
     }
 }

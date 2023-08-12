@@ -9,17 +9,35 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private string _id;
         [SerializeField] private BakedMaterialProperty _preset;
+        [SerializeField] private MaterialPropertyConfig _config;
         public string ID => _id;
         public BakedMaterialProperty Preset => _preset;
 
-        public PresetIDPair()
+        public MaterialPropertyConfig Config
         {
-            
+            get => _config;
+            set => _config = value;
         }
+        public PresetIDPair() { }
         public PresetIDPair(string id, BakedMaterialProperty preset)
         {
             _id = id;
             _preset = preset;
+        }
+        
+        public void GetWarnings(in List<string> warnings)
+        {
+            // if (string.IsNullOrWhiteSpace(_id))
+            //     warnings.Add("Empty ID");
+            // if (_preset == null)
+            //     warnings.Add("Empty Preset");
+            // if (_config == null)
+            //     warnings.Add("Empty Config");
+            if (Preset != null && Config != null && Config.ShaderName != Preset.ShaderName)
+            {
+                // shader name check
+                warnings.Add($"ShaderName of {ID} is different from the preset's shader name");
+            }
         }
     }
 
@@ -37,12 +55,15 @@ namespace sui4.MaterialPropertyBaker
             var emptyIDNum = 0;
             foreach (var pair in _presetIDPairs)
             {
+                // id duplicate check
                 if (ids.Contains(pair.ID))
                     warnings.Add($"Duplicate ID: {pair.ID}");
                 else if (string.IsNullOrWhiteSpace(pair.ID))
                     emptyIDNum++;
                 else
                     ids.Add(pair.ID);
+                
+                // pair.GetWarnings(warnings);
             }
 
             if (emptyIDNum > 0)
