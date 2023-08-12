@@ -101,7 +101,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                 }
             }
-            WarningGUI(Target.Warnings);
+            EditorUtils.WarningGUI(Target.Warnings);
         }
 
         // ri = renderer index
@@ -245,17 +245,6 @@ namespace sui4.MaterialPropertyBaker
                 using (new EditorGUI.DisabledScope(true))
                 {
                     EditorGUILayout.PropertyField(materialProp, Styles.MaterialLabel);
-                }
-            }
-        }
-        private static void WarningGUI(List<string> warnings)
-        {
-            // helpBox
-            if (warnings.Count > 0)
-            {
-                foreach (var warning in warnings)
-                {
-                    EditorGUILayout.HelpBox(warning, MessageType.Warning);
                 }
             }
         }
