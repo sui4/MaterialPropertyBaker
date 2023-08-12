@@ -104,6 +104,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     {
                         RenewValueFromPreset(prevPresetRef);
                     }
+
                     serializedObject.ApplyModifiedProperties();
 
                     EditorUtility.SetDirty(target);

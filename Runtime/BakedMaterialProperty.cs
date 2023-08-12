@@ -19,7 +19,7 @@ namespace sui4.MaterialPropertyBaker
         }
 
         public MaterialProps MaterialProps => _materialProps;
-        
+
         public MaterialPropertyConfig Config
         {
             get => _config;
@@ -52,6 +52,7 @@ namespace sui4.MaterialPropertyBaker
             _materialProps = new MaterialProps(mat, config);
             UpdateShaderID();
         }
+
         public void CreatePropsFrom(in MaterialProps matProps)
         {
             _materialProps ??= new MaterialProps();
@@ -112,7 +113,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 var editable = config.Editable[pi];
                 var propType = config.PropertyTypes[pi];
-                if(!editable || !MaterialProps.IsSupportedType(propType)) continue;
+                if (!editable || !MaterialProps.IsSupportedType(propType)) continue;
                 var propName = config.PropertyNames[pi];
                 if (!MaterialProps.HasProperties(propName, propType))
                 {

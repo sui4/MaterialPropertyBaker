@@ -57,6 +57,7 @@ namespace sui4.MaterialPropertyBaker
                         CreateConfigAsset();
                     }
                 }
+
                 EditorGUILayout.PropertyField(_defaultProfileProp, Styles.OverrideDefaultProfileLabel);
 
                 if (change.changed)
@@ -101,6 +102,7 @@ namespace sui4.MaterialPropertyBaker
                     }
                 }
             }
+
             EditorUtils.WarningGUI(Target.Warnings);
         }
 
@@ -128,6 +130,7 @@ namespace sui4.MaterialPropertyBaker
                     {
                         Target.MaterialStatusDictDict.Remove(currentRenderer);
                     }
+
                     Target.Renderers.RemoveAt(ri);
                     Target.OnValidate();
                     EditorUtility.SetDirty(Target);
@@ -222,6 +225,7 @@ namespace sui4.MaterialPropertyBaker
 
                 Target.Renderers[ri] = newRenderer;
             }
+
             Target.OnValidate();
             EditorUtility.SetDirty(Target);
             serializedObject.Update();
@@ -258,7 +262,7 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogWarning("MaterialGroup: No target material found. Please add a material to MaterialGroup.");
                 return;
             }
-            
+
             MaterialPropertyExporter.Init(mat, OnExported);
         }
 
@@ -275,7 +279,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
                 {
-                    if(isTarget)
+                    if (isTarget)
                     {
                         return material;
                     }
@@ -284,7 +288,7 @@ namespace sui4.MaterialPropertyBaker
 
             return null;
         }
-        
+
         // utils
         private static (SerializedProperty keyMaterialListProp, SerializedProperty valueIsTargetListProp)
             GetSerializedPropertyFrom(SerializedProperty materialStatusSDictWrapperProp)

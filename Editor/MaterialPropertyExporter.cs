@@ -160,7 +160,7 @@ namespace sui4.MaterialPropertyBaker
 
             GenerateBakedMaterialProperty(_targetMaterial, exportedConfig as MaterialPropertyConfig);
             // folderPathの.assetを"_properties.asset"に置き換える
-            var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
+            var propertyPath = $"{folderPath.Replace(".asset", "")}_property.asset";
             EditorUtils.ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var _, GetType());
 
             if (actionOnExported != null)

@@ -23,14 +23,18 @@ namespace sui4.MaterialPropertyBaker
             get => _config;
             set => _config = value;
         }
-        public PresetIDPair() { }
+
+        public PresetIDPair()
+        {
+        }
+
         public PresetIDPair(string id, MaterialPropertyConfig config, BakedMaterialProperty preset)
         {
             _id = id;
             _config = config;
             _preset = preset;
         }
-        
+
         public void GetWarnings(in List<string> warnings)
         {
             // if (string.IsNullOrWhiteSpace(_id))
@@ -65,7 +69,7 @@ namespace sui4.MaterialPropertyBaker
                     emptyIDNum++;
                 else
                     ids.Add(pair.ID);
-                
+
                 // pair.GetWarnings(warnings);
             }
 

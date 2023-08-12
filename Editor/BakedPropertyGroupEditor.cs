@@ -23,9 +23,10 @@ namespace sui4.MaterialPropertyBaker
             public static readonly GUIContent IDLabel = new GUIContent("ID");
             public static readonly GUIContent PresetLabel = new GUIContent("Preset Property");
         }
+
         private void OnEnable()
         {
-            if(target == null) return;
+            if (target == null) return;
             _presetIDPairsProp = serializedObject.FindProperty("_presetIDPairs");
             for (var pi = 0; pi < _presetIDPairsProp.arraySize; pi++)
             {
@@ -40,17 +41,17 @@ namespace sui4.MaterialPropertyBaker
             SessionState.SetBool("foldout" + index, state);
             _foldouts[index] = state;
         }
-        
+
         private void SavePresetFoldoutState(int index, bool state)
         {
             SessionState.SetBool("foldoutPreset" + index, state);
             _foldoutsPreset[index] = state;
         }
-        
+
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-            if(Target == null) return;
+            if (Target == null) return;
 
             serializedObject.Update();
             EditorUtils.WarningGUI(Target.Warnings);
@@ -81,13 +82,14 @@ namespace sui4.MaterialPropertyBaker
                     _foldouts[pi] = tmp;
                     SaveFoldoutState(pi, _foldouts[pi]);
                 }
+
                 if (!_foldouts[pi]) continue;
-                
+
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.PropertyField(idProp, Styles.IDLabel);
                     EditorGUILayout.PropertyField(configProp);
-                    
+
                     var preset = presetProp.objectReferenceValue as BakedMaterialProperty;
                     using (new EditorGUILayout.HorizontalScope())
                     {
@@ -101,16 +103,19 @@ namespace sui4.MaterialPropertyBaker
                             NewPresetButtonGUI(pi);
                         }
                     }
+
                     using (new EditorGUI.IndentLevelScope())
                     {
                         BakedPropertyEditorGUI(preset, pi);
                     }
+
                     _warnings.Clear();
-                    var warnings = new List<string>(); 
+                    var warnings = new List<string>();
                     Target.PresetIDPairs[pi].GetWarnings(warnings);
                     EditorUtils.WarningGUI(warnings);
                 }
             }
+
             EditorGUI.indentLevel--;
         }
 
@@ -140,12 +145,12 @@ namespace sui4.MaterialPropertyBaker
                     _foldoutsPreset[index] = tmp;
                     SavePresetFoldoutState(index, _foldoutsPreset[index]);
                 }
+
                 if (!_foldoutsPreset[index]) return;
                 // EditorGUILayout.LabelField(, EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
                 _bakedPropertyEditors[index].OnInspectorGUI();
                 EditorGUI.indentLevel--;
-
             }
         }
 
@@ -155,10 +160,10 @@ namespace sui4.MaterialPropertyBaker
             {
                 var clone = Instantiate(preset);
                 clone.name = preset.name + "_Clone";
-                
+
                 EditorUtils.CreateAsset(clone, out var saved, GetType(), clone.name, $"Clone {preset.name}", "");
-                if(saved == null) return;
-                
+                if (saved == null) return;
+
                 Target.PresetIDPairs[index].Preset = saved as BakedMaterialProperty;
                 EditorUtility.SetDirty(Target);
                 AssetDatabase.SaveAssetIfDirty(Target);
@@ -168,21 +173,20 @@ namespace sui4.MaterialPropertyBaker
 
         private void NewPresetButtonGUI(int index)
         {
-            if(GUILayout.Button("New", GUILayout.Width(50)))
+            if (GUILayout.Button("New", GUILayout.Width(50)))
             {
                 var preset = CreateInstance<BakedMaterialProperty>();
-                preset.name = $"{Target.PresetIDPairs[index].ID}_Property";
+                preset.name = $"{Target.PresetIDPairs[index].ID}_property";
                 preset.SyncPropertyWithConfig(Target.PresetIDPairs[index].Config);
                 preset.Config = Target.PresetIDPairs[index].Config;
                 EditorUtils.CreateAsset(preset, out var saved, GetType(), preset.name, $"New Baked Property", "");
-                if(saved == null) return;
-                
+                if (saved == null) return;
+
                 Target.PresetIDPairs[index].Preset = saved as BakedMaterialProperty;
                 EditorUtility.SetDirty(Target);
                 AssetDatabase.SaveAssetIfDirty(Target);
                 serializedObject.Update();
             }
         }
-
     }
 }
