@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 34e2a9fb5478d054885ce699d34ace45, type: 3}
-  m_Name: Unlit_config
+  m_Name: Cube_Unlit_config
   m_EditorClassIdentifier: 
   _shaderName: Unlit/Color
   _propertyNames:

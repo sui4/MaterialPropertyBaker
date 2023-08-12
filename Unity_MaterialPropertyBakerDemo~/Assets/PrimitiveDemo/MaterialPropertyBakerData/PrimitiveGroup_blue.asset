@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3af66c4e4fc14402a426c33403f74793, type: 3}
+  m_Name: PrimitiveGroup_blue
+  m_EditorClassIdentifier: 
+  _presetIDPairs:
+  - _id: Sphere
+    _preset: {fileID: 11400000, guid: 5738ae6867b59b1499458b03029edfc8, type: 2}
+    _config: {fileID: 11400000, guid: b09898c29de5aad40860b4bae027137c, type: 2}
+  - _id: Capsule
+    _preset: {fileID: 11400000, guid: b7396df12a06adf468142aeec1341b78, type: 2}
+    _config: {fileID: 11400000, guid: bef1db9064a1fc74892b1a4d9520180e, type: 2}
+  - _id: Cube
+    _preset: {fileID: 11400000, guid: eee2691ee6121ac46a8204ea1ff651cd, type: 2}
+    _config: {fileID: 11400000, guid: 6cb7daa09dee1d04aab6087987b66c05, type: 2}
