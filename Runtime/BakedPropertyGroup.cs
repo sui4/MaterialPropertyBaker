@@ -19,9 +19,10 @@ namespace sui4.MaterialPropertyBaker
             set => _config = value;
         }
         public PresetIDPair() { }
-        public PresetIDPair(string id, BakedMaterialProperty preset)
+        public PresetIDPair(string id, MaterialPropertyConfig config, BakedMaterialProperty preset)
         {
             _id = id;
+            _config = config;
             _preset = preset;
         }
         
