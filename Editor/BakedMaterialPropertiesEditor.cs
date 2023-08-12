@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [CustomEditor(typeof(BakedMaterialProperty))]
+    [CustomEditor(typeof(BakedMaterialProperty)), CanEditMultipleObjects]
     public class BakedMaterialPropertiesEditor : Editor
     {
         private SerializedProperty _config;
