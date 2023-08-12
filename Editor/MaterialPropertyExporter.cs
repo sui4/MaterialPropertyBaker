@@ -156,12 +156,12 @@ namespace sui4.MaterialPropertyBaker
             // folderPathの.assetを"_config.asset"に置き換える
             var configPath = $"{folderPath.Replace(".asset", "")}_config.asset";
             var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
-            ExportScriptableObject(config, configPath, out var exportedConfig);
+            EditorUtils.ExportScriptableObject(config, configPath, out var exportedConfig, GetType());
 
             GenerateBakedMaterialProperty(_targetMaterial, exportedConfig as MaterialPropertyConfig);
             // folderPathの.assetを"_properties.asset"に置き換える
             var propertyPath = $"{folderPath.Replace(".asset", "")}_properties.asset";
-            ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var exportedProperty);
+            EditorUtils.ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var _, GetType());
 
             if (actionOnExported != null)
             {
@@ -177,74 +177,19 @@ namespace sui4.MaterialPropertyBaker
 
         private void GenerateConfig(Shader shader)
         {
-            DestroyScriptableObjectIfExist(ref _materialPropertyConfig);
+            EditorUtils.DestroyScriptableObjectIfExist(ref _materialPropertyConfig);
             _materialPropertyConfig = CreateInstance<MaterialPropertyConfig>();
             _materialPropertyConfig.LoadProperties(shader);
         }
 
         private void GenerateBakedMaterialProperty(Material targetMaterial, MaterialPropertyConfig config)
         {
-            DestroyScriptableObjectIfExist(ref _bakedMaterialProperty);
+            EditorUtils.DestroyScriptableObjectIfExist(ref _bakedMaterialProperty);
             _bakedMaterialProperty = CreateInstance<BakedMaterialProperty>();
             _bakedMaterialProperty.ShaderName = _targetMaterial.shader.name;
             _bakedMaterialProperty.Config = config;
             _bakedMaterialProperty.CreatePropsFrom(targetMaterial);
             _bakedMaterialProperty.DeleteUnEditableProperties(config);
-
-        }
-
-        private static void DestroyScriptableObjectIfExist<T>(ref T scriptableObject) where T : ScriptableObject
-        {
-            if (scriptableObject != null)
-            {
-                if (!AssetDatabase.IsMainAsset(scriptableObject))
-                {
-                    DestroyImmediate(scriptableObject);
-                }
-
-                scriptableObject = null;
-            }
-        }
-
-        // path: Assets以下のパス, ファイル名込み
-        private bool ExportScriptableObject(in ScriptableObject scriptableObject, string path,
-            out ScriptableObject exported, bool refresh = true)
-        {
-            exported = null;
-            if (string.IsNullOrEmpty(path))
-            {
-                Debug.LogError($"Failed to export : path is null or empty.");
-                return false;
-            }
-
-            if (scriptableObject == null)
-            {
-                Debug.LogError("Failed to export : target object is null.");
-            }
-
-            exported = Instantiate(scriptableObject);
-            EditorUtility.SetDirty(exported);
-
-            if (File.Exists(path))
-            {
-                Debug.Log($"{GetType()}: delete existing: {path}");
-                var success = AssetDatabase.DeleteAsset(path);
-                if (!success)
-                {
-                    Debug.LogError($"{GetType()}: failed to delete existing: {path}");
-                    return false;
-                }
-            }
-
-            AssetDatabase.CreateAsset(exported, path);
-            if (refresh)
-            {
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
-
-            Debug.Log($"Saved : {path}");
-            return true;
         }
 
         #endregion
