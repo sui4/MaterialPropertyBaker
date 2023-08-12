@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 
 namespace sui4.MaterialPropertyBaker
 {
-    [CustomEditor(typeof(MaterialPropertyConfig))]
+    [CustomEditor(typeof(MaterialPropertyConfig)), CanEditMultipleObjects]
     public class MaterialPropertyConfigEditor : Editor
     {
         private SerializedProperty _shaderNameProp;
@@ -42,6 +42,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 EditorGUILayout.PropertyField(_shaderNameProp, new GUIContent("Shader Name"));
             }
+
             _filterQuery = EditorGUILayout.TextField("Filter by name", _filterQuery);
 
             using (new EditorGUILayout.HorizontalScope())
@@ -67,11 +68,14 @@ namespace sui4.MaterialPropertyBaker
 
                             using (new EditorGUILayout.HorizontalScope())
                             {
-                                using (new EditorGUI.DisabledScope(!MaterialProps.IsSupportedType(sp.PropertyTypes[pi])))
+                                using (new EditorGUI.DisabledScope(
+                                           !MaterialProps.IsSupportedType(sp.PropertyTypes[pi])))
                                 {
-                                    EditorGUILayout.PropertyField(_propertyEditableProp, GUIContent.none, GUILayout.Width(60));
+                                    EditorGUILayout.PropertyField(_propertyEditableProp, GUIContent.none,
+                                        GUILayout.Width(60));
                                     EditorGUILayout.LabelField(_propertyNameProp.stringValue);
                                 }
+
                                 using (new EditorGUI.DisabledScope(true))
                                 {
                                     EditorGUILayout.PropertyField(_propertyTypeProp, GUIContent.none);

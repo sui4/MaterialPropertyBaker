@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -11,6 +10,7 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private string _shaderName;
         [SerializeField] private MaterialProps _materialProps;
+        [SerializeField] private MaterialPropertyConfig _config;
 
         public string ShaderName
         {
@@ -19,6 +19,12 @@ namespace sui4.MaterialPropertyBaker
         }
 
         public MaterialProps MaterialProps => _materialProps;
+
+        public MaterialPropertyConfig Config
+        {
+            get => _config;
+            set => _config = value;
+        }
 
         private void OnEnable()
         {
@@ -46,6 +52,7 @@ namespace sui4.MaterialPropertyBaker
             _materialProps = new MaterialProps(mat, config);
             UpdateShaderID();
         }
+
         public void CreatePropsFrom(in MaterialProps matProps)
         {
             _materialProps ??= new MaterialProps();
@@ -106,7 +113,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 var editable = config.Editable[pi];
                 var propType = config.PropertyTypes[pi];
-                if(!editable || !MaterialProps.IsSupportedType(propType)) continue;
+                if (!editable || !MaterialProps.IsSupportedType(propType)) continue;
                 var propName = config.PropertyNames[pi];
                 if (!MaterialProps.HasProperties(propName, propType))
                 {

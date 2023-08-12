@@ -14,16 +14,25 @@ namespace sui4.MaterialPropertyBaker
         private BakedPropertyGroup Target => (BakedPropertyGroup)target;
         private List<string> _warnings = new List<string>();
         private readonly List<bool> _foldouts = new();
+        private readonly List<bool> _foldoutsPreset = new();
 
         private readonly List<BakedMaterialPropertiesEditor> _bakedPropertyEditors = new();
+
+        private static class Styles
+        {
+            public static readonly GUIContent IDLabel = new GUIContent("ID");
+            public static readonly GUIContent PresetLabel = new GUIContent("Preset Property");
+        }
+
         private void OnEnable()
         {
-            if(target == null) return;
+            if (target == null) return;
             _presetIDPairsProp = serializedObject.FindProperty("_presetIDPairs");
             for (var pi = 0; pi < _presetIDPairsProp.arraySize; pi++)
             {
                 _bakedPropertyEditors.Add(null);
                 _foldouts.Add(SessionState.GetBool("foldout" + pi, true));
+                _foldoutsPreset.Add(SessionState.GetBool("foldoutPreset" + pi, true));
             }
         }
 
@@ -32,13 +41,21 @@ namespace sui4.MaterialPropertyBaker
             SessionState.SetBool("foldout" + index, state);
             _foldouts[index] = state;
         }
-        
+
+        private void SavePresetFoldoutState(int index, bool state)
+        {
+            SessionState.SetBool("foldoutPreset" + index, state);
+            _foldoutsPreset[index] = state;
+        }
+
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-            if(Target == null) return;
-            
+            if (Target == null) return;
+
             serializedObject.Update();
+            EditorUtils.WarningGUI(Target.Warnings);
+
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 PairsGUI();
@@ -47,8 +64,6 @@ namespace sui4.MaterialPropertyBaker
                     serializedObject.ApplyModifiedProperties();
                 }
             }
-
-            WarningGUI(Target.Warnings);
         }
 
         private void PairsGUI()
@@ -60,27 +75,47 @@ namespace sui4.MaterialPropertyBaker
                 var pairProp = _presetIDPairsProp.GetArrayElementAtIndex(pi);
                 var presetProp = pairProp.FindPropertyRelative("_preset");
                 var idProp = pairProp.FindPropertyRelative("_id");
+                var configProp = pairProp.FindPropertyRelative("_config");
                 var tmp = EditorGUILayout.Foldout(_foldouts[pi], idProp.stringValue);
                 if (tmp != _foldouts[pi])
                 {
                     _foldouts[pi] = tmp;
                     SaveFoldoutState(pi, _foldouts[pi]);
                 }
+
                 if (!_foldouts[pi]) continue;
-                
+
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.PropertyField(idProp);
-                    EditorGUILayout.PropertyField(presetProp);
-                
+                    EditorGUILayout.PropertyField(idProp, Styles.IDLabel);
+                    EditorGUILayout.PropertyField(configProp);
+
                     var preset = presetProp.objectReferenceValue as BakedMaterialProperty;
-                    using (new EditorGUILayout.VerticalScope("box"))
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.PropertyField(presetProp, Styles.PresetLabel);
+                        if (presetProp.objectReferenceValue != null)
+                        {
+                            ClonePresetButtonGUI(preset, pi);
+                        }
+                        else
+                        {
+                            NewPresetButtonGUI(pi);
+                        }
+                    }
+
+                    using (new EditorGUI.IndentLevelScope())
                     {
                         BakedPropertyEditorGUI(preset, pi);
                     }
-                }
 
+                    _warnings.Clear();
+                    var warnings = new List<string>();
+                    Target.PresetIDPairs[pi].GetWarnings(warnings);
+                    EditorUtils.WarningGUI(warnings);
+                }
             }
+
             EditorGUI.indentLevel--;
         }
 
@@ -90,7 +125,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 return;
             }
-            
+
             if (_bakedPropertyEditors[index] == null)
             {
                 _bakedPropertyEditors[index] = (BakedMaterialPropertiesEditor)CreateEditor(bakedProperty);
@@ -104,23 +139,53 @@ namespace sui4.MaterialPropertyBaker
 
             if (_bakedPropertyEditors[index] != null)
             {
-                EditorGUILayout.LabelField($"{bakedProperty.name}", EditorStyles.boldLabel);
+                var tmp = EditorGUILayout.Foldout(_foldoutsPreset[index], $"{bakedProperty.name}");
+                if (tmp != _foldoutsPreset[index])
+                {
+                    _foldoutsPreset[index] = tmp;
+                    SavePresetFoldoutState(index, _foldoutsPreset[index]);
+                }
+
+                if (!_foldoutsPreset[index]) return;
+                // EditorGUILayout.LabelField(, EditorStyles.boldLabel);
                 EditorGUI.indentLevel++;
                 _bakedPropertyEditors[index].OnInspectorGUI();
                 EditorGUI.indentLevel--;
-
             }
         }
 
-        private void WarningGUI(List<string> warnings)
+        private void ClonePresetButtonGUI(BakedMaterialProperty preset, int index)
         {
-            // helpBox
-            if (warnings.Count > 0)
+            if (GUILayout.Button("Clone", GUILayout.Width(50)))
             {
-                foreach (var warning in warnings)
-                {
-                    EditorGUILayout.HelpBox(warning, MessageType.Warning);
-                }
+                var clone = Instantiate(preset);
+                clone.name = preset.name + "_Clone";
+
+                EditorUtils.CreateAsset(clone, out var saved, GetType(), clone.name, $"Clone {preset.name}", "");
+                if (saved == null) return;
+
+                Target.PresetIDPairs[index].Preset = saved as BakedMaterialProperty;
+                EditorUtility.SetDirty(Target);
+                AssetDatabase.SaveAssetIfDirty(Target);
+                serializedObject.Update();
+            }
+        }
+
+        private void NewPresetButtonGUI(int index)
+        {
+            if (GUILayout.Button("New", GUILayout.Width(50)))
+            {
+                var preset = CreateInstance<BakedMaterialProperty>();
+                preset.name = $"{Target.PresetIDPairs[index].ID}_property";
+                preset.SyncPropertyWithConfig(Target.PresetIDPairs[index].Config);
+                preset.Config = Target.PresetIDPairs[index].Config;
+                EditorUtils.CreateAsset(preset, out var saved, GetType(), preset.name, $"New Baked Property", "");
+                if (saved == null) return;
+
+                Target.PresetIDPairs[index].Preset = saved as BakedMaterialProperty;
+                EditorUtility.SetDirty(Target);
+                AssetDatabase.SaveAssetIfDirty(Target);
+                serializedObject.Update();
             }
         }
     }

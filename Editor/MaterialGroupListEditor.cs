@@ -31,9 +31,9 @@ namespace sui4.MaterialPropertyBaker
             }
 
             EditorGUILayout.Separator();
-            
+
             CreateBakedPropertyGroupGUI();
-            
+
             EditorGUILayout.Separator();
 
             using (new GUILayout.VerticalScope("box"))
@@ -141,7 +141,7 @@ namespace sui4.MaterialPropertyBaker
 
             addMaterialGroupMenu.ShowAsContext();
         }
-        
+
         private void AddRecorderInfoToMenu(MaterialGroup mg, GenericMenu menu)
         {
             menu.AddItem(new GUIContent(mg.ID), false, data => OnAddMaterialGroup((MaterialGroup)data), mg);

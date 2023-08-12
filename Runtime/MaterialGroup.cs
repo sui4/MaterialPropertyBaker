@@ -58,7 +58,7 @@ namespace sui4.MaterialPropertyBaker
             _mpb = new MaterialPropertyBlock();
             if (Renderers.Count == 0)
                 Renderers.Add(null);
-            
+
             OnValidate();
         }
 
@@ -78,6 +78,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 Warnings.Add("MaterialPropertyConfig should be set");
             }
+
             SyncMaterial();
             ValidateShaderName();
         }

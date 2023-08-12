@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b94f62325319e24fbefedd36009b987, type: 3}
-  m_Name: Standard_properties_blue
+  m_Name: Capsule_property
   m_EditorClassIdentifier: 
   _shaderName: Standard
   _materialProps:
     _colors:
     - _name: _Color
-      _value: {r: 0, g: 0.1215651, b: 1, a: 1}
+      _value: {r: 1, g: 1, b: 1, a: 1}
     - _name: _EmissionColor
       _value: {r: 0, g: 0, b: 0, a: 1}
     _floats:
@@ -24,3 +24,6 @@ MonoBehaviour:
       _value: 0
     - _name: _SpecularHighlights
       _value: 1
+    - _name: _OcclusionStrength
+      _value: 1
+  _config: {fileID: 11400000, guid: bef1db9064a1fc74892b1a4d9520180e, type: 2}

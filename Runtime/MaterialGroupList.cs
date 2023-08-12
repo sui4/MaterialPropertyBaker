@@ -58,7 +58,7 @@ namespace sui4.MaterialPropertyBaker
                 FindObjectsSortMode.None);
             _materialGroupsInScene = new List<MaterialGroup>(materialGroups);
         }
-        
+
 #if UNITY_EDITOR
         [ContextMenu("Create Baked Property Group Asset")]
         public void CreateBakedPropertyGroupAsset()
@@ -66,9 +66,10 @@ namespace sui4.MaterialPropertyBaker
             var propertyGroup = ScriptableObject.CreateInstance<BakedPropertyGroup>();
             foreach (var mg in MaterialGroups)
             {
-                var presetIDPairs = new PresetIDPair(mg.ID, null);
+                var presetIDPairs = new PresetIDPair(mg.ID, mg.MaterialPropertyConfig, null);
                 propertyGroup.PresetIDPairs.Add(presetIDPairs);
             }
+
             var defaultName = $"New BakedPropertyGroup";
             Utils.CreateAsset(propertyGroup, defaultName, "Create BakedPropertyGroup", "BakedPropertyGroup");
         }

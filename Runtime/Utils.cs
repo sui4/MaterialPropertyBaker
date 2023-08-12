@@ -70,6 +70,7 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogError("Failed to Create Asset: Invalid Path");
                 return;
             }
+
             AssetDatabase.CreateAsset(assetToSave, path);
             AssetDatabase.SaveAssets();
         }

@@ -10,11 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b94f62325319e24fbefedd36009b987, type: 3}
-  m_Name: Unlit_properties_red
+  m_Name: Sphere_Standard_property_blue_Clone
   m_EditorClassIdentifier: 
-  _shaderName: Unlit/Color
+  _shaderName: Standard
   _materialProps:
     _colors:
     - _name: _Color
-      _value: {r: 1, g: 0, b: 0, a: 1}
-    _floats: []
+      _value: {r: 0, g: 0.1215651, b: 1, a: 1}
+    - _name: _EmissionColor
+      _value: {r: 0, g: 0, b: 0, a: 1}
+    _floats:
+    - _name: _Metallic
+      _value: 0
+    - _name: _SpecularHighlights
+      _value: 1
+  _config: {fileID: 11400000, guid: b09898c29de5aad40860b4bae027137c, type: 2}

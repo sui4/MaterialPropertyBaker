@@ -10,17 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b94f62325319e24fbefedd36009b987, type: 3}
-  m_Name: Standard_properties_white
+  m_Name: Cube_Unlit_property_blue
   m_EditorClassIdentifier: 
-  _shaderName: Standard
+  _shaderName: Unlit/Color
   _materialProps:
     _colors:
     - _name: _Color
-      _value: {r: 1, g: 1, b: 1, a: 1}
-    - _name: _EmissionColor
-      _value: {r: 0, g: 0, b: 0, a: 1}
-    _floats:
-    - _name: _Metallic
-      _value: 0
-    - _name: _SpecularHighlights
-      _value: 1
+      _value: {r: 0, g: 0, b: 1, a: 1}
+    _floats: []
+  _config: {fileID: 11400000, guid: 6cb7daa09dee1d04aab6087987b66c05, type: 2}

@@ -28,7 +28,7 @@ namespace sui4.MaterialPropertyBaker
             for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
             {
                 var propType = mat.shader.GetPropertyType(pi);
-                if(!IsSupportedType(propType)) continue;
+                if (!IsSupportedType(propType)) continue;
                 var propName = mat.shader.GetPropertyName(pi);
 
                 switch (propType)
@@ -50,15 +50,16 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
+
         public MaterialProps(Material mat, MaterialPropertyConfig config)
         {
             for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
             {
                 var propType = mat.shader.GetPropertyType(pi);
-                if(!IsSupportedType(propType)) continue;
+                if (!IsSupportedType(propType)) continue;
                 var propName = mat.shader.GetPropertyName(pi);
                 if (!config.HasEditableProperty(propName)) continue;
-                
+
                 switch (propType)
                 {
                     case ShaderPropertyType.Color:
@@ -146,6 +147,7 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogWarning($"{spType.ToString()} is not supported type.");
                 return false;
             }
+
             return spType switch
             {
                 ShaderPropertyType.Color => Colors.Any(materialProp => materialProp.Name == propName),

@@ -9,10 +9,10 @@ namespace sui4.MaterialPropertyBaker
     public class Dashboard : EditorWindow
     {
         private const string WindowTitle = "Dashboard";
-        
+
         private MaterialGroupList _materialGroupList;
         private List<MaterialGroup> _materialGroupsInScene = new();
-        
+
         [MenuItem("MaterialPropertyBaker/Dashboard")]
         private static void ShowWindow()
         {
@@ -43,9 +43,9 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUILayout.Separator();
                 foreach (var materialGroup in _materialGroupsInScene)
                 {
-                    EditorGUILayout.ObjectField(materialGroup.ID , materialGroup, typeof(MaterialGroup), true);
-                    if(materialGroup.Warnings.Count > 0)
-                        EditorGUILayout.HelpBox(string.Join("\n", materialGroup.Warnings), MessageType.Warning); 
+                    EditorGUILayout.ObjectField(materialGroup.ID, materialGroup, typeof(MaterialGroup), true);
+                    if (materialGroup.Warnings.Count > 0)
+                        EditorGUILayout.HelpBox(string.Join("\n", materialGroup.Warnings), MessageType.Warning);
                 }
             }
         }
