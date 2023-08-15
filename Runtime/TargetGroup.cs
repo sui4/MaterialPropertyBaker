@@ -132,6 +132,7 @@ namespace sui4.MaterialPropertyBaker
                     var targetInfo = wrapper.MatTargetInfoDict[mat];
                     var defaultProps = DefaultMaterialPropsDict[mat];
                     ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
+                    bool isFirstTime = true;
                     foreach (var (profile, weight) in profileWeightDict)
                     {
                         if (profile.IdMaterialPropsDict.TryGetValue(targetInfo.ID, out var props))
@@ -140,17 +141,28 @@ namespace sui4.MaterialPropertyBaker
                             {
                                 var prop = defaultProps.Colors.Find(c => c.ID == color.ID);
                                 if (prop == null) continue;
+                                Color current;
+                                if (isFirstTime)
+                                    current = prop.Value;
+                                else
+                                    current = _mpb.GetColor(prop.ID);
                                 var diff = color.Value - prop.Value;  
-                                _mpb.SetColor(prop.ID, prop.Value + diff * weight);
+                                _mpb.SetColor(prop.ID, current + diff * weight);
                             }
 
                             foreach (var f in props.Floats)
                             {
                                 var prop = defaultProps.Floats.Find(c => c.ID == f.ID);
                                 if (prop == null) continue;
+                                float current;
+                                if(isFirstTime)
+                                    current = prop.Value;
+                                else
+                                    current = _mpb.GetFloat(prop.ID);
                                 var diff = f.Value - prop.Value;
-                                _mpb.SetFloat(prop.ID, prop.Value + diff * weight);
+                                _mpb.SetFloat(prop.ID, current + diff * weight);
                             }
+                            isFirstTime = false;
                         }
                     }
                     ren.SetPropertyBlock(_mpb, mi);
