@@ -26,12 +26,15 @@ namespace sui4.MaterialPropertyBaker
         public List<Renderer> Renderers => _renderers;
         public List<string> Warnings => _warnings;
         
+        public Dictionary<Material, MaterialProps> DefaultMaterialPropsDict { get; } = new();
+
         private void OnEnable()
         {
             if (Renderers.Count == 0)
                 Renderers.Add(null);
 
             OnValidate();
+            ResetPropertyBlock();
         }
 
         public void OnValidate()
@@ -41,6 +44,21 @@ namespace sui4.MaterialPropertyBaker
             
             SyncRenderer();
             SyncMaterial();
+            RetrieveInitialProps();
+        }
+
+        private void RetrieveInitialProps()
+        {
+            DefaultMaterialPropsDict.Clear();
+            foreach (var ren in Renderers)
+            {
+                var wrapper = RendererMatTargetInfoWrapperDict[ren];
+                foreach (var mat in wrapper.MatTargetInfoDict.Keys)
+                {
+                    var defaultProps = new MaterialProps(mat);
+                    DefaultMaterialPropsDict.TryAdd(mat, defaultProps);
+                }
+            }
         }
 
         private void SyncMaterial()
@@ -96,14 +114,7 @@ namespace sui4.MaterialPropertyBaker
             }
 
         }
-        
-        public void GetRenderersInChild()
-        {
-            if (_target == null) return;
-            Renderers.Clear();
-            _target.GetComponentsInChildren<Renderer>(true, Renderers);
-        }
-        
+
         // validate shader name: 同じIDを持つmaterialのshaderが同じかどうか
         private void ValidateShader()
         {
@@ -112,7 +123,39 @@ namespace sui4.MaterialPropertyBaker
 
         public void SetPropertyBlock(Dictionary<MpbProfile, float> profileWeightDict)
         {
-            
+            foreach (var ren in Renderers)
+            {
+                var wrapper = RendererMatTargetInfoWrapperDict[ren];
+                for (int mi = 0; mi < ren.sharedMaterials.Length; mi++)
+                {
+                    var mat = ren.sharedMaterials[mi];
+                    var targetInfo = wrapper.MatTargetInfoDict[mat];
+                    var defaultProps = DefaultMaterialPropsDict[mat];
+                    ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
+                    foreach (var (profile, weight) in profileWeightDict)
+                    {
+                        if (profile.IdMaterialPropsDict.TryGetValue(targetInfo.ID, out var props))
+                        {
+                            foreach (var color in props.Colors)
+                            {
+                                var prop = defaultProps.Colors.Find(c => c.ID == color.ID);
+                                if (prop == null) continue;
+                                var diff = color.Value - prop.Value;  
+                                _mpb.SetColor(prop.ID, prop.Value + diff * weight);
+                            }
+
+                            foreach (var f in props.Floats)
+                            {
+                                var prop = defaultProps.Floats.Find(c => c.ID == f.ID);
+                                if (prop == null) continue;
+                                var diff = f.Value - prop.Value;
+                                _mpb.SetFloat(prop.ID, prop.Value + diff * weight);
+                            }
+                        }
+                    }
+                    ren.SetPropertyBlock(_mpb, mi);
+                }
+            }
         }
 
         public void ResetPropertyBlock()

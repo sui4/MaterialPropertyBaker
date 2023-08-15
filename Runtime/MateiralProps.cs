@@ -82,6 +82,18 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
+        public string ID
+        {
+            get => _id;
+            set => _id = value;
+        }
+        
+        public Shader Shader
+        {
+            get => _shader;
+            set => _shader = value;
+        }
+
         public List<MaterialProp<Color>> Colors
         {
             get => _colors;
