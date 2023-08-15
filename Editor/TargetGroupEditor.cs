@@ -15,6 +15,15 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _rendererMatTargetInfoWrapperSDictProp;
         // private SerializedProperty _defaultProfileProp;
 
+        private bool _renderersFoldout = true;
+        const string RenderersFoldoutKey = "renderersFoldout";
+        private List<bool> _rendererFoldoutList = new();
+        const string RendererFoldoutKey = "rendererFoldout";
+
+        private static void SaveFoldoutState(int index, string key, bool state)
+        {
+            SessionState.SetBool(key + index, state);
+        }
         private static class Styles
         {
             public static readonly GUIContent
@@ -33,6 +42,11 @@ namespace sui4.MaterialPropertyBaker
             _rendererMatTargetInfoWrapperSDictProp =
                 serializedObject.FindProperty("_rendererMatTargetInfoWrapperSDict");
             _renderersProp = serializedObject.FindProperty("_renderers");
+            _renderersFoldout = SessionState.GetBool(RenderersFoldoutKey, true);
+            for (var i = 0; i < _renderersProp.arraySize; i++)
+            {
+                _rendererFoldoutList.Add(SessionState.GetBool(RendererFoldoutKey + i, true));
+            }
         }
 
         public override void OnInspectorGUI()
@@ -63,11 +77,13 @@ namespace sui4.MaterialPropertyBaker
             }
 
             // renderer list
-            using (new EditorGUILayout.VerticalScope("box"))
-            {
-                EditorGUILayout.LabelField("Renderers", new GUIStyle("label"));
-                EditorUtils.WarningGUI(Target.Warnings);
+            _renderersFoldout = EditorGUILayout.Foldout(_renderersFoldout, "Renderers");
+            SessionState.SetBool(RenderersFoldoutKey, _renderersFoldout);
 
+            EditorUtils.WarningGUI(Target.Warnings);
+
+            if (_renderersFoldout)
+            {
                 EditorGUI.indentLevel++;
                 for (int ri = 0; ri < _renderersProp.arraySize; ri++)
                 {
@@ -80,7 +96,7 @@ namespace sui4.MaterialPropertyBaker
                         RendererGUI(ri, rendererProp, rendererKeysProp, matStatusSDictWrapperValuesProp);
                     }
 
-                    EditorGUILayout.Separator();
+                    // EditorGUILayout.Separator();
                 }
 
                 EditorGUI.indentLevel--;
@@ -96,6 +112,9 @@ namespace sui4.MaterialPropertyBaker
             var currentRenderer = rendererProp.objectReferenceValue as Renderer;
             if (currentRenderer == null) return;
 
+            _rendererFoldoutList[ri] = EditorGUILayout.Foldout(_rendererFoldoutList[ri], "Materials");
+            SaveFoldoutState(ri, RendererFoldoutKey, _rendererFoldoutList[ri]);
+            if (!_rendererFoldoutList[ri]) return;
             EditorGUI.indentLevel++;
 
             if (Target.RendererMatTargetInfoWrapperDict.TryGetValue(currentRenderer,
