@@ -10,14 +10,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private readonly Dictionary<MpbProfile, float> _profileWeightDict = new();
 
-        private TargetGroup _trackBinding;
-        public TargetGroupTrack ParentSwitcherTrack;
+        public TargetGroup BindingTargetGroup;
         private Dictionary<int, bool> _isWarningLogged = new();
+        
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            _trackBinding = playerData as TargetGroup;
-            if (_trackBinding == null)
+            BindingTargetGroup = playerData as TargetGroup;
+            if (BindingTargetGroup == null)
                 return;
 
             var inputCount = playable.GetInputCount();
@@ -33,7 +33,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 {
                     var sp = (ScriptPlayable<TargetGroupBehaviour>)playable.GetInput(i);
                     var clip = sp.GetBehaviour().Clip;
-                    if (clip.BakedPropertyGroup == null)
+                    if (clip.MpbProfile == null)
                     {
                         if (inputWeight < 1 && !_isWarningLogged[i])
                         {
@@ -46,13 +46,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     }
 
                     totalWeight += inputWeight;
-                    if (_profileWeightDict.TryGetValue(clip.BakedPropertyGroup, out var weight))
+                    if (_profileWeightDict.TryGetValue(clip.MpbProfile, out var weight))
                     {
-                        _profileWeightDict[clip.BakedPropertyGroup] = weight + inputWeight;
+                        _profileWeightDict[clip.MpbProfile] = weight + inputWeight;
                     }
                     else
                     {
-                        _profileWeightDict.Add(clip.BakedPropertyGroup, inputWeight);
+                        _profileWeightDict.Add(clip.MpbProfile, inputWeight);
                     }
                     
                 }
@@ -60,11 +60,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (totalWeight > 0f)
             {
-                _trackBinding.SetPropertyBlock(_profileWeightDict);
+                BindingTargetGroup.SetPropertyBlock(_profileWeightDict);
             }
             else
             {
-                _trackBinding.ResetToDefault();
+                BindingTargetGroup.ResetToDefault();
             }
         }
 
@@ -72,16 +72,20 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             var inputCount = playable.GetInputCount();
             _isWarningLogged.Clear();
+            if (BindingTargetGroup != null)
+            {
+                BindingTargetGroup.ResetPropertyBlock();
+            }
 
             for (var i = 0; i < inputCount; i++)
             {
                 _isWarningLogged.Add(i, false);
                 var sp = (ScriptPlayable<TargetGroupBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
-                if (clip.BakedPropertyGroup == null) continue;
+                if (clip.MpbProfile == null) continue;
                 
                 
-                foreach (var matProps in clip.BakedPropertyGroup.MaterialPropsList)
+                foreach (var matProps in clip.MpbProfile.MaterialPropsList)
                 {
                     if(matProps == null) continue;
                     matProps.UpdateShaderID();
@@ -93,10 +97,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         public override void OnPlayableDestroy(Playable playable)
         {
-            if (_trackBinding == null)
+            if (BindingTargetGroup == null)
                 return;
 
-            _trackBinding.ResetToDefault();
+            BindingTargetGroup.ResetToDefault();
         }
     }
 }

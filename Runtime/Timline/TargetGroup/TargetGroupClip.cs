@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -11,7 +10,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         private TargetGroupTrack _parentTrack;
         private TargetGroupBehaviour _template = new();
-        [SerializeField] private MpbProfile _bakedPropertyGroup;
+        [SerializeField] private MpbProfile _mpbProfile;
 
         public TargetGroupTrack ParentTrack
         {
@@ -20,7 +19,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         }
 
         public MaterialGroup BindingMaterialGroup { get; private set; }
-        public MpbProfile BakedPropertyGroup => _bakedPropertyGroup;
+        public MpbProfile MpbProfile => _mpbProfile;
 
         public ClipCaps clipCaps => ClipCaps.Blending;
 
