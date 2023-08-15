@@ -16,54 +16,48 @@ namespace sui4.MaterialPropertyBaker
         // private SerializedProperty _defaultProfileProp;
 
         private bool _renderersFoldout = true;
-        const string RenderersFoldoutKey = "renderersFoldout";
+        private string RenderersFoldoutKey => name + "renderersFoldout";
         private List<bool> _rendererFoldoutList = new();
-        const string RendererFoldoutKey = "rendererFoldout";
-
-        private static void SaveFoldoutState(int index, string key, bool state)
-        {
-            SessionState.SetBool(key + index, state);
-        }
-        private static class Styles
-        {
-            public static readonly GUIContent
-                OverrideDefaultProfileLabel = new GUIContent("Preset to Override Default");
-
-            public static readonly GUIContent MaterialLabel = GUIContent.none;
-            public static readonly GUIContent IDLabel = new GUIContent("ID");
-        }
+        private string RendererFoldoutKeyAt(int index) => name + "rendererFoldout" + index;
 
         private TargetGroup Target => (TargetGroup)target;
 
         private void OnEnable()
         {
-            // _defaultProfileProp = serializedObject.FindProperty("_overrideDefaultPreset");
             _targetProp = serializedObject.FindProperty("_target");
             _rendererMatTargetInfoWrapperSDictProp =
                 serializedObject.FindProperty("_rendererMatTargetInfoWrapperSDict");
             _renderersProp = serializedObject.FindProperty("_renderers");
-            _renderersFoldout = SessionState.GetBool(RenderersFoldoutKey, true);
+            
+            _renderersFoldout = SessionState.GetBool(name + RenderersFoldoutKey, true);
+            Validate();
+        }
+
+        private void Validate()
+        {
             for (var i = 0; i < _renderersProp.arraySize; i++)
             {
-                _rendererFoldoutList.Add(SessionState.GetBool(RendererFoldoutKey + i, true));
+                _rendererFoldoutList.Add(SessionState.GetBool( RendererFoldoutKeyAt(i), true));
             }
         }
 
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-            serializedObject.Update();
             if (Target == null)
                 return;
-
+            serializedObject.Update();
+            Validate();
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 EditorGUILayout.PropertyField(_targetProp);
-                // EditorGUILayout.PropertyField(_defaultProfileProp, Styles.OverrideDefaultProfileLabel);
 
                 if (change.changed)
+                {
                     serializedObject.ApplyModifiedProperties();
+                    Validate();
+                }
             }
 
             EditorGUILayout.Separator();
@@ -113,7 +107,7 @@ namespace sui4.MaterialPropertyBaker
             if (currentRenderer == null) return;
 
             _rendererFoldoutList[ri] = EditorGUILayout.Foldout(_rendererFoldoutList[ri], "Materials");
-            SaveFoldoutState(ri, RendererFoldoutKey, _rendererFoldoutList[ri]);
+            SessionState.SetBool(RendererFoldoutKeyAt(ri), _rendererFoldoutList[ri]);
             if (!_rendererFoldoutList[ri]) return;
             EditorGUI.indentLevel++;
 
