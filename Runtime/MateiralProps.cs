@@ -26,33 +26,36 @@ namespace sui4.MaterialPropertyBaker
             UpdateShaderID();
         }
 
-        public MaterialProps(Material mat)
+        public MaterialProps(Material mat, bool loadValue = true)
         {
             this.Shader = mat.shader;
             this.Material = mat;
             ID = mat.name;
-            for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
+            if (loadValue)
             {
-                var propType = mat.shader.GetPropertyType(pi);
-                if (!IsSupportedType(propType)) continue;
-                var propName = mat.shader.GetPropertyName(pi);
-
-                switch (propType)
+                for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
                 {
-                    case ShaderPropertyType.Color:
-                        var c = mat.GetColor(propName);
-                        Colors.Add(new MaterialProp<Color>(propName, c));
-                        break;
-                    case ShaderPropertyType.Float:
-                    case ShaderPropertyType.Range:
-                        var f = mat.GetFloat(propName);
-                        Floats.Add(new MaterialProp<float>(propName, f));
-                        break;
-                    case ShaderPropertyType.Int:
-                    case ShaderPropertyType.Vector:
-                    case ShaderPropertyType.Texture:
-                    default:
-                        break;
+                    var propType = mat.shader.GetPropertyType(pi);
+                    if (!IsSupportedType(propType)) continue;
+                    var propName = mat.shader.GetPropertyName(pi);
+
+                    switch (propType)
+                    {
+                        case ShaderPropertyType.Color:
+                            var c = mat.GetColor(propName);
+                            Colors.Add(new MaterialProp<Color>(propName, c));
+                            break;
+                        case ShaderPropertyType.Float:
+                        case ShaderPropertyType.Range:
+                            var f = mat.GetFloat(propName);
+                            Floats.Add(new MaterialProp<float>(propName, f));
+                            break;
+                        case ShaderPropertyType.Int:
+                        case ShaderPropertyType.Vector:
+                        case ShaderPropertyType.Texture:
+                        default:
+                            break;
+                    }
                 }
             }
         }

@@ -210,7 +210,7 @@ namespace sui4.MaterialPropertyBaker
                     var mat = ren.sharedMaterials[mi];
                     var targetInfo = wrapper.MatTargetInfoDict[mat];
                     if(asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID)) continue;
-                    var matProps = new MaterialProps(mat);
+                    var matProps = new MaterialProps(mat, false);
                     matProps.ID = targetInfo.ID;
                     asset.MaterialPropsList.Add(matProps);
                     asset.IdMaterialPropsDict.Add(targetInfo.ID, matProps);
