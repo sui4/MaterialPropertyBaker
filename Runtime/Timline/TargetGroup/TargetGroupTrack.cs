@@ -5,8 +5,8 @@ using UnityEngine.Timeline;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {
-    [TrackClipType(typeof(MultiMaterialPropClip))]
-    [TrackBindingType(typeof(MaterialGroupList))]
+    [TrackClipType(typeof(TargetGroupClip))]
+    [TrackBindingType(typeof(TargetGroup))]
     [DisplayName("Material Property Baker/TargetGroup Track")]
     public class TargetGroupTrack : TrackAsset
     {

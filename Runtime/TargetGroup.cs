@@ -186,6 +186,31 @@ namespace sui4.MaterialPropertyBaker
         {
             ResetPropertyBlock();
         }
+        
+#if UNITY_EDITOR
+        [ContextMenu("Create MPB Profile Asset")]
+        public void CreateMpbProfileAsset()
+        {
+            var asset = ScriptableObject.CreateInstance<MpbProfile>();
+            foreach (var ren in Renderers)
+            {
+                var wrapper = RendererMatTargetInfoWrapperDict[ren];
+                for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
+                {
+                    var mat = ren.sharedMaterials[mi];
+                    var targetInfo = wrapper.MatTargetInfoDict[mat];
+                    if(asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID)) continue;
+                    var matProps = new MaterialProps(mat);
+                    matProps.ID = targetInfo.ID;
+                    asset.MaterialPropsList.Add(matProps);
+                    asset.IdMaterialPropsDict.Add(targetInfo.ID, matProps);
+                }
+            }
+
+            var defaultName = $"{this.name}_profile";
+            Utils.CreateAsset(asset, defaultName, "Create MPB Profile", "");
+        }
+#endif
 
 
     }

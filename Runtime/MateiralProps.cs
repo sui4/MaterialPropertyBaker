@@ -27,6 +27,8 @@ namespace sui4.MaterialPropertyBaker
 
         public MaterialProps(Material mat)
         {
+            this.Shader = mat.shader;
+            ID = mat.name;
             for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
             {
                 var propType = mat.shader.GetPropertyType(pi);

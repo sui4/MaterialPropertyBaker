@@ -44,21 +44,15 @@ namespace sui4.MaterialPropertyBaker
             // default
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                // using (new GUILayout.HorizontalScope())
-                // {
-                //     if (GUILayout.Button("New", GUILayout.Width(50)))
-                //     {
-                //         CreateConfigAsset();
-                //     }
-                // }
-
                 EditorGUILayout.PropertyField(_targetProp);
                 // EditorGUILayout.PropertyField(_defaultProfileProp, Styles.OverrideDefaultProfileLabel);
             
                 if (change.changed)
                     serializedObject.ApplyModifiedProperties();
             }
-            
+            EditorGUILayout.Separator();
+
+            CreateBakedPropertyGroupGUI();
             EditorGUILayout.Separator();
 
             // renderer list
@@ -251,18 +245,13 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        // private void CreateConfigAsset()
-        // {
-        //     // get any material from any renderer that is target
-        //     // Material mat = GetAnyTargetMaterial();
-        //     if (mat == null)
-        //     {
-        //         Debug.LogWarning("MaterialGroup: No target material found. Please add a material to MaterialGroup.");
-        //         return;
-        //     }
-        //
-        //     MaterialPropertyExporter.Init(mat, OnExported);
-        // }
+        private void CreateBakedPropertyGroupGUI()
+        {
+            if (GUILayout.Button("Create MPB Profile"))
+            {
+                Target.CreateMpbProfileAsset();
+            }
+        }
 
         private void OnExported(MaterialPropertyConfig config)
         {
