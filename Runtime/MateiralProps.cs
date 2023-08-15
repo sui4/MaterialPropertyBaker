@@ -11,6 +11,7 @@ namespace sui4.MaterialPropertyBaker
     {
         [SerializeField] private string _id;
         [SerializeField] private Shader _shader;
+        [SerializeField] private Material _material;
         [SerializeField] private List<MaterialProp<Color>> _colors = new();
         [SerializeField] private List<MaterialProp<float>> _floats = new();
 
@@ -28,6 +29,7 @@ namespace sui4.MaterialPropertyBaker
         public MaterialProps(Material mat)
         {
             this.Shader = mat.shader;
+            this.Material = mat;
             ID = mat.name;
             for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
             {
@@ -94,6 +96,12 @@ namespace sui4.MaterialPropertyBaker
         {
             get => _shader;
             set => _shader = value;
+        }
+
+        public Material Material
+        {
+            get => _material;
+            set => _material = value;
         }
 
         public List<MaterialProp<Color>> Colors
