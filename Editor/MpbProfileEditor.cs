@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -68,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
             if (_colorsFoldoutList[index])
             {
                 EditorGUI.indentLevel++;
-                PropsGUI(colors, true);
+                PropsGUI(colors, index, true);
                 EditorGUI.indentLevel--;
             }
             
@@ -78,14 +80,14 @@ namespace sui4.MaterialPropertyBaker
             if (_floatsFoldoutList[index])
             {
                 EditorGUI.indentLevel++;
-                PropsGUI(floats);
+                PropsGUI(floats, index);
                 EditorGUI.indentLevel--;
             }
         }
         
         
         
-        private void PropsGUI(SerializedProperty propsList, bool isColor = false)
+        private void PropsGUI(SerializedProperty propsList, int index, bool isColor = false)
         {
             if (propsList.arraySize == 0)
             {
@@ -109,6 +111,7 @@ namespace sui4.MaterialPropertyBaker
                     if (GUILayout.Button("-", GUILayout.Width(20)))
                     {
                         propsList.DeleteArrayElementAtIndex(i);
+                        serializedObject.ApplyModifiedProperties();
                     }
                 }
             }
@@ -118,9 +121,67 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUILayout.Space();
                 if (GUILayout.Button("+", GUILayout.Width(20)))
                 {
-                    propsList.InsertArrayElementAtIndex(propsList.arraySize);
+                    ShowNewRecorderMenu(index, isColor);
                 }
             }
+        }
+
+        private void ShowNewRecorderMenu(int index, bool isColor)
+        {
+            var addPropertyMenu = new GenericMenu();
+            var shader = Target.MaterialPropsList[index].Shader;
+            for (var pi = 0; pi < shader.GetPropertyCount(); pi++)
+            {
+                var propName = shader.GetPropertyName(pi);
+                var propType = shader.GetPropertyType(pi);
+                if (isColor)
+                {
+                    // すでに同じ名前のプロパティがある場合は追加しない
+                    if (propType != ShaderPropertyType.Color ||
+                        Target.MaterialPropsList[index].Colors.Any(c => c.Name == propName))
+                        continue;
+                       
+                    AddPropertyToMenu(propName, addPropertyMenu, index, true);
+
+                }
+                else if(propType is ShaderPropertyType.Float or ShaderPropertyType.Range)
+                {
+                    // すでに同じ名前のプロパティがある場合は追加しない
+                    if (Target.MaterialPropsList[index].Floats.Any(f => f.Name == propName))
+                        continue;
+                    AddPropertyToMenu(propName, addPropertyMenu, index);
+                }
+            }
+
+            if (addPropertyMenu.GetItemCount() == 0)
+            {
+                addPropertyMenu.AddDisabledItem(new GUIContent("No Property to Add"));
+            }
+
+            addPropertyMenu.ShowAsContext();
+        }
+
+        private void AddPropertyToMenu(string propName, GenericMenu menu, int index, bool isColor = false)
+        {
+            menu.AddItem(new GUIContent(propName), false, data => OnAddProperty((string)data, index, isColor), propName);
+        }
+
+        private void OnAddProperty(string propName, int index, bool isColor = false)
+        {
+            var material = Target.MaterialPropsList[index].Material;
+            if (isColor)
+            {
+                var defaultColor = material == null ? Color.black : material.GetColor(propName);
+                var matProp = new MaterialProp<Color>(propName, defaultColor);
+                Target.MaterialPropsList[index].Colors.Add(matProp);
+            }
+            else
+            {
+                var defaultFloat = material == null ? 0.0f : material.GetFloat(propName);
+                var matProp = new MaterialProp<float>(propName, defaultFloat);
+                Target.MaterialPropsList[index].Floats.Add(matProp);
+            }
+            serializedObject.Update();
         }
     }
 }
