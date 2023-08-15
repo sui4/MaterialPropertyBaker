@@ -12,7 +12,7 @@ namespace sui4.MaterialPropertyBaker
 
         public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; private set; } =
             new();
-        private void OnEnable()
+        private void OnValidate()
         {
             foreach (var matProps in MaterialPropsList)
             {
