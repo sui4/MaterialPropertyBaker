@@ -12,7 +12,7 @@ namespace sui4.MaterialPropertyBaker
     {
         private SerializedProperty _materialPropsListProp;
         private SerializedProperty _materialPropsProp;
-        
+
         private List<bool> _propFoldoutList = new List<bool>();
         const string PropFoldoutKey = "propFoldout";
         private List<bool> _colorsFoldoutList = new List<bool>();
@@ -20,6 +20,7 @@ namespace sui4.MaterialPropertyBaker
         private List<bool> _floatsFoldoutList = new List<bool>();
         const string FloatsFoldoutKey = "floatsFoldout";
         public MpbProfile Target => (MpbProfile)target;
+
         private void OnEnable()
         {
             _materialPropsListProp = serializedObject.FindProperty("_materialPropsList");
@@ -30,8 +31,8 @@ namespace sui4.MaterialPropertyBaker
                 _floatsFoldoutList.Add(SessionState.GetBool(FloatsFoldoutKey + i, false));
             }
         }
-        
-        private void SaveFoldoutState(int index, string key ,bool state, ref List<bool> foldouts)
+
+        private void SaveFoldoutState(int index, string key, bool state, ref List<bool> foldouts)
         {
             SessionState.SetBool(key + index, state);
             foldouts[index] = state;
@@ -39,16 +40,26 @@ namespace sui4.MaterialPropertyBaker
 
         public override void OnInspectorGUI()
         {
-            for (var i = 0; i < _materialPropsListProp.arraySize; i++)
+            using (var change = new EditorGUI.ChangeCheckScope())
             {
-                _materialPropsProp = _materialPropsListProp.GetArrayElementAtIndex(i);
-                var title = Target.MaterialPropsList[i] == null ? $"MaterialProps {i}" : Target.MaterialPropsList[i].ID;
-                _propFoldoutList[i] = EditorGUILayout.Foldout(_propFoldoutList[i], Target.MaterialPropsList[i].ID);
-                SaveFoldoutState(i, PropFoldoutKey, _propFoldoutList[i], ref _propFoldoutList);
-                if(!_propFoldoutList[i]) continue;
-                EditorGUI.indentLevel++;
-                MaterialPropsGUI(_materialPropsProp, i);
-                EditorGUI.indentLevel--;
+                for (var i = 0; i < _materialPropsListProp.arraySize; i++)
+                {
+                    _materialPropsProp = _materialPropsListProp.GetArrayElementAtIndex(i);
+                    var title = Target.MaterialPropsList[i] == null
+                        ? $"MaterialProps {i}"
+                        : Target.MaterialPropsList[i].ID;
+                    _propFoldoutList[i] = EditorGUILayout.Foldout(_propFoldoutList[i], Target.MaterialPropsList[i].ID);
+                    SaveFoldoutState(i, PropFoldoutKey, _propFoldoutList[i], ref _propFoldoutList);
+                    if (!_propFoldoutList[i]) continue;
+                    EditorGUI.indentLevel++;
+                    MaterialPropsGUI(_materialPropsProp, i);
+                    EditorGUI.indentLevel--;
+                }
+
+                if (change.changed)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
             }
         }
 
@@ -59,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
             var material = materialPropsProp.FindPropertyRelative("_material");
             var colors = materialPropsProp.FindPropertyRelative("_colors");
             var floats = materialPropsProp.FindPropertyRelative("_floats");
-            
+
             EditorGUILayout.PropertyField(id, new GUIContent("ID"));
             EditorGUILayout.PropertyField(shader);
             EditorGUILayout.PropertyField(material);
@@ -73,7 +84,7 @@ namespace sui4.MaterialPropertyBaker
                 PropsGUI(colors, index, true);
                 EditorGUI.indentLevel--;
             }
-            
+
             // Floats
             _floatsFoldoutList[index] = EditorGUILayout.Foldout(_floatsFoldoutList[index], "Floats");
             SaveFoldoutState(index, FloatsFoldoutKey, _floatsFoldoutList[index], ref _floatsFoldoutList);
@@ -84,15 +95,14 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUI.indentLevel--;
             }
         }
-        
-        
-        
+
         private void PropsGUI(SerializedProperty propsList, int index, bool isColor = false)
         {
             if (propsList.arraySize == 0)
             {
                 EditorGUILayout.LabelField("List is Empty");
             }
+
             for (int i = 0; i < propsList.arraySize; i++)
             {
                 SerializedProperty prop = propsList.GetArrayElementAtIndex(i);
@@ -107,7 +117,7 @@ namespace sui4.MaterialPropertyBaker
                             EditorGUILayout.ColorField(new GUIContent(label), valueProp.colorValue, true, true, true);
                     else
                         EditorGUILayout.PropertyField(valueProp, new GUIContent(label));
-                    
+
                     if (GUILayout.Button("-", GUILayout.Width(20)))
                     {
                         propsList.DeleteArrayElementAtIndex(i);
@@ -140,11 +150,10 @@ namespace sui4.MaterialPropertyBaker
                     if (propType != ShaderPropertyType.Color ||
                         Target.MaterialPropsList[index].Colors.Any(c => c.Name == propName))
                         continue;
-                       
-                    AddPropertyToMenu(propName, addPropertyMenu, index, true);
 
+                    AddPropertyToMenu(propName, addPropertyMenu, index, true);
                 }
-                else if(propType is ShaderPropertyType.Float or ShaderPropertyType.Range)
+                else if (propType is ShaderPropertyType.Float or ShaderPropertyType.Range)
                 {
                     // すでに同じ名前のプロパティがある場合は追加しない
                     if (Target.MaterialPropsList[index].Floats.Any(f => f.Name == propName))
@@ -163,7 +172,8 @@ namespace sui4.MaterialPropertyBaker
 
         private void AddPropertyToMenu(string propName, GenericMenu menu, int index, bool isColor = false)
         {
-            menu.AddItem(new GUIContent(propName), false, data => OnAddProperty((string)data, index, isColor), propName);
+            menu.AddItem(new GUIContent(propName), false, data => OnAddProperty((string)data, index, isColor),
+                propName);
         }
 
         private void OnAddProperty(string propName, int index, bool isColor = false)
@@ -181,6 +191,7 @@ namespace sui4.MaterialPropertyBaker
                 var matProp = new MaterialProp<float>(propName, defaultFloat);
                 Target.MaterialPropsList[index].Floats.Add(matProp);
             }
+
             serializedObject.Update();
         }
     }
