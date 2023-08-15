@@ -9,6 +9,8 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialProps
     {
+        [SerializeField] private string _id;
+        [SerializeField] private Shader _shader;
         [SerializeField] private List<MaterialProp<Color>> _colors = new();
         [SerializeField] private List<MaterialProp<float>> _floats = new();
 

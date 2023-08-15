@@ -6,6 +6,8 @@ namespace sui4.MaterialPropertyBaker
     [CustomPropertyDrawer(typeof(MaterialProps))]
     public class MaterialPropsPropertyDrawer : PropertyDrawer
     {
+        private SerializedProperty _id;
+        private SerializedProperty _shader;
         private SerializedProperty _colors;
         private SerializedProperty _floats;
 
@@ -16,8 +18,13 @@ namespace sui4.MaterialPropertyBaker
         {
             EditorGUI.BeginProperty(position, label, property);
 
+            _id = property.FindPropertyRelative("_id");
+            _shader = property.FindPropertyRelative("_shader");
             _colors = property.FindPropertyRelative("_colors");
             _floats = property.FindPropertyRelative("_floats");
+            
+            EditorGUILayout.PropertyField(_id);
+            EditorGUILayout.PropertyField(_shader);
 
             // Colors
             EditorGUILayout.LabelField("Colors", EditorStyles.boldLabel);
@@ -30,6 +37,7 @@ namespace sui4.MaterialPropertyBaker
             EditorGUILayout.LabelField("Floats", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
             PropsGUI(_floats);
+            EditorGUI.indentLevel--;
 
             EditorGUI.EndProperty();
         }
