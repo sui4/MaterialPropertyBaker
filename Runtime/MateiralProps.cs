@@ -9,6 +9,9 @@ namespace sui4.MaterialPropertyBaker
     [Serializable]
     public class MaterialProps
     {
+        [SerializeField] private string _id;
+        [SerializeField] private Shader _shader;
+        [SerializeField] private Material _material;
         [SerializeField] private List<MaterialProp<Color>> _colors = new();
         [SerializeField] private List<MaterialProp<float>> _floats = new();
 
@@ -23,30 +26,36 @@ namespace sui4.MaterialPropertyBaker
             UpdateShaderID();
         }
 
-        public MaterialProps(Material mat)
+        public MaterialProps(Material mat, bool loadValue = true)
         {
-            for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
+            this.Shader = mat.shader;
+            this.Material = mat;
+            ID = mat.name;
+            if (loadValue)
             {
-                var propType = mat.shader.GetPropertyType(pi);
-                if (!IsSupportedType(propType)) continue;
-                var propName = mat.shader.GetPropertyName(pi);
-
-                switch (propType)
+                for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
                 {
-                    case ShaderPropertyType.Color:
-                        var c = mat.GetColor(propName);
-                        Colors.Add(new MaterialProp<Color>(propName, c));
-                        break;
-                    case ShaderPropertyType.Float:
-                    case ShaderPropertyType.Range:
-                        var f = mat.GetFloat(propName);
-                        Floats.Add(new MaterialProp<float>(propName, f));
-                        break;
-                    case ShaderPropertyType.Int:
-                    case ShaderPropertyType.Vector:
-                    case ShaderPropertyType.Texture:
-                    default:
-                        break;
+                    var propType = mat.shader.GetPropertyType(pi);
+                    if (!IsSupportedType(propType)) continue;
+                    var propName = mat.shader.GetPropertyName(pi);
+
+                    switch (propType)
+                    {
+                        case ShaderPropertyType.Color:
+                            var c = mat.GetColor(propName);
+                            Colors.Add(new MaterialProp<Color>(propName, c));
+                            break;
+                        case ShaderPropertyType.Float:
+                        case ShaderPropertyType.Range:
+                            var f = mat.GetFloat(propName);
+                            Floats.Add(new MaterialProp<float>(propName, f));
+                            break;
+                        case ShaderPropertyType.Int:
+                        case ShaderPropertyType.Vector:
+                        case ShaderPropertyType.Texture:
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -78,6 +87,24 @@ namespace sui4.MaterialPropertyBaker
                         break;
                 }
             }
+        }
+
+        public string ID
+        {
+            get => _id;
+            set => _id = value;
+        }
+        
+        public Shader Shader
+        {
+            get => _shader;
+            set => _shader = value;
+        }
+
+        public Material Material
+        {
+            get => _material;
+            set => _material = value;
         }
 
         public List<MaterialProp<Color>> Colors
