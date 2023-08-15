@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 271143a54b244a328be05ac2a2cb4349, type: 3}
+  m_Name: MPB Target_profile
+  m_EditorClassIdentifier: 
+  _materialPropsList:
+  - _id: bodyB_eyepatch_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: f3b67743523d08c4ba0cf3bcd43cfe67, type: 2}
+    _colors: []
+    _floats: []
+  - _id: glowB_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
+    _colors:
+    - _name: _Color
+      _value: {r: 1, g: 1, b: 1, a: 1}
+    - _name: _EmissionColor
+      _value: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
+    - _name: _ShadeColor
+      _value: {r: 1, g: 1, b: 1, a: 1}
+    - _name: _OutlineColor
+      _value: {r: 0, g: 0, b: 0, a: 1}
+    _floats:
+    - _name: _BumpScale
+      _value: 1
+    - _name: _AlphaMode
+      _value: 0
+  - _id: hair_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
+    _colors:
+    - _name: _Color
+      _value: {r: 0.2971698, g: 0.32428226, b: 1, a: 1}
+    _floats: []
+  - _id: face_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
+    _colors:
+    - _name: _Color
+      _value: {r: 1, g: 1, b: 1, a: 1}
+    _floats: []
+  - _id: eye_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: 67d3c62cc58bb664297076c2a8afc92d, type: 2}
+    _colors: []
+    _floats: []
+  - _id: eyeKakusei_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: ab5fefbb4ef03534b87b0c88231a0391, type: 2}
+    _colors: []
+    _floats: []
+  - _id: eyeGuruguru_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: cfaaf8aceb6e2f846b0da533890b9928, type: 2}
+    _colors: []
+    _floats: []
+  - _id: emissionB_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
+    _colors: []
+    _floats: []
+  - _id: bodyB_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+    _colors: []
+    _floats: []
+  - _id: bodyA_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
+    _colors: []
+    _floats: []
+  - _id: glowA_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
+    _colors: []
+    _floats: []
+  - _id: emissionA_NoOutline_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: 595924341ce0d544eaee0ead9a192943, type: 2}
+    _colors: []
+    _floats: []
+  - _id: skinB_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: 636913b334b91d94f8894a4e962bf8b7, type: 2}
+    _colors: []
+    _floats: []
+  - _id: thunder_mtoon
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 2100000, guid: d42901c7bacb4df4e81658c82da712c4, type: 2}
+    _colors: []
+    _floats: []
