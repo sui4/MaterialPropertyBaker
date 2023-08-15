@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace sui4.MaterialPropertyBaker
 {
+    [AddComponentMenu("MaterialPropertyBaker/MPB TargetGroup")]
     public class TargetGroup : MonoBehaviour
     {
         [SerializeField] private GameObject _target;
@@ -30,9 +31,6 @@ namespace sui4.MaterialPropertyBaker
 
         private void OnEnable()
         {
-            if (Renderers.Count == 0)
-                Renderers.Add(null);
-
             OnValidate();
             ResetPropertyBlock();
         }
@@ -40,7 +38,6 @@ namespace sui4.MaterialPropertyBaker
         public void OnValidate()
         {
             Warnings.Clear();
-            if(Renderers.Count == 0) Renderers.Add(null);
             
             SyncRenderer();
             SyncMaterial();
@@ -52,6 +49,7 @@ namespace sui4.MaterialPropertyBaker
             DefaultMaterialPropsDict.Clear();
             foreach (var ren in Renderers)
             {
+                if(ren == null) continue;
                 var wrapper = RendererMatTargetInfoWrapperDict[ren];
                 foreach (var mat in wrapper.MatTargetInfoDict.Keys)
                 {
@@ -100,15 +98,27 @@ namespace sui4.MaterialPropertyBaker
             
             List<Renderer> renderers = new();
             _target.GetComponentsInChildren<Renderer>(true, renderers);
+            var renderersToRemove = new List<Renderer>();
             foreach (var ren in Renderers)
             {
                 if(renderers.Contains(ren)) continue;
+                renderersToRemove.Add(ren);
+            }
+            foreach (var ren in renderersToRemove)
+            {
                 Renderers.Remove(ren);
                 RendererMatTargetInfoWrapperDict.Remove(ren);
             }
+            
+            var renderersToAdd = new List<Renderer>();
             foreach (var ren in renderers)
             {
-                if(Renderers.Contains(ren)) continue;
+                if (Renderers.Contains(ren)) continue;
+                renderersToAdd.Add(ren);
+            }
+
+            foreach (var ren in renderersToAdd)
+            {
                 Renderers.Add(ren);
                 RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
             }
