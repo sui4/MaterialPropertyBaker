@@ -36,8 +36,8 @@ namespace sui4.MaterialPropertyBaker
                     ? i.ToString()
                     : Target.MaterialPropsList[i].ID;
                 _propFoldoutList.Add(SessionState.GetBool(PropFoldoutKeyAt(key), false));
-                _colorsFoldoutList.Add(SessionState.GetBool(ColorsFoldoutKeyAt(key), false));
-                _floatsFoldoutList.Add(SessionState.GetBool(FloatsFoldoutKeyAt(key), false));
+                _colorsFoldoutList.Add(SessionState.GetBool(ColorsFoldoutKeyAt(key), true));
+                _floatsFoldoutList.Add(SessionState.GetBool(FloatsFoldoutKeyAt(key), true));
             }
         }
 

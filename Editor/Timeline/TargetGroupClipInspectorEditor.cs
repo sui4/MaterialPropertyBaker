@@ -25,7 +25,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                SaveAsButtonGUI();
                 using (new EditorGUI.DisabledScope(!_editable.boolValue))
                     PropertyGroupEditor(Target.MpbProfile);
             }
@@ -70,6 +69,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (_presetEditor != null)
             {
+                SaveAsButtonGUI();
                 _presetEditor.OnInspectorGUI();
             }
         }
