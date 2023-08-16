@@ -11,7 +11,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private TargetGroupTrack _parentTrack;
         private TargetGroupBehaviour _template = new();
         [SerializeField] private MpbProfile _mpbProfile;
-
+        [SerializeField] private bool _editable;
         public TargetGroupTrack ParentTrack
         {
             get => _parentTrack;

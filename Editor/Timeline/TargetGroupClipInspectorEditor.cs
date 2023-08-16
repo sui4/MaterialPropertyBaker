@@ -9,13 +9,14 @@ namespace sui4.MaterialPropertyBaker.Timeline
     public class TargetGroupClipInspectorEditor : Editor
     {
         private SerializedProperty _mpbProfileProp;
-        private bool _editable;
+        private SerializedProperty _editable;
         private Editor _presetEditor;
         private TargetGroupClip Target => (TargetGroupClip)target;
 
         private void OnEnable()
         {
             _mpbProfileProp = serializedObject.FindProperty("_mpbProfile");
+            _editable = serializedObject.FindProperty("_editable");
             if(Target.MpbProfile != null)
                 _presetEditor = CreateEditor(Target.MpbProfile);
         }
@@ -26,7 +27,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                using (new EditorGUI.DisabledScope(!_editable)) 
+                using (new EditorGUI.DisabledScope(!_editable.boolValue)) 
                     PropertyGroupEditor(Target.MpbProfile);
             }
         }
@@ -40,7 +41,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 // Load Save buttons
                 if (Target.MpbProfile != null)
                 {
-                    _editable = EditorGUILayout.Toggle("Edit Preset", _editable);
+                    EditorGUILayout.PropertyField(_editable, new GUIContent("Edit Preset"));
                 }
 
                 if (changeCheck.changed)
