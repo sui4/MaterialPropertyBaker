@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,11 +8,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
     [CanEditMultipleObjects]
     public class MaterialPropSwitcherClipInspectorEditor : Editor
     {
-        private SerializedProperty _presetRef;
         private SerializedProperty _editable;
-        private SerializedProperty _props;
 
         private BakedMaterialPropertiesEditor _editor;
+        private SerializedProperty _presetRef;
+        private SerializedProperty _props;
         private MaterialPropSwitcherClip _targetClip;
 
         private void OnEnable()
@@ -229,7 +228,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 // throw new Exception("Failed to Export MaterialProps is null");
             }
 
-            var bakedProps = ScriptableObject.CreateInstance<BakedMaterialProperty>();
+            var bakedProps = CreateInstance<BakedMaterialProperty>();
             bakedProps.MaterialProps.CopyValuesFromOther(props);
             ExportProfile(bakedProps);
         }

@@ -16,17 +16,17 @@ namespace sui4.MaterialPropertyBaker
 
         [SerializeField] private List<Renderer> _renderers = new();
 
-        private readonly List<string> _warnings = new();
         private MaterialPropertyBlock _mpb; // to reduce GCAlloc
 
         public Dictionary<Renderer, MaterialTargetInfoSDictWrapper> RendererMatTargetInfoWrapperDict =>
             _rendererMatTargetInfoWrapperSDict.Dictionary;
+
         public SerializedDictionary<Renderer, MaterialTargetInfoSDictWrapper> RendererMatTargetInfoWrapperSDict =>
             _rendererMatTargetInfoWrapperSDict;
 
         public List<Renderer> Renderers => _renderers;
-        public List<string> Warnings => _warnings;
-        
+        public List<string> Warnings { get; } = new();
+
         public Dictionary<Material, MaterialProps> DefaultMaterialPropsDict { get; } = new();
 
         private void OnEnable()
@@ -38,7 +38,7 @@ namespace sui4.MaterialPropertyBaker
         public void OnValidate()
         {
             Warnings.Clear();
-            
+
             SyncRenderer();
             SyncMaterial();
             RetrieveInitialProps();
@@ -49,7 +49,7 @@ namespace sui4.MaterialPropertyBaker
             DefaultMaterialPropsDict.Clear();
             foreach (var ren in Renderers)
             {
-                if(ren == null) continue;
+                if (ren == null) continue;
                 var wrapper = RendererMatTargetInfoWrapperDict[ren];
                 foreach (var mat in wrapper.MatTargetInfoDict.Keys)
                 {
@@ -63,17 +63,15 @@ namespace sui4.MaterialPropertyBaker
         {
             foreach (var ren in Renderers)
             {
-                if(ren == null) continue;
+                if (ren == null) continue;
                 RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
 
                 var matTargetInfoSDictWrapper = RendererMatTargetInfoWrapperDict[ren];
                 // 削除されたmaterialを取り除く
                 var matKeysToRemove = new List<Material>();
                 foreach (var mat in matTargetInfoSDictWrapper.MatTargetInfoDict.Keys)
-                {
-                    if(!ren.sharedMaterials.Contains(mat))
+                    if (!ren.sharedMaterials.Contains(mat))
                         matKeysToRemove.Add(mat);
-                }
 
                 foreach (var mat in matKeysToRemove)
                     matTargetInfoSDictWrapper.MatTargetInfoDict.Remove(mat);
@@ -94,22 +92,23 @@ namespace sui4.MaterialPropertyBaker
 
         private void SyncRenderer()
         {
-            if(_target == null) return;
-            
+            if (_target == null) return;
+
             List<Renderer> renderers = new();
-            _target.GetComponentsInChildren<Renderer>(true, renderers);
+            _target.GetComponentsInChildren(true, renderers);
             var renderersToRemove = new List<Renderer>();
             foreach (var ren in Renderers)
             {
-                if(renderers.Contains(ren)) continue;
+                if (renderers.Contains(ren)) continue;
                 renderersToRemove.Add(ren);
             }
+
             foreach (var ren in renderersToRemove)
             {
                 Renderers.Remove(ren);
                 RendererMatTargetInfoWrapperDict.Remove(ren);
             }
-            
+
             var renderersToAdd = new List<Renderer>();
             foreach (var ren in renderers)
             {
@@ -122,13 +121,11 @@ namespace sui4.MaterialPropertyBaker
                 Renderers.Add(ren);
                 RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
             }
-
         }
 
         // validate shader name: 同じIDを持つmaterialのshaderが同じかどうか
         private void ValidateShader()
         {
-            
         }
 
         public void SetPropertyBlock(Dictionary<MpbProfile, float> profileWeightDict)
@@ -136,7 +133,7 @@ namespace sui4.MaterialPropertyBaker
             foreach (var ren in Renderers)
             {
                 var wrapper = RendererMatTargetInfoWrapperDict[ren];
-                for (int mi = 0; mi < ren.sharedMaterials.Length; mi++)
+                for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     var mat = ren.sharedMaterials[mi];
                     var targetInfo = wrapper.MatTargetInfoDict[mat];
@@ -144,7 +141,6 @@ namespace sui4.MaterialPropertyBaker
                     ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
                     HashSet<int> isFirstTime = new();
                     foreach (var (profile, weight) in profileWeightDict)
-                    {
                         if (profile.IdMaterialPropsDict.TryGetValue(targetInfo.ID, out var props))
                         {
                             foreach (var color in props.Colors)
@@ -163,7 +159,8 @@ namespace sui4.MaterialPropertyBaker
                                     current = prop.Value;
                                     isFirstTime.Add(prop.ID);
                                 }
-                                var diff = color.Value - prop.Value;  
+
+                                var diff = color.Value - prop.Value;
                                 _mpb.SetColor(prop.ID, current + diff * weight);
                             }
 
@@ -183,11 +180,12 @@ namespace sui4.MaterialPropertyBaker
                                     current = prop.Value;
                                     isFirstTime.Add(prop.ID);
                                 }
+
                                 var diff = f.Value - prop.Value;
                                 _mpb.SetFloat(prop.ID, current + diff * weight);
                             }
                         }
-                    }
+
                     ren.SetPropertyBlock(_mpb, mi);
                 }
             }
@@ -197,19 +195,15 @@ namespace sui4.MaterialPropertyBaker
         {
             _mpb = new MaterialPropertyBlock();
             foreach (var ren in Renderers)
-            {
-                for(var mi = 0; mi < ren.sharedMaterials.Length; mi++)
-                {
+                for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                     ren.SetPropertyBlock(_mpb, mi);
-                }
-            }
         }
 
         public void ResetToDefault()
         {
             ResetPropertyBlock();
         }
-        
+
 #if UNITY_EDITOR
         [ContextMenu("Create MPB Profile Asset")]
         public void CreateMpbProfileAsset()
@@ -222,7 +216,7 @@ namespace sui4.MaterialPropertyBaker
                 {
                     var mat = ren.sharedMaterials[mi];
                     var targetInfo = wrapper.MatTargetInfoDict[mat];
-                    if(asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID)) continue;
+                    if (asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID)) continue;
                     var matProps = new MaterialProps(mat, false);
                     matProps.ID = targetInfo.ID;
                     asset.MaterialPropsList.Add(matProps);
@@ -230,21 +224,19 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
 
-            var defaultName = $"{this.name}_profile";
+            var defaultName = $"{name}_profile";
             Utils.CreateAsset(asset, defaultName, "Create MPB Profile", "");
         }
 #endif
-
-
     }
-    
+
     [Serializable]
     public class MaterialTargetInfoSDictWrapper
     {
         [SerializeField] private SerializedDictionary<Material, TargetInfo> _matTargetInfoSDict = new();
         public Dictionary<Material, TargetInfo> MatTargetInfoDict => _matTargetInfoSDict.Dictionary;
     }
-    
+
     [Serializable]
     public class TargetInfo
     {

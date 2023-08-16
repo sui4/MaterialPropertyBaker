@@ -1,15 +1,13 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {
     [CustomEditor(typeof(TargetGroupClip))]
     public class TargetGroupClipInspectorEditor : Editor
     {
-        private SerializedProperty _mpbProfileProp;
         private SerializedProperty _editable;
+        private SerializedProperty _mpbProfileProp;
         private Editor _presetEditor;
         private TargetGroupClip Target => (TargetGroupClip)target;
 
@@ -17,7 +15,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             _mpbProfileProp = serializedObject.FindProperty("_mpbProfile");
             _editable = serializedObject.FindProperty("_editable");
-            if(Target.MpbProfile != null)
+            if (Target.MpbProfile != null)
                 _presetEditor = CreateEditor(Target.MpbProfile);
         }
 
@@ -27,7 +25,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                using (new EditorGUI.DisabledScope(!_editable.boolValue)) 
+                using (new EditorGUI.DisabledScope(!_editable.boolValue))
                     PropertyGroupEditor(Target.MpbProfile);
             }
         }

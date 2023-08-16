@@ -24,7 +24,6 @@ namespace sui4.MaterialPropertyBaker
 
         // レンダラーのインデックス、マテリアルのインデックス、マテリアルの状態
         private MaterialPropertyBlock _mpb;
-        private readonly List<string> _warnings = new();
 
         public BakedMaterialProperty OverrideDefaultPreset
         {
@@ -45,7 +44,7 @@ namespace sui4.MaterialPropertyBaker
             _materialStatusDictDict;
 
         public List<Renderer> Renderers => _renderers;
-        public List<string> Warnings => _warnings;
+        public List<string> Warnings { get; } = new();
 
         public string ID
         {
@@ -64,20 +63,14 @@ namespace sui4.MaterialPropertyBaker
 
         public void OnValidate()
         {
-            _warnings.Clear();
+            Warnings.Clear();
 
-            if (string.IsNullOrWhiteSpace(ID))
-            {
-                ID = "Group_" + Guid.NewGuid().ToString();
-            }
+            if (string.IsNullOrWhiteSpace(ID)) ID = "Group_" + Guid.NewGuid();
 
             if (Renderers.Count == 0)
                 Renderers.Add(null);
 
-            if (MaterialPropertyConfig == null)
-            {
-                Warnings.Add("MaterialPropertyConfig should be set");
-            }
+            if (MaterialPropertyConfig == null) Warnings.Add("MaterialPropertyConfig should be set");
 
             SyncMaterial();
             ValidateShaderName();
@@ -118,21 +111,17 @@ namespace sui4.MaterialPropertyBaker
 
             var shaders = new HashSet<string>();
             foreach (var (renderer, materialStatusDictWrapper) in MaterialStatusDictDict)
+            foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
             {
-                foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
-                {
-                    if (!isTarget) continue;
-                    shaders.Add(material.shader.name);
-                    if (hasConfig && material.shader.name != MaterialPropertyConfig.ShaderName)
-                    {
-                        _warnings.Add(
-                            $"Material({material.name}) of Renderer({renderer.name}) use different shader from config({MaterialPropertyConfig.ShaderName})");
-                    }
-                }
+                if (!isTarget) continue;
+                shaders.Add(material.shader.name);
+                if (hasConfig && material.shader.name != MaterialPropertyConfig.ShaderName)
+                    Warnings.Add(
+                        $"Material({material.name}) of Renderer({renderer.name}) use different shader from config({MaterialPropertyConfig.ShaderName})");
             }
 
             if (!hasConfig && shaders.Count > 1)
-                _warnings.Add($"MaterialGroup({ID}) has multiple shaders({string.Join(", ", shaders)})");
+                Warnings.Add($"MaterialGroup({ID}) has multiple shaders({string.Join(", ", shaders)})");
         }
 
         // shaderがconfigと違う場合はisTargetをfalseにする
@@ -147,17 +136,10 @@ namespace sui4.MaterialPropertyBaker
             {
                 List<Material> materialsToDisable = new();
                 foreach (var (material, isTarget) in materialStatusDictWrapper.MaterialStatusDict)
-                {
                     if (isTarget && material.shader.name != shaderName)
-                    {
                         materialsToDisable.Add(material);
-                    }
-                }
 
-                foreach (var mat in materialsToDisable)
-                {
-                    materialStatusDictWrapper.MaterialStatusDict[mat] = false;
-                }
+                foreach (var mat in materialsToDisable) materialStatusDictWrapper.MaterialStatusDict[mat] = false;
             }
 
             OnValidate();

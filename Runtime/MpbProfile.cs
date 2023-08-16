@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,17 +11,14 @@ namespace sui4.MaterialPropertyBaker
 
         public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; } =
             new();
+
         private void OnValidate()
         {
             IdMaterialPropsDict.Clear();
             foreach (var matProps in MaterialPropsList)
-            {
                 if (!IdMaterialPropsDict.TryAdd(matProps.ID, matProps))
-                {
                     // failed to add
                     Debug.LogWarning($"Duplicate ID: {matProps.ID}");
-                }
-            }
         }
     }
 }

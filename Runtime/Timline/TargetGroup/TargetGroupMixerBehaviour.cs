@@ -4,14 +4,13 @@ using UnityEngine.Playables;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {
-
     public class TargetGroupMixerBehaviour : PlayableBehaviour
     {
+        private readonly Dictionary<int, bool> _isWarningLogged = new();
         private readonly Dictionary<MpbProfile, float> _profileWeightDict = new();
 
         public TargetGroup BindingTargetGroup;
-        private readonly Dictionary<int, bool> _isWarningLogged = new();
-        
+
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
@@ -61,10 +60,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             var inputCount = playable.GetInputCount();
             _isWarningLogged.Clear();
-            if (BindingTargetGroup != null)
-            {
-                BindingTargetGroup.ResetPropertyBlock();
-            }
+            if (BindingTargetGroup != null) BindingTargetGroup.ResetPropertyBlock();
 
             for (var i = 0; i < inputCount; i++)
             {
@@ -73,10 +69,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var clip = sp.GetBehaviour().Clip;
                 if (clip.MpbProfile == null) continue;
 
-                foreach (var matProps in clip.MpbProfile.MaterialPropsList)
-                {
-                    matProps?.UpdateShaderID();
-                }
+                foreach (var matProps in clip.MpbProfile.MaterialPropsList) matProps?.UpdateShaderID();
             }
 
             base.OnGraphStart(playable);

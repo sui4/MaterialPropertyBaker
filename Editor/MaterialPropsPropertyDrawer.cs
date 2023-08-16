@@ -6,12 +6,12 @@ namespace sui4.MaterialPropertyBaker
     [CustomPropertyDrawer(typeof(MaterialProps))]
     public class MaterialPropsPropertyDrawer : PropertyDrawer
     {
-        private SerializedProperty _id;
-        private SerializedProperty _shader;
         private SerializedProperty _colors;
         private SerializedProperty _floats;
+        private SerializedProperty _id;
 
         private SerializedProperty _property;
+        private SerializedProperty _shader;
         private SerializedProperty _value;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -22,7 +22,7 @@ namespace sui4.MaterialPropertyBaker
             _shader = property.FindPropertyRelative("_shader");
             _colors = property.FindPropertyRelative("_colors");
             _floats = property.FindPropertyRelative("_floats");
-            
+
             EditorGUILayout.PropertyField(_id);
             EditorGUILayout.PropertyField(_shader);
 

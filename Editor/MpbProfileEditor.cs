@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -10,23 +9,24 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(MpbProfile))]
     public class MpbProfileEditor : Editor
     {
-        private SerializedProperty _materialPropsListProp;
-        private SerializedProperty _materialPropsProp;
+        private readonly List<bool> _colorsFoldoutList = new();
+        private readonly List<bool> _floatsFoldoutList = new();
 
         private readonly List<bool> _propFoldoutList = new();
-        private string PropFoldoutKeyAt(string id) => $"{Target.name}_propFoldout_{id}";
-        private readonly List<bool> _colorsFoldoutList = new();
-        private string ColorsFoldoutKeyAt(string id) => $"{Target.name}_colorsFoldout_{id}";
-        private readonly List<bool> _floatsFoldoutList = new();
-        private string FloatsFoldoutKeyAt(string id) => $"{Target.name}_floatsFoldout_{id}";
+        private SerializedProperty _materialPropsListProp;
+        private SerializedProperty _materialPropsProp;
         private MpbProfile Target => (MpbProfile)target;
 
         private void OnEnable()
         {
-            if(target == null) return;
+            if (target == null) return;
             _materialPropsListProp = serializedObject.FindProperty("_materialPropsList");
             Validate();
         }
+
+        private string PropFoldoutKeyAt(string id) => $"{Target.name}_propFoldout_{id}";
+        private string ColorsFoldoutKeyAt(string id) => $"{Target.name}_colorsFoldout_{id}";
+        private string FloatsFoldoutKeyAt(string id) => $"{Target.name}_floatsFoldout_{id}";
 
         private void Validate()
         {
@@ -43,10 +43,10 @@ namespace sui4.MaterialPropertyBaker
 
         public override void OnInspectorGUI()
         {
-            if(target == null) return;
+            if (target == null) return;
             if (_materialPropsListProp.arraySize > _propFoldoutList.Count)
                 Validate();
-            
+
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 for (var i = 0; i < _materialPropsListProp.arraySize; i++)
@@ -62,6 +62,7 @@ namespace sui4.MaterialPropertyBaker
                     {
                         key = title = Target.MaterialPropsList[i].ID;
                     }
+
                     _propFoldoutList[i] = EditorGUILayout.Foldout(_propFoldoutList[i], title);
                     SessionState.SetBool(PropFoldoutKeyAt(key), _propFoldoutList[i]);
                     if (_propFoldoutList[i])

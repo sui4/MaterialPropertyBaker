@@ -1,25 +1,24 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace sui4.MaterialPropertyBaker
 {
     [CustomEditor(typeof(MaterialPropertyConfig)), CanEditMultipleObjects]
     public class MaterialPropertyConfigEditor : Editor
     {
-        private SerializedProperty _shaderNameProp;
-        private SerializedProperty _propertyNamesProp;
-        private SerializedProperty _propertyTypesProp;
         private SerializedProperty _editableProp;
 
-        private SerializedProperty _propertyNameProp;
-        private SerializedProperty _propertyTypeProp;
+        private string _filterQuery = "";
         private SerializedProperty _propertyEditableProp;
 
-        private Vector2 _scrollPos = Vector2.zero;
+        private SerializedProperty _propertyNameProp;
+        private SerializedProperty _propertyNamesProp;
+        private SerializedProperty _propertyTypeProp;
+        private SerializedProperty _propertyTypesProp;
 
-        private string _filterQuery = "";
+        private Vector2 _scrollPos = Vector2.zero;
+        private SerializedProperty _shaderNameProp;
 
         private void OnEnable()
         {

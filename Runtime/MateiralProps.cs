@@ -28,11 +28,10 @@ namespace sui4.MaterialPropertyBaker
 
         public MaterialProps(Material mat, bool loadValue = true)
         {
-            this.Shader = mat.shader;
-            this.Material = mat;
+            Shader = mat.shader;
+            Material = mat;
             ID = mat.name;
             if (loadValue)
-            {
                 for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
                 {
                     var propType = mat.shader.GetPropertyType(pi);
@@ -57,7 +56,6 @@ namespace sui4.MaterialPropertyBaker
                             break;
                     }
                 }
-            }
         }
 
         public MaterialProps(Material mat, MaterialPropertyConfig config)
@@ -94,7 +92,7 @@ namespace sui4.MaterialPropertyBaker
             get => _id;
             set => _id = value;
         }
-        
+
         public Shader Shader
         {
             get => _shader;
