@@ -16,9 +16,9 @@ namespace sui4.MaterialPropertyBaker
         // private SerializedProperty _defaultProfileProp;
 
         private bool _renderersFoldout = true;
-        private string RenderersFoldoutKey => name + "renderersFoldout";
+        private string RenderersFoldoutKey => $"{Target.name}_renderersFoldout";
         private List<bool> _rendererFoldoutList = new();
-        private string RendererFoldoutKeyAt(int index) => name + "rendererFoldout" + index;
+        private string RendererFoldoutKeyAt(int index) => $"{Target.name}_rendererFoldout_{index}";
 
         private TargetGroup Target => (TargetGroup)target;
 
@@ -29,15 +29,15 @@ namespace sui4.MaterialPropertyBaker
                 serializedObject.FindProperty("_rendererMatTargetInfoWrapperSDict");
             _renderersProp = serializedObject.FindProperty("_renderers");
             
-            _renderersFoldout = SessionState.GetBool(name + RenderersFoldoutKey, true);
+            _renderersFoldout = SessionState.GetBool(RenderersFoldoutKey, true);
             Validate();
         }
 
         private void Validate()
         {
-            for (var i = 0; i < _renderersProp.arraySize; i++)
+            for (var i = _rendererFoldoutList.Count; i < _renderersProp.arraySize; i++)
             {
-                _rendererFoldoutList.Add(SessionState.GetBool( RendererFoldoutKeyAt(i), true));
+                _rendererFoldoutList.Add(SessionState.GetBool(RendererFoldoutKeyAt(i), true));
             }
         }
 

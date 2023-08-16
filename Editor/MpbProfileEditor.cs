@@ -13,47 +13,63 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _materialPropsListProp;
         private SerializedProperty _materialPropsProp;
 
-        private List<bool> _propFoldoutList = new List<bool>();
-        const string PropFoldoutKey = "propFoldout";
-        private List<bool> _colorsFoldoutList = new List<bool>();
-        const string ColorsFoldoutKey = "colorsFoldout";
-        private List<bool> _floatsFoldoutList = new List<bool>();
-        const string FloatsFoldoutKey = "floatsFoldout";
-        public MpbProfile Target => (MpbProfile)target;
+        private readonly List<bool> _propFoldoutList = new();
+        private string PropFoldoutKeyAt(string id) => $"{Target.name}_propFoldout_{id}";
+        private readonly List<bool> _colorsFoldoutList = new();
+        private string ColorsFoldoutKeyAt(string id) => $"{Target.name}_colorsFoldout_{id}";
+        private readonly List<bool> _floatsFoldoutList = new();
+        private string FloatsFoldoutKeyAt(string id) => $"{Target.name}_floatsFoldout_{id}";
+        private MpbProfile Target => (MpbProfile)target;
 
         private void OnEnable()
         {
+            if(target == null) return;
             _materialPropsListProp = serializedObject.FindProperty("_materialPropsList");
-            for (var i = 0; i < _materialPropsListProp.arraySize; i++)
-            {
-                _propFoldoutList.Add(SessionState.GetBool(PropFoldoutKey + i, false));
-                _colorsFoldoutList.Add(SessionState.GetBool(ColorsFoldoutKey + i, false));
-                _floatsFoldoutList.Add(SessionState.GetBool(FloatsFoldoutKey + i, false));
-            }
+            Validate();
         }
 
-        private void SaveFoldoutState(int index, string key, bool state, ref List<bool> foldouts)
+        private void Validate()
         {
-            SessionState.SetBool(key + index, state);
-            foldouts[index] = state;
+            for (var i = _propFoldoutList.Count; i < _materialPropsListProp.arraySize; i++)
+            {
+                var key = string.IsNullOrWhiteSpace(Target.MaterialPropsList[i].ID)
+                    ? i.ToString()
+                    : Target.MaterialPropsList[i].ID;
+                _propFoldoutList.Add(SessionState.GetBool(PropFoldoutKeyAt(key), false));
+                _colorsFoldoutList.Add(SessionState.GetBool(ColorsFoldoutKeyAt(key), false));
+                _floatsFoldoutList.Add(SessionState.GetBool(FloatsFoldoutKeyAt(key), false));
+            }
         }
 
         public override void OnInspectorGUI()
         {
+            if(target == null) return;
+            if (_materialPropsListProp.arraySize > _propFoldoutList.Count)
+                Validate();
+            
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 for (var i = 0; i < _materialPropsListProp.arraySize; i++)
                 {
                     _materialPropsProp = _materialPropsListProp.GetArrayElementAtIndex(i);
-                    var title = Target.MaterialPropsList[i] == null
-                        ? $"MaterialProps {i}"
-                        : Target.MaterialPropsList[i].ID;
-                    _propFoldoutList[i] = EditorGUILayout.Foldout(_propFoldoutList[i], Target.MaterialPropsList[i].ID);
-                    SaveFoldoutState(i, PropFoldoutKey, _propFoldoutList[i], ref _propFoldoutList);
-                    if (!_propFoldoutList[i]) continue;
-                    EditorGUI.indentLevel++;
-                    MaterialPropsGUI(_materialPropsProp, i);
-                    EditorGUI.indentLevel--;
+                    string key, title;
+                    if (string.IsNullOrWhiteSpace(Target.MaterialPropsList[i].ID))
+                    {
+                        key = i.ToString();
+                        title = $"Material Property {i}";
+                    }
+                    else
+                    {
+                        key = title = Target.MaterialPropsList[i].ID;
+                    }
+                    _propFoldoutList[i] = EditorGUILayout.Foldout(_propFoldoutList[i], title);
+                    SessionState.SetBool(PropFoldoutKeyAt(key), _propFoldoutList[i]);
+                    if (_propFoldoutList[i])
+                    {
+                        EditorGUI.indentLevel++;
+                        MaterialPropsGUI(_materialPropsProp, i);
+                        EditorGUI.indentLevel--;
+                    }
                 }
 
                 if (change.changed)
@@ -75,9 +91,10 @@ namespace sui4.MaterialPropertyBaker
             EditorGUILayout.PropertyField(shader);
             EditorGUILayout.PropertyField(material);
 
+            var key = string.IsNullOrWhiteSpace(id.stringValue) ? index.ToString() : id.stringValue;
             // Colors
             _colorsFoldoutList[index] = EditorGUILayout.Foldout(_colorsFoldoutList[index], "Colors");
-            SaveFoldoutState(index, ColorsFoldoutKey, _colorsFoldoutList[index], ref _colorsFoldoutList);
+            SessionState.SetBool(ColorsFoldoutKeyAt(key), _colorsFoldoutList[index]);
             if (_colorsFoldoutList[index])
             {
                 EditorGUI.indentLevel++;
@@ -87,7 +104,7 @@ namespace sui4.MaterialPropertyBaker
 
             // Floats
             _floatsFoldoutList[index] = EditorGUILayout.Foldout(_floatsFoldoutList[index], "Floats");
-            SaveFoldoutState(index, FloatsFoldoutKey, _floatsFoldoutList[index], ref _floatsFoldoutList);
+            SessionState.SetBool(FloatsFoldoutKeyAt(key), _floatsFoldoutList[index]);
             if (_floatsFoldoutList[index])
             {
                 EditorGUI.indentLevel++;
