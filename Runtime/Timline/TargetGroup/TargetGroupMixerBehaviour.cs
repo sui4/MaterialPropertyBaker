@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -11,14 +10,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private readonly Dictionary<MpbProfile, float> _profileWeightDict = new();
 
         public TargetGroup BindingTargetGroup;
-        private Dictionary<int, bool> _isWarningLogged = new();
+        private readonly Dictionary<int, bool> _isWarningLogged = new();
         
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
             BindingTargetGroup = playerData as TargetGroup;
-            if (BindingTargetGroup == null)
-                return;
+            if (BindingTargetGroup == null) return;
 
             var inputCount = playable.GetInputCount();
             float totalWeight = 0;
@@ -47,25 +45,16 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
                     totalWeight += inputWeight;
                     if (_profileWeightDict.TryGetValue(clip.MpbProfile, out var weight))
-                    {
                         _profileWeightDict[clip.MpbProfile] = weight + inputWeight;
-                    }
                     else
-                    {
                         _profileWeightDict.Add(clip.MpbProfile, inputWeight);
-                    }
-                    
                 }
             }
 
             if (totalWeight > 0f)
-            {
                 BindingTargetGroup.SetPropertyBlock(_profileWeightDict);
-            }
             else
-            {
                 BindingTargetGroup.ResetToDefault();
-            }
         }
 
         public override void OnGraphStart(Playable playable)
@@ -83,12 +72,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 var sp = (ScriptPlayable<TargetGroupBehaviour>)playable.GetInput(i);
                 var clip = sp.GetBehaviour().Clip;
                 if (clip.MpbProfile == null) continue;
-                
-                
+
                 foreach (var matProps in clip.MpbProfile.MaterialPropsList)
                 {
-                    if(matProps == null) continue;
-                    matProps.UpdateShaderID();
+                    matProps?.UpdateShaderID();
                 }
             }
 
@@ -97,8 +84,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         public override void OnPlayableDestroy(Playable playable)
         {
-            if (BindingTargetGroup == null)
-                return;
+            if (BindingTargetGroup == null) return;
 
             BindingTargetGroup.ResetToDefault();
         }

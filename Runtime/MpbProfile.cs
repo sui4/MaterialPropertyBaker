@@ -10,7 +10,7 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private List<MaterialProps> _materialPropsList = new();
         public List<MaterialProps> MaterialPropsList => _materialPropsList;
 
-        public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; private set; } =
+        public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; } =
             new();
         private void OnValidate()
         {

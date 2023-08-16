@@ -23,7 +23,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             return mixer;
         }
         
-        public static T GetBindingComponent<T>(TrackAsset asset, GameObject gameObject) where T : class
+        private static T GetBindingComponent<T>(TrackAsset asset, GameObject gameObject) where T : class
         {
             if (gameObject == null) return default;
         
