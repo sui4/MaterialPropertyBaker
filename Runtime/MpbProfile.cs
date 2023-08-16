@@ -12,6 +12,11 @@ namespace sui4.MaterialPropertyBaker
         public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; } =
             new();
 
+        private void OnEnable()
+        {
+            OnValidate();
+        }
+
         private void OnValidate()
         {
             IdMaterialPropsDict.Clear();
