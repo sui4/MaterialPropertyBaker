@@ -12,7 +12,11 @@ namespace sui4.MaterialPropertyBaker.Timeline
         [SerializeField] private bool _editable;
         private TargetGroupBehaviour _template = new();
 
-        public MpbProfile MpbProfile => _mpbProfile;
+        public MpbProfile MpbProfile
+        {
+            get => _mpbProfile;
+            set => _mpbProfile = value;
+        }
 
         public ClipCaps clipCaps => ClipCaps.Blending;
 

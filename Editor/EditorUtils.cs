@@ -49,7 +49,7 @@ namespace sui4.MaterialPropertyBaker
             exported = null;
             if (string.IsNullOrEmpty(path))
             {
-                Debug.LogError($"Failed to export : path is null or empty.");
+                // Debug.LogError($"Failed to export : path is null or empty.");
                 return false;
             }
 

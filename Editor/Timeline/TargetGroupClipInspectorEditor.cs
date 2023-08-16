@@ -25,6 +25,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope("box"))
             {
+                SaveAsButtonGUI();
                 using (new EditorGUI.DisabledScope(!_editable.boolValue))
                     PropertyGroupEditor(Target.MpbProfile);
             }
@@ -71,6 +72,26 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 _presetEditor.OnInspectorGUI();
             }
+        }
+
+        private void SaveAsButtonGUI()
+        {
+            var tmp = GUI.backgroundColor;
+            GUI.backgroundColor = Color.green;
+            if (GUILayout.Button("Clone"))
+            {
+                var profileToSave = ScriptableObject.Instantiate(Target.MpbProfile);
+                var defaultName = $"{profileToSave.name}";
+                EditorUtils.CreateAsset(profileToSave, out var saved, typeof(MpbProfile), defaultName, "Save as New", "");
+                if (saved)
+                {
+                    Target.MpbProfile = saved as MpbProfile;
+                    EditorUtility.SetDirty(Target);
+                    AssetDatabase.SaveAssetIfDirty(Target);
+                    serializedObject.Update();
+                }
+            }
+            GUI.backgroundColor = tmp;
         }
     }
 }
