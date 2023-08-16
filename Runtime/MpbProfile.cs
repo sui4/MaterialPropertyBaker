@@ -12,6 +12,7 @@ namespace sui4.MaterialPropertyBaker
         public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; } =
             new();
 
+        public List<string> Warnings { get; } = new();
         private void OnEnable()
         {
             OnValidate();
@@ -20,10 +21,14 @@ namespace sui4.MaterialPropertyBaker
         private void OnValidate()
         {
             IdMaterialPropsDict.Clear();
+            Warnings.Clear();
             foreach (var matProps in MaterialPropsList)
                 if (!IdMaterialPropsDict.TryAdd(matProps.ID, matProps))
-                    // failed to add
-                    Debug.LogWarning($"Duplicate ID: {matProps.ID}");
+                {
+                    var message = $"Duplicate ID: {matProps.ID}";
+                    Warnings.Add(message);
+                    Debug.LogWarning(message);
+                }
         }
     }
 }

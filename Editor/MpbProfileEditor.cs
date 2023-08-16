@@ -48,6 +48,7 @@ namespace sui4.MaterialPropertyBaker
             if (_materialPropsListProp.arraySize > _propFoldoutList.Count)
                 Validate();
 
+            EditorUtils.WarningGUI(Target.Warnings);
             using (var change = new EditorGUI.ChangeCheckScope())
             {
                 for (var i = 0; i < _materialPropsListProp.arraySize; i++)
