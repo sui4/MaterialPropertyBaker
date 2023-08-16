@@ -14,6 +14,7 @@ namespace sui4.MaterialPropertyBaker
             new();
         private void OnValidate()
         {
+            IdMaterialPropsDict.Clear();
             foreach (var matProps in MaterialPropsList)
             {
                 if (!IdMaterialPropsDict.TryAdd(matProps.ID, matProps))
