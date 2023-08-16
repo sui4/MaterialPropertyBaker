@@ -21,6 +21,9 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         public override void OnInspectorGUI()
         {
+            if (target == null) return;
+            serializedObject.Update();
+            
             PresetRefGUI();
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope("box"))

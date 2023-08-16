@@ -44,6 +44,7 @@ namespace sui4.MaterialPropertyBaker
         public override void OnInspectorGUI()
         {
             if (target == null) return;
+            serializedObject.Update();
             if (_materialPropsListProp.arraySize > _propFoldoutList.Count)
                 Validate();
 
