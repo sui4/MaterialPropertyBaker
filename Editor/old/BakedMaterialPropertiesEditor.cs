@@ -9,14 +9,17 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(BakedMaterialProperty)), CanEditMultipleObjects]
     public class BakedMaterialPropertiesEditor : Editor
     {
-        private SerializedProperty _config;
-        private SerializedProperty _shaderName;
-        private SerializedProperty _materialProps;
         private SerializedProperty _colors;
+        private SerializedProperty _config;
         private SerializedProperty _floats;
 
 
         private MaterialPropertyConfig _materialPropertyConfig;
+        private SerializedProperty _materialProps;
+
+        private SerializedProperty _property;
+        private SerializedProperty _shaderName;
+        private SerializedProperty _value;
 
         public MaterialPropertyConfig MaterialPropertyConfig
         {
@@ -80,9 +83,6 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-
-        private SerializedProperty _property;
-        private SerializedProperty _value;
 
         private void PropsGUI(SerializedProperty props, ShaderPropertyType type, bool isColor = false)
         {

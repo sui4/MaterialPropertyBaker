@@ -1,15 +1,13 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace sui4.MaterialPropertyBaker.Timeline
 {
     [CustomEditor(typeof(TargetGroupClip))]
     public class TargetGroupClipInspectorEditor : Editor
     {
-        private SerializedProperty _mpbProfileProp;
         private SerializedProperty _editable;
+        private SerializedProperty _mpbProfileProp;
         private Editor _presetEditor;
         private TargetGroupClip Target => (TargetGroupClip)target;
 
@@ -17,17 +15,20 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             _mpbProfileProp = serializedObject.FindProperty("_mpbProfile");
             _editable = serializedObject.FindProperty("_editable");
-            if(Target.MpbProfile != null)
+            if (Target.MpbProfile != null)
                 _presetEditor = CreateEditor(Target.MpbProfile);
         }
 
         public override void OnInspectorGUI()
         {
+            if (target == null) return;
+            serializedObject.Update();
+            
             PresetRefGUI();
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope("box"))
             {
-                using (new EditorGUI.DisabledScope(!_editable.boolValue)) 
+                using (new EditorGUI.DisabledScope(!_editable.boolValue))
                     PropertyGroupEditor(Target.MpbProfile);
             }
         }
@@ -71,8 +72,29 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (_presetEditor != null)
             {
+                SaveAsButtonGUI();
                 _presetEditor.OnInspectorGUI();
             }
+        }
+
+        private void SaveAsButtonGUI()
+        {
+            var tmp = GUI.backgroundColor;
+            GUI.backgroundColor = Color.green;
+            if (GUILayout.Button("Clone"))
+            {
+                var profileToSave = ScriptableObject.Instantiate(Target.MpbProfile);
+                var defaultName = $"{profileToSave.name}";
+                EditorUtils.CreateAsset(profileToSave, out var saved, typeof(MpbProfile), defaultName, "Save as New", "");
+                if (saved)
+                {
+                    Target.MpbProfile = saved as MpbProfile;
+                    EditorUtility.SetDirty(Target);
+                    AssetDatabase.SaveAssetIfDirty(Target);
+                    serializedObject.Update();
+                }
+            }
+            GUI.backgroundColor = tmp;
         }
     }
 }

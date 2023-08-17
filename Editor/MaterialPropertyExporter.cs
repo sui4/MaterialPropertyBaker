@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,17 +7,17 @@ namespace sui4.MaterialPropertyBaker
     [EditorWindowTitle(title = "Material Property Exporter")]
     public class MaterialPropertyExporter : EditorWindow
     {
-        private MaterialPropertyExporter _window;
         private const string WindowTitle = "Material Property Exporter";
 
-        private MaterialPropertyConfig _materialPropertyConfig;
-        private MaterialPropertyConfig _existingConfigAsset;
+        private BakedMaterialProperty _bakedMaterialProperty;
         private MaterialPropertyConfigEditor _editor;
-        private bool _useExistingConfig = false;
+        private MaterialPropertyConfig _existingConfigAsset;
+
+        private MaterialPropertyConfig _materialPropertyConfig;
 
         private Material _targetMaterial;
-
-        private BakedMaterialProperty _bakedMaterialProperty;
+        private bool _useExistingConfig = false;
+        private MaterialPropertyExporter _window;
 
         private event Action<MaterialPropertyConfig> actionOnExported;
 
@@ -39,6 +38,43 @@ namespace sui4.MaterialPropertyBaker
             window.GenerateConfig(target.shader);
             window.Show();
         }
+
+        private bool IsValid()
+        {
+            var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
+            return _targetMaterial != null &&
+                   config != null &&
+                   config.ShaderName == _targetMaterial.shader.name;
+        }
+
+        # region Event
+
+        private void OnExportButtonClicked()
+        {
+            var defaultName = Utils.MakeFileNameSafe(_targetMaterial.name);
+            var folderPath = EditorUtility.SaveFilePanelInProject("Save Config and Properties", defaultName, "asset",
+                "MaterialPropertyBakerData");
+            if (string.IsNullOrEmpty(folderPath)) return;
+
+            // folderPathの.assetを"_config.asset"に置き換える
+            var configPath = $"{folderPath.Replace(".asset", "")}_config.asset";
+            var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
+            EditorUtils.ExportScriptableObject(config, configPath, out var exportedConfig, GetType());
+
+            GenerateBakedMaterialProperty(_targetMaterial, exportedConfig as MaterialPropertyConfig);
+            // folderPathの.assetを"_properties.asset"に置き換える
+            var propertyPath = $"{folderPath.Replace(".asset", "")}_property.asset";
+            EditorUtils.ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var _, GetType());
+
+            if (actionOnExported != null)
+            {
+                actionOnExported?.Invoke(exportedConfig as MaterialPropertyConfig);
+                actionOnExported = null;
+                this.Close();
+            }
+        }
+
+        #endregion // event
 
         #region GUI
 
@@ -135,43 +171,6 @@ namespace sui4.MaterialPropertyBaker
         }
 
         #endregion
-
-        private bool IsValid()
-        {
-            var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
-            return _targetMaterial != null &&
-                   config != null &&
-                   config.ShaderName == _targetMaterial.shader.name;
-        }
-
-        # region Event
-
-        private void OnExportButtonClicked()
-        {
-            var defaultName = Utils.MakeFileNameSafe(_targetMaterial.name);
-            var folderPath = EditorUtility.SaveFilePanelInProject("Save Config and Properties", defaultName, "asset",
-                "MaterialPropertyBakerData");
-            if (string.IsNullOrEmpty(folderPath)) return;
-
-            // folderPathの.assetを"_config.asset"に置き換える
-            var configPath = $"{folderPath.Replace(".asset", "")}_config.asset";
-            var config = _useExistingConfig ? _existingConfigAsset : _materialPropertyConfig;
-            EditorUtils.ExportScriptableObject(config, configPath, out var exportedConfig, GetType());
-
-            GenerateBakedMaterialProperty(_targetMaterial, exportedConfig as MaterialPropertyConfig);
-            // folderPathの.assetを"_properties.asset"に置き換える
-            var propertyPath = $"{folderPath.Replace(".asset", "")}_property.asset";
-            EditorUtils.ExportScriptableObject(_bakedMaterialProperty, propertyPath, out var _, GetType());
-
-            if (actionOnExported != null)
-            {
-                actionOnExported?.Invoke(exportedConfig as MaterialPropertyConfig);
-                actionOnExported = null;
-                this.Close();
-            }
-        }
-
-        #endregion // event
 
         #region Assets
 

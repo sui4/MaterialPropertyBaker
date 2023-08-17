@@ -115,10 +115,7 @@ namespace sui4.MaterialPropertyBaker
                 var propType = config.PropertyTypes[pi];
                 if (!editable || !MaterialProps.IsSupportedType(propType)) continue;
                 var propName = config.PropertyNames[pi];
-                if (!MaterialProps.HasProperties(propName, propType))
-                {
-                    _materialProps.AddProperty(propName, propType);
-                }
+                if (!MaterialProps.HasProperties(propName, propType)) _materialProps.AddProperty(propName, propType);
             }
         }
     }

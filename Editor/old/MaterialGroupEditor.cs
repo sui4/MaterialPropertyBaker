@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,24 +7,14 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(MaterialGroup))]
     public class MaterialGroupEditor : Editor
     {
+        private SerializedProperty _defaultProfileProp;
+        private SerializedProperty _idProp;
+        private SerializedProperty _materialPropertyConfigProp;
+
+        private SerializedProperty _materialStatusSDictSDictProp;
+
         // serialized property of MaterialGroup(target)
         private SerializedProperty _renderersProp;
-        private SerializedProperty _materialStatusSDictSDictProp;
-        private SerializedProperty _defaultProfileProp;
-        private SerializedProperty _materialPropertyConfigProp;
-        private SerializedProperty _idProp;
-
-        private static class Styles
-        {
-            public static readonly GUIContent MaterialPropertyConfigLabel = new GUIContent("Material Property Config");
-
-            public static readonly GUIContent
-                OverrideDefaultProfileLabel = new GUIContent("Preset to Override Default");
-
-            public static readonly GUIContent MaterialLabel = GUIContent.none;
-            public static readonly GUIContent IsTargetLabel = new GUIContent("Apply");
-            public static readonly GUIContent IDLabel = new GUIContent("ID");
-        }
 
         private MaterialGroup Target => (MaterialGroup)target;
 
@@ -298,6 +287,18 @@ namespace sui4.MaterialPropertyBaker
             var materialStatusSDictProp = materialStatusSDictWrapperProp.FindPropertyRelative("_materialStatusDict");
             if (materialStatusSDictProp == null) throw new NullReferenceException("materialStatusSDictProp is null");
             return SerializedDictionaryUtil.GetKeyValueListSerializedProperty(materialStatusSDictProp);
+        }
+
+        private static class Styles
+        {
+            public static readonly GUIContent MaterialPropertyConfigLabel = new GUIContent("Material Property Config");
+
+            public static readonly GUIContent
+                OverrideDefaultProfileLabel = new GUIContent("Preset to Override Default");
+
+            public static readonly GUIContent MaterialLabel = GUIContent.none;
+            public static readonly GUIContent IsTargetLabel = new GUIContent("Apply");
+            public static readonly GUIContent IDLabel = new GUIContent("ID");
         }
     }
 }

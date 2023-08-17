@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
-using System;
-using System.IO;
+using Object = UnityEngine.Object;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -26,7 +27,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 if (!AssetDatabase.IsMainAsset(scriptableObject))
                 {
-                    UnityEngine.Object.DestroyImmediate(scriptableObject);
+                    Object.DestroyImmediate(scriptableObject);
                 }
 
                 scriptableObject = null;
@@ -48,7 +49,7 @@ namespace sui4.MaterialPropertyBaker
             exported = null;
             if (string.IsNullOrEmpty(path))
             {
-                Debug.LogError($"Failed to export : path is null or empty.");
+                // Debug.LogError($"Failed to export : path is null or empty.");
                 return false;
             }
 
@@ -57,7 +58,7 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogError("Failed to export : target object is null.");
             }
 
-            exported = UnityEngine.Object.Instantiate(scriptableObject);
+            exported = Object.Instantiate(scriptableObject);
             EditorUtility.SetDirty(exported);
 
             if (File.Exists(path))

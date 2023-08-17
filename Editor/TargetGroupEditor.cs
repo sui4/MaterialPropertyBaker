@@ -8,17 +8,18 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(TargetGroup))]
     public class TargetGroupEditor : Editor
     {
-        // serialized property of MaterialGroup(target)
-        private SerializedProperty _targetProp;
-        private SerializedProperty _renderersProp;
+        private List<bool> _rendererFoldoutList = new();
 
         private SerializedProperty _rendererMatTargetInfoWrapperSDictProp;
         // private SerializedProperty _defaultProfileProp;
 
         private bool _renderersFoldout = true;
+
+        private SerializedProperty _renderersProp;
+
+        // serialized property of MaterialGroup(target)
+        private SerializedProperty _targetProp;
         private string RenderersFoldoutKey => $"{Target.name}_renderersFoldout";
-        private List<bool> _rendererFoldoutList = new();
-        private string RendererFoldoutKeyAt(int index) => $"{Target.name}_rendererFoldout_{index}";
 
         private TargetGroup Target => (TargetGroup)target;
 
@@ -28,10 +29,12 @@ namespace sui4.MaterialPropertyBaker
             _rendererMatTargetInfoWrapperSDictProp =
                 serializedObject.FindProperty("_rendererMatTargetInfoWrapperSDict");
             _renderersProp = serializedObject.FindProperty("_renderers");
-            
+
             _renderersFoldout = SessionState.GetBool(RenderersFoldoutKey, true);
             Validate();
         }
+
+        private string RendererFoldoutKeyAt(int index) => $"{Target.name}_rendererFoldout_{index}";
 
         private void Validate()
         {

@@ -20,18 +20,19 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 targetGroup.OnValidate();
                 timelineMixer.BindingTargetGroup = targetGroup;
             }
+
             return mixer;
         }
-        
-        public static T GetBindingComponent<T>(TrackAsset asset, GameObject gameObject) where T : class
+
+        private static T GetBindingComponent<T>(TrackAsset asset, GameObject gameObject) where T : class
         {
             if (gameObject == null) return default;
-        
+
             var director = gameObject.GetComponent<PlayableDirector>();
             if (director == null) return default;
 
             var binding = director.GetGenericBinding(asset) as T;
-        
+
             return binding switch
             {
                 { } component => component,
