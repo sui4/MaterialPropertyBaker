@@ -15,7 +15,7 @@ namespace sui4.MaterialPropertyBaker
         private List<bool> _baseFoldoutList = new();
         private List<bool> _targetFoldoutList = new();
 
-        private Dictionary<string, List<MatProp>> _diffPropsDict = new();
+        private Dictionary<string, List<BaseTargetValueHolder>> _diffPropsDict = new();
         [MenuItem("MaterialPropertyBaker/Diff Property Baker")]
         private static void ShowWindow()
         {
@@ -97,12 +97,11 @@ namespace sui4.MaterialPropertyBaker
                                 EditorGUILayout.FloatField(new GUIContent(prop.PropName), floatValue);
                                 break;
                             default:
+                                Debug.LogWarning($"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
                                 break;
-                            
                         }
                     }
                 }
-                
             }
         }
         
@@ -144,10 +143,33 @@ namespace sui4.MaterialPropertyBaker
 
         private void BakeDifferentProperties()
         {
+            if(_baseProfile == null || _targetProfile == null) return;
+            Validate();
             
+            foreach (var (id, diffProps) in _diffPropsDict)
+            {
+                if (_targetProfile.IdMaterialPropsDict.TryGetValue(id, out var targetMatProps))
+                {
+                    foreach (var prop in diffProps)
+                    {
+                        switch (prop.PropType)
+                        {
+                            case ShaderPropertyType.Color:
+                                targetMatProps.SetColor(prop.PropName, prop.TargetColorValue);
+                                break;
+                            case ShaderPropertyType.Float:
+                                targetMatProps.SetFloat(prop.PropName, prop.TargetFloatValue);
+                                break;
+                            default:
+                                Debug.LogWarning($"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
-        private class MatProp
+        private class BaseTargetValueHolder
         {
             public string PropName;
             public Material Material;
@@ -157,9 +179,9 @@ namespace sui4.MaterialPropertyBaker
             public Color TargetColorValue;
             public float TargetFloatValue;
         }
-        private static void GetDifferentProperties(Material baseMat, Material targetMat, out List<MatProp> differentProps)
+        private static void GetDifferentProperties(Material baseMat, Material targetMat, out List<BaseTargetValueHolder> differentProps)
         {
-            differentProps = new List<MatProp>();
+            differentProps = new List<BaseTargetValueHolder>();
             const float tolerance = 0.0001f;
             if (baseMat.shader != targetMat.shader)
             {
@@ -180,7 +202,7 @@ namespace sui4.MaterialPropertyBaker
                         var targetColor = targetMat.GetColor(propName);
                         if (baseColor != targetColor)
                         {
-                            var prop = new MatProp()
+                            var prop = new BaseTargetValueHolder()
                             {
                                 PropName = propName,
                                 Material = baseMat,
@@ -197,7 +219,7 @@ namespace sui4.MaterialPropertyBaker
                         var targetFloat = targetMat.GetFloat(propName);
                         if (Math.Abs(baseFloat - targetFloat) > tolerance)
                         {
-                            var prop = new MatProp()
+                            var prop = new BaseTargetValueHolder()
                             {
                                 PropName = propName,
                                 Material = baseMat,
