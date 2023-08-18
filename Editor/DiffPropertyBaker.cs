@@ -167,6 +167,14 @@ namespace sui4.MaterialPropertyBaker
                     }
                 }
             }
+
+            if (EditorUtility.DisplayDialog("Bake Succeeded",
+                    $"Properties baked to {_targetProfile.name}",
+                    "OK"))
+            {
+                Close();
+                Selection.activeObject = _targetProfile;
+            }
         }
 
         private class BaseTargetValueHolder
