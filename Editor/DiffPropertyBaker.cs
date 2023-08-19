@@ -93,6 +93,7 @@ namespace sui4.MaterialPropertyBaker
                                 EditorGUILayout.ColorField(new GUIContent(prop.PropName), colorValue, true, true, true);
                                 break;
                             case ShaderPropertyType.Float:
+                            case ShaderPropertyType.Range:
                                 var floatValue = isBase ? prop.BaseFloatValue : prop.TargetFloatValue;
                                 EditorGUILayout.FloatField(new GUIContent(prop.PropName), floatValue);
                                 break;
@@ -158,6 +159,7 @@ namespace sui4.MaterialPropertyBaker
                                 targetMatProps.SetColor(prop.PropName, prop.TargetColorValue);
                                 break;
                             case ShaderPropertyType.Float:
+                            case ShaderPropertyType.Range:
                                 targetMatProps.SetFloat(prop.PropName, prop.TargetFloatValue);
                                 break;
                             default:
