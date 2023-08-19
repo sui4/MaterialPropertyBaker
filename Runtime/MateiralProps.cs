@@ -144,9 +144,11 @@ namespace sui4.MaterialPropertyBaker
             foreach (var f in Floats)
                 f.UpdateShaderID();
         }
-
+        
+        // add property with default value
         public void AddProperty(string propName, ShaderPropertyType spType)
         {
+            if(HasProperty(propName, spType)) return;
             switch (spType)
             {
                 case ShaderPropertyType.Color:
@@ -165,7 +167,43 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        public bool HasProperties(string propName, ShaderPropertyType spType)
+        public void SetFloat(string propName, float value)
+        {
+            if (HasProperty(propName, ShaderPropertyType.Float))
+            {
+                // 既存のプロパティを更新
+                UpdateProperty(Floats, propName, value);
+            }
+            else
+            {
+                Floats.Add(new MaterialProp<float>(propName, value));
+            }
+        }
+
+        public void SetColor(string propName, Color value)
+        {
+            if (HasProperty(propName, ShaderPropertyType.Color))
+            {
+                // 既存のプロパティを更新
+                UpdateProperty(Colors, propName, value);
+            }
+            else
+            {
+                Colors.Add(new MaterialProp<Color>(propName, value));
+            }
+        }
+
+        private void UpdateProperty<T>(List<MaterialProp<T>> props, string propName, T value)
+        {
+            var prop = props.FirstOrDefault(p => p.Name == propName);
+            if (prop != null)
+            {
+                prop.Value = value;
+            }
+        }
+
+
+        public bool HasProperty(string propName, ShaderPropertyType spType)
         {
             if (!IsSupportedType(spType))
             {

@@ -148,7 +148,7 @@ namespace sui4.MaterialPropertyBaker
                 // TODO: ShaderPropertyTypeと、MaterialPropsのTypeは1:1じゃない。Range, floatはともにfloatに対応する
                 // 型が一致、かつ、MaterialPropsに存在しない かつ editableなプロパティのみ追加
                 if (pType == spType && config.HasEditableProperty(pName) &&
-                    !bp.MaterialProps.HasProperties(pName, pType))
+                    !bp.MaterialProps.HasProperty(pName, pType))
                 {
                     propertySelectList.Add(pName);
                 }
