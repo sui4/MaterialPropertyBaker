@@ -51,7 +51,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
 
             if (totalWeight > 0f)
+            {
+                BindingTargetGroup.ResetToDefault();
                 BindingTargetGroup.SetPropertyBlock(_profileWeightDict);
+            }
             else
                 BindingTargetGroup.ResetToDefault();
         }
