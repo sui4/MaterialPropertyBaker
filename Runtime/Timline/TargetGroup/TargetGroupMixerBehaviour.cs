@@ -26,7 +26,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 var inputWeight = playable.GetInputWeight(i);
                 // 各paramの重み付き和
-                if (inputWeight > 0)
                 {
                     var sp = (ScriptPlayable<TargetGroupBehaviour>)playable.GetInput(i);
                     var clip = sp.GetBehaviour().Clip;
