@@ -138,7 +138,8 @@ namespace sui4.MaterialPropertyBaker
                     var mat = ren.sharedMaterials[mi];
                     var targetInfo = wrapper.MatTargetInfoDict[mat];
                     var defaultProps = DefaultMaterialPropsDict[mat];
-                    ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
+                    // ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
+                    _mpb = new MaterialPropertyBlock();
                     HashSet<int> isFirstTime = new();
                     foreach (var (profile, weight) in profileWeightDict)
                         if (profile.IdMaterialPropsDict.TryGetValue(targetInfo.ID, out var props))
