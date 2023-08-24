@@ -146,23 +146,23 @@ namespace sui4.MaterialPropertyBaker
                         {
                             foreach (var color in props.Colors)
                             {
-                                var prop = defaultProps.Colors.Find(c => c.ID == color.ID);
-                                if (prop == null) continue;
+                                var defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
+                                if (defaultProp == null) continue;
                                 Color current;
-                                if (isFirstTime.Contains(prop.ID))
+                                if (isFirstTime.Contains(defaultProp.ID))
                                 {
                                     // second time
-                                    current = _mpb.GetColor(prop.ID);
+                                    current = _mpb.GetColor(defaultProp.ID);
                                 }
                                 else
                                 {
                                     // first time
-                                    current = prop.Value;
-                                    isFirstTime.Add(prop.ID);
+                                    current = defaultProp.Value;
+                                    isFirstTime.Add(defaultProp.ID);
                                 }
 
-                                var diff = color.Value - prop.Value;
-                                _mpb.SetColor(prop.ID, current + diff * weight);
+                                var diff = color.Value - defaultProp.Value;
+                                _mpb.SetColor(defaultProp.ID, current + diff * weight);
                             }
 
                             foreach (var f in props.Floats)
