@@ -26,6 +26,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 var inputWeight = playable.GetInputWeight(i);
                 // 各paramの重み付き和
+                if (inputWeight > 0f)
                 {
                     var sp = (ScriptPlayable<TargetGroupBehaviour>)playable.GetInput(i);
                     var clip = sp.GetBehaviour().Clip;
@@ -50,10 +51,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             }
 
             if (totalWeight > 0f)
-            {
-                BindingTargetGroup.ResetToDefault();
                 BindingTargetGroup.SetPropertyBlock(_profileWeightDict);
-            }
             else
                 BindingTargetGroup.ResetToDefault();
         }
