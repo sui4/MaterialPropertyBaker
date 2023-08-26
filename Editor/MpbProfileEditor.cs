@@ -368,7 +368,12 @@ namespace sui4.MaterialPropertyBaker
             {
                 var propName = shader.GetPropertyName(pi);
                 var propType = shader.GetPropertyType(pi);
-                if(!IsMatchShaderType(targetPropType, propType)) continue;
+                if (!IsMatchShaderType(targetPropType, propType)) continue;
+                
+                // 隠しプロパティは追加しない
+                var si = shader.FindPropertyIndex(propName);
+                var flags = shader.GetPropertyFlags(si);
+                if (flags == ShaderPropertyFlags.HideInInspector) continue;
                 switch (propType)
                 {
                     // すでに同じ名前のプロパティがある場合は追加しない
