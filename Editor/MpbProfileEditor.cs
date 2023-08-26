@@ -240,7 +240,7 @@ namespace sui4.MaterialPropertyBaker
                             var controlCreated = false;
                             for (int ai = 0; ai < attribs.Count(); ai++)
                             {
-                                if (attribs[ai] == "Toggle" || attribs[ai] == "MaterialToggle")
+                                if (attribs[ai] == "Toggle" || attribs[ai] == "MaterialToggle" || attribs[ai] == "ToggleUI")
                                 {
                                     var flag = valueProp.floatValue != 0;
                                     flag = EditorGUILayout.Toggle(new GUIContent(label), flag);
@@ -250,10 +250,43 @@ namespace sui4.MaterialPropertyBaker
                                 }
                                 else if (attribs[ai] == "Enum")
                                 {
-                                    // pop upの作成大変なので後で
+                                    var tmp = Regex.Replace(attribValues[ai], @"\s", "");
+                                    var enumValues = tmp.Split(',');
+                                    if (enumValues.Length % 2 != 0) break; // 名前と値がペアになっていない→無効
+                                    
+                                    var enumNum = enumValues.Length / 2;
+                                    var enumNames = new string[enumNum];
+                                    var enumInts = new int[enumNum];
+                                    var errorOccured = false;
+                                    var selected = 0;
+                                    for (int ei = 0; ei < enumNum; ei++)
+                                    {
+                                        enumNames[ei] = enumValues[ei * 2];
+                                        try
+                                        {
+                                            enumInts[ei] = int.Parse(enumValues[ei * 2 + 1]);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            errorOccured = true;
+                                            break;
+                                        }
+                                        if((int)valueProp.floatValue == enumInts[ei])
+                                        {
+                                            selected = ei;
+                                        }
+                                    }
+                                    if (errorOccured) continue;
+                                    
+                                    selected = EditorGUILayout.Popup(label, selected, enumNames);
+                                    valueProp.floatValue = enumInts[selected];
+                                    controlCreated = true;
+                                    break;
                                 }
                                 else if (attribs[ai] == "KeywordEnum")
                                 {
+                                    // TODO: 実装
+                                    // material を直接いじらないので、不要かも？
                                 }
                             }
 
