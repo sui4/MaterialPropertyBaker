@@ -401,21 +401,25 @@ namespace sui4.MaterialPropertyBaker
         private void OnAddProperty(string propName, MaterialProps props, ShaderPropertyType propType)
         {
             var material = props.Material;
+            var shader = props.Shader;
+            var propIndex = shader.FindPropertyIndex(propName);
+            
             if (propType is ShaderPropertyType.Color)
             {
-                var defaultColor = material == null ? Color.black : material.GetColor(propName);
+                var vCol = shader.GetPropertyDefaultVectorValue(propIndex);
+                var defaultColor = material == null ? new Color(vCol.x, vCol.y, vCol.z, vCol.w) : material.GetColor(propName);
                 var matProp = new MaterialProp<Color>(propName, defaultColor);
                 props.Colors.Add(matProp);
             }
             else if (propType is ShaderPropertyType.Float or ShaderPropertyType.Range)
             {
-                var defaultFloat = material == null ? 0.0f : material.GetFloat(propName);
+                var defaultFloat = material == null ? shader.GetPropertyDefaultFloatValue(propIndex) : material.GetFloat(propName);
                 var matProp = new MaterialProp<float>(propName, defaultFloat);
                 props.Floats.Add(matProp);
             }
             else if (propType is ShaderPropertyType.Int)
             {
-                var defaultInt = material == null ? 0 : material.GetInteger(propName);
+                var defaultInt = material == null ? shader.GetPropertyDefaultIntValue(propIndex) : material.GetInteger(propName);
                 var matProp = new MaterialProp<int>(propName, defaultInt);
                 props.Ints.Add(matProp);
             }
