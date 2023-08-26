@@ -41,9 +41,9 @@ namespace sui4.MaterialPropertyBaker
             EditorGUI.indentLevel++;
             PropsGUI(_floats);
             EditorGUI.indentLevel--;
-            
+
             EditorGUILayout.Space();
-            
+
             // Ints
             EditorGUILayout.LabelField("Ints", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
