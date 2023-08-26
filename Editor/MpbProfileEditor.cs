@@ -138,7 +138,7 @@ namespace sui4.MaterialPropertyBaker
                 PropsGUI(floats, Target.GlobalProps, ShaderPropertyType.Float, targetShader);
                 EditorGUI.indentLevel--;
             }
-            
+
             // // Ints
             // _globalIntsFoldout = EditorGUILayout.Foldout(_globalIntsFoldout, "Ints");
             // SessionState.SetBool(IntsFoldoutKeyAt("global"), _globalIntsFoldout);
@@ -189,7 +189,7 @@ namespace sui4.MaterialPropertyBaker
                 PropsGUI(floats, Target.MaterialPropsList[index], ShaderPropertyType.Float, targetShader);
                 EditorGUI.indentLevel--;
             }
-            
+
             // // Ints
             // _intsFoldoutList[index] = EditorGUILayout.Foldout(_intsFoldoutList[index], "Ints");
             // SessionState.SetBool(IntsFoldoutKeyAt(key), _intsFoldoutList[index]);
@@ -201,7 +201,8 @@ namespace sui4.MaterialPropertyBaker
             // }
         }
 
-        private void PropsGUI(SerializedProperty propsList, MaterialProps matProps, ShaderPropertyType targetPropType, Shader targetShader)
+        private void PropsGUI(SerializedProperty propsList, MaterialProps matProps, ShaderPropertyType targetPropType,
+            Shader targetShader)
         {
             if (propsList.arraySize == 0)
             {
@@ -216,12 +217,13 @@ namespace sui4.MaterialPropertyBaker
 
                 // attribute がある場合は、attribute を適用する
                 var si = targetShader.FindPropertyIndex(property.stringValue);
+
                 var shaderAttributes = targetShader.GetPropertyAttributes(si);
                 ParseShaderAttribute(shaderAttributes, out var attribs, out var attribValues);
                 // 最後の要素が適用されるため、逆順にする
                 attribs.Reverse();
                 attribValues.Reverse();
-                
+
                 var propType = targetShader.GetPropertyType(si);
                 var label = Utils.UnderscoresToSpaces(property.stringValue);
                 using (new GUILayout.HorizontalScope())
@@ -230,7 +232,8 @@ namespace sui4.MaterialPropertyBaker
                     {
                         case ShaderPropertyType.Color:
                             valueProp.colorValue =
-                                EditorGUILayout.ColorField(new GUIContent(label), valueProp.colorValue, true, true, true);
+                                EditorGUILayout.ColorField(new GUIContent(label), valueProp.colorValue, true, true,
+                                    true);
                             break;
                         case ShaderPropertyType.Float:
                             var controlCreated = false;
@@ -259,6 +262,7 @@ namespace sui4.MaterialPropertyBaker
                             {
                                 EditorGUILayout.PropertyField(valueProp, new GUIContent(label));
                             }
+
                             break;
                         case ShaderPropertyType.Range:
                             var min = ShaderUtil.GetRangeLimits(targetShader, si, 1);
@@ -274,12 +278,14 @@ namespace sui4.MaterialPropertyBaker
                                     // catch
                                     //     continue;
                                     // CAUTION: PowerSliderはEditorGUILayoutにはなさそう？
-                                    valueProp.floatValue = EditorGUILayout.Slider(label, valueProp.floatValue, min, max);
+                                    valueProp.floatValue =
+                                        EditorGUILayout.Slider(label, valueProp.floatValue, min, max);
                                     created = true;
                                 }
                                 else if (attribs[ai] == "IntRange")
                                 {
-                                     valueProp.floatValue = EditorGUILayout.IntSlider(label, (int)valueProp.floatValue, (int)min, (int)max);
+                                    valueProp.floatValue = EditorGUILayout.IntSlider(label, (int)valueProp.floatValue,
+                                        (int)min, (int)max);
                                     created = true;
                                 }
                             }
@@ -297,7 +303,6 @@ namespace sui4.MaterialPropertyBaker
                         case ShaderPropertyType.Texture:
                         default:
                             break;
-                            
                     }
 
                     if (GUILayout.Button("-", GUILayout.Width(20)))
@@ -318,7 +323,8 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        private void ParseShaderAttribute(IEnumerable<string> propAttributes, out List<string> attribs, out List<string> parameters)
+        private static void ParseShaderAttribute(IEnumerable<string> propAttributes, out List<string> attribs,
+            out List<string> parameters)
         {
             attribs = new List<string>();
             parameters = new List<string>();
@@ -345,7 +351,7 @@ namespace sui4.MaterialPropertyBaker
 
         private static bool IsMatchShaderType(ShaderPropertyType s1, ShaderPropertyType s2)
         {
-            if(s1 == s2) return true;
+            if (s1 == s2) return true;
             switch (s1)
             {
                 case ShaderPropertyType.Float when s2 == ShaderPropertyType.Range:
@@ -380,7 +386,8 @@ namespace sui4.MaterialPropertyBaker
                     case ShaderPropertyType.Color when matProps.Colors.All(c => c.Name != propName):
                         AddPropertyToMenu(propName, addPropertyMenu, matProps, propType);
                         break;
-                    case ShaderPropertyType.Float or ShaderPropertyType.Range when matProps.Floats.All(f => f.Name != propName):
+                    case ShaderPropertyType.Float or ShaderPropertyType.Range
+                        when matProps.Floats.All(f => f.Name != propName):
                         AddPropertyToMenu(propName, addPropertyMenu, matProps, propType);
                         break;
                     case ShaderPropertyType.Int when matProps.Ints.All(f => f.Name != propName):
@@ -397,7 +404,8 @@ namespace sui4.MaterialPropertyBaker
             addPropertyMenu.ShowAsContext();
         }
 
-        private void AddPropertyToMenu(string propName, GenericMenu menu, MaterialProps props, ShaderPropertyType propType)
+        private void AddPropertyToMenu(string propName, GenericMenu menu, MaterialProps props,
+            ShaderPropertyType propType)
         {
             menu.AddItem(new GUIContent(propName), false, data => OnAddProperty((string)data, props, propType),
                 propName);
@@ -408,23 +416,29 @@ namespace sui4.MaterialPropertyBaker
             var material = props.Material;
             var shader = props.Shader;
             var propIndex = shader.FindPropertyIndex(propName);
-            
+
             if (propType is ShaderPropertyType.Color)
             {
                 var vCol = shader.GetPropertyDefaultVectorValue(propIndex);
-                var defaultColor = material == null ? new Color(vCol.x, vCol.y, vCol.z, vCol.w) : material.GetColor(propName);
+                var defaultColor = material == null
+                    ? new Color(vCol.x, vCol.y, vCol.z, vCol.w)
+                    : material.GetColor(propName);
                 var matProp = new MaterialProp<Color>(propName, defaultColor);
                 props.Colors.Add(matProp);
             }
             else if (propType is ShaderPropertyType.Float or ShaderPropertyType.Range)
             {
-                var defaultFloat = material == null ? shader.GetPropertyDefaultFloatValue(propIndex) : material.GetFloat(propName);
+                var defaultFloat = material == null
+                    ? shader.GetPropertyDefaultFloatValue(propIndex)
+                    : material.GetFloat(propName);
                 var matProp = new MaterialProp<float>(propName, defaultFloat);
                 props.Floats.Add(matProp);
             }
             else if (propType is ShaderPropertyType.Int)
             {
-                var defaultInt = material == null ? shader.GetPropertyDefaultIntValue(propIndex) : material.GetInteger(propName);
+                var defaultInt = material == null
+                    ? shader.GetPropertyDefaultIntValue(propIndex)
+                    : material.GetInteger(propName);
                 var matProp = new MaterialProp<int>(propName, defaultInt);
                 props.Ints.Add(matProp);
             }
