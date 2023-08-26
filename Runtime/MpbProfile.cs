@@ -40,6 +40,7 @@ namespace sui4.MaterialPropertyBaker
                 {
                     matProps.Shader = matProps.Material.shader;
                 }
+
                 if (!IdMaterialPropsDict.TryAdd(matProps.ID, matProps))
                 {
                     var message = $"Duplicate ID: {matProps.ID}";
@@ -47,7 +48,6 @@ namespace sui4.MaterialPropertyBaker
                     Debug.LogWarning(message);
                 }
             }
-
         }
     }
 }

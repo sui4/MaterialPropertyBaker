@@ -162,6 +162,7 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
+        // materialから取得したdefault propertyに存在しないpropertyは無視する
         private static void SetPropertyBlock(MaterialProps targetProps, float weight, MaterialProps defaultProps,
             ISet<int> usedProperty, MaterialPropertyBlock mpb)
         {
@@ -251,7 +252,7 @@ namespace sui4.MaterialPropertyBaker
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     var mat = ren.sharedMaterials[mi];
-                    if(matNumDict.ContainsKey(mat.shader))
+                    if (matNumDict.ContainsKey(mat.shader))
                         matNumDict[mat.shader] += 1;
                     else
                         matNumDict[mat.shader] = 1;
