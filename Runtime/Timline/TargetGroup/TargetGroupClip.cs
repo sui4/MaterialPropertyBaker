@@ -9,7 +9,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
     public class TargetGroupClip : PlayableAsset, ITimelineClipAsset
     {
         [SerializeField] private MpbProfile _mpbProfile;
-        [SerializeField] private bool _editable;
+        [SerializeField] private bool _editable; // for editor GUI
         private TargetGroupBehaviour _template = new();
 
         public MpbProfile MpbProfile
