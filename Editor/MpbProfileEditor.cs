@@ -245,17 +245,15 @@ namespace sui4.MaterialPropertyBaker
                                     var flag = valueProp.floatValue != 0;
                                     flag = EditorGUILayout.Toggle(new GUIContent(label), flag);
                                     valueProp.floatValue = flag ? 1 : 0;
-                                    // キーワードの有効・無効の切り替えが必要？
+                                    // キーワードの有効・無効の切り替えが必要？materialを直接いじらないからいらない？
                                     controlCreated = true;
                                 }
                                 else if (attribs[ai] == "Enum")
                                 {
                                     // pop upの作成大変なので後で
-                                    Debug.Log("Enum");
                                 }
                                 else if (attribs[ai] == "KeywordEnum")
                                 {
-                                    Debug.Log("KeywordEnum");
                                 }
                             }
 
@@ -376,7 +374,7 @@ namespace sui4.MaterialPropertyBaker
                 var propName = shader.GetPropertyName(pi);
                 var propType = shader.GetPropertyType(pi);
                 if (!IsMatchShaderType(targetPropType, propType)) continue;
-                
+
                 // 隠しプロパティは追加しない
                 var si = shader.FindPropertyIndex(propName);
                 var flags = shader.GetPropertyFlags(si);
