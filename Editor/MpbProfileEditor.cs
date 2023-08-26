@@ -217,7 +217,6 @@ namespace sui4.MaterialPropertyBaker
 
                 // attribute がある場合は、attribute を適用する
                 var si = targetShader.FindPropertyIndex(property.stringValue);
-
                 var shaderAttributes = targetShader.GetPropertyAttributes(si);
                 ParseShaderAttribute(shaderAttributes, out var attribs, out var attribValues);
                 // 最後の要素が適用されるため、逆順にする
@@ -231,9 +230,11 @@ namespace sui4.MaterialPropertyBaker
                     switch (propType)
                     {
                         case ShaderPropertyType.Color:
+                            var flags = targetShader.GetPropertyFlags(si);
+                            var isHdr = flags.HasFlag(ShaderPropertyFlags.HDR);
                             valueProp.colorValue =
                                 EditorGUILayout.ColorField(new GUIContent(label), valueProp.colorValue, true, true,
-                                    true);
+                                    isHdr);
                             break;
                         case ShaderPropertyType.Float:
                             var controlCreated = false;
