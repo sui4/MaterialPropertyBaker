@@ -212,13 +212,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 var target = layeredProps[li];
                 foreach (var colorProp in target.Colors)
-                {
                     idColorDict[colorProp.Name] = colorProp;
-                    if (li == 0)
-                    {
-                        Debug.Log(colorProp.Name + " " + colorProp.Value);
-                    }
-                }
 
                 foreach (var floatProp in target.Floats)
                     idFloatDict[floatProp.ID] = floatProp;
