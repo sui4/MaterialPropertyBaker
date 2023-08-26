@@ -23,6 +23,9 @@ namespace sui4.MaterialPropertyBaker
         private void OnEnable()
         {
             OnValidate();
+            GlobalProps.UpdateShaderID();
+            foreach (var matProps in MaterialPropsList)
+                matProps.UpdateShaderID();
         }
 
         private void OnValidate()
