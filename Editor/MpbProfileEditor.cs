@@ -137,14 +137,17 @@ namespace sui4.MaterialPropertyBaker
         private void MaterialPropsGUI(SerializedProperty materialPropsProp, int index)
         {
             var id = materialPropsProp.FindPropertyRelative("_id");
-            var shader = materialPropsProp.FindPropertyRelative("_shader");
             var material = materialPropsProp.FindPropertyRelative("_material");
+            var shader = materialPropsProp.FindPropertyRelative("_shader");
             var colors = materialPropsProp.FindPropertyRelative("_colors");
             var floats = materialPropsProp.FindPropertyRelative("_floats");
 
             EditorGUILayout.PropertyField(id, new GUIContent("ID"));
-            EditorGUILayout.PropertyField(shader);
             EditorGUILayout.PropertyField(material);
+            using (new EditorGUI.DisabledScope(material.objectReferenceValue != null))
+            {
+                EditorGUILayout.PropertyField(shader);
+            }
 
             var key = string.IsNullOrWhiteSpace(id.stringValue) ? index.ToString() : id.stringValue;
             // Colors
