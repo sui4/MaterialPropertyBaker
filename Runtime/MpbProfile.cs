@@ -35,12 +35,19 @@ namespace sui4.MaterialPropertyBaker
             IdMaterialPropsDict.Clear();
             Warnings.Clear();
             foreach (var matProps in MaterialPropsList)
+            {
+                if (matProps.Material)
+                {
+                    matProps.Shader = matProps.Material.shader;
+                }
                 if (!IdMaterialPropsDict.TryAdd(matProps.ID, matProps))
                 {
                     var message = $"Duplicate ID: {matProps.ID}";
                     Warnings.Add(message);
                     Debug.LogWarning(message);
                 }
+            }
+
         }
     }
 }
