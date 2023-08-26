@@ -130,6 +130,14 @@ namespace sui4.MaterialPropertyBaker
 
         public void SetPropertyBlock(Dictionary<MpbProfile, float> profileWeightDict)
         {
+            // merge global profile
+            Dictionary<MpbProfile, Dictionary<string, MaterialProps>> mergedPropsDictDict = new();
+            foreach (var (profile, _) in profileWeightDict)
+            {
+                MergeGlobalProps(profile, out var mergedPropsDict);
+                mergedPropsDictDict[profile] = mergedPropsDict;
+            }
+
             foreach (var ren in Renderers)
             {
                 var wrapper = RendererMatTargetInfoWrapperDict[ren];
@@ -140,56 +148,83 @@ namespace sui4.MaterialPropertyBaker
                     var defaultProps = DefaultMaterialPropsDict[mat];
                     // ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
                     _mpb = new MaterialPropertyBlock();
-                    HashSet<int> isFirstTime = new();
+                    HashSet<int> usedProperty = new();
                     foreach (var (profile, weight) in profileWeightDict)
-                        if (profile.IdMaterialPropsDict.TryGetValue(targetInfo.ID, out var props))
+                    {
+                        if (mergedPropsDictDict[profile].TryGetValue(targetInfo.ID, out var props))
                         {
-                            foreach (var color in props.Colors)
-                            {
-                                var defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
-                                if (defaultProp == null) continue;
-                                Color current;
-                                if (isFirstTime.Contains(defaultProp.ID))
-                                {
-                                    // second time
-                                    current = _mpb.GetColor(defaultProp.ID);
-                                }
-                                else
-                                {
-                                    // first time
-                                    current = defaultProp.Value;
-                                    isFirstTime.Add(defaultProp.ID);
-                                }
-
-                                var diff = color.Value - defaultProp.Value;
-                                _mpb.SetColor(defaultProp.ID, current + diff * weight);
-                            }
-
-                            foreach (var f in props.Floats)
-                            {
-                                var prop = defaultProps.Floats.Find(c => c.ID == f.ID);
-                                if (prop == null) continue;
-                                float current;
-                                if (isFirstTime.Contains(prop.ID))
-                                {
-                                    // second time
-                                    current = _mpb.GetFloat(prop.ID);
-                                }
-                                else
-                                {
-                                    // first time
-                                    current = prop.Value;
-                                    isFirstTime.Add(prop.ID);
-                                }
-
-                                var diff = f.Value - prop.Value;
-                                _mpb.SetFloat(prop.ID, current + diff * weight);
-                            }
+                            SetPropertyBlock(props, weight, defaultProps, usedProperty, _mpb);
                         }
+                    }
 
                     ren.SetPropertyBlock(_mpb, mi);
                 }
             }
+        }
+
+        // materialから取得したdefault propertyに存在しないpropertyは無視する
+        private static void SetPropertyBlock(MaterialProps targetProps, float weight, MaterialProps defaultProps,
+            ISet<int> usedProperty, MaterialPropertyBlock mpb)
+        {
+            foreach (var color in targetProps.Colors)
+            {
+                var defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
+                if (defaultProp == null) continue;
+                var current = defaultProp.Value;
+                if (usedProperty.Add(defaultProp.ID) == false)
+                    current = mpb.GetColor(defaultProp.ID); //already set
+
+                var diff = color.Value - defaultProp.Value;
+                mpb.SetColor(defaultProp.ID, current + diff * weight);
+            }
+
+            foreach (var f in targetProps.Floats)
+            {
+                var prop = defaultProps.Floats.Find(c => c.ID == f.ID);
+                if (prop == null) continue;
+                var current = prop.Value;
+                if (usedProperty.Add(prop.ID) == false)
+                    current = mpb.GetFloat(prop.ID); // already set
+
+                var diff = f.Value - prop.Value;
+                mpb.SetFloat(prop.ID, current + diff * weight);
+            }
+        }
+
+        // 個別に設定された値を優先する
+        private static void MergeGlobalProps(MpbProfile profile, out Dictionary<string, MaterialProps> mergedPropsDict)
+        {
+            mergedPropsDict = new Dictionary<string, MaterialProps>();
+            foreach (var (id, props) in profile.IdMaterialPropsDict)
+            {
+                var mergedProps = MergeMaterialProps(new MaterialProps[2] { profile.GlobalProps, props });
+                mergedPropsDict[id] = mergedProps;
+            }
+        }
+
+
+        // layerが上(indexが大きい)のを優先する
+        private static MaterialProps MergeMaterialProps(in IReadOnlyList<MaterialProps> layeredProps)
+        {
+            MaterialProps mergedProps = new();
+            Dictionary<string, MaterialProp<Color>> idColorDict = new();
+            Dictionary<int, MaterialProp<float>> idFloatDict = new();
+            for (int li = 0; li < layeredProps.Count; li++)
+            {
+                var target = layeredProps[li];
+                foreach (var colorProp in target.Colors)
+                    idColorDict[colorProp.Name] = colorProp;
+
+                foreach (var floatProp in target.Floats)
+                    idFloatDict[floatProp.ID] = floatProp;
+            }
+
+            foreach (var (_, colorProp) in idColorDict)
+                mergedProps.Colors.Add(colorProp);
+
+            foreach (var (_, floatProp) in idFloatDict)
+                mergedProps.Floats.Add(floatProp);
+            return mergedProps;
         }
 
         public void ResetPropertyBlock()
@@ -210,18 +245,37 @@ namespace sui4.MaterialPropertyBaker
         public void CreateMpbProfileAsset()
         {
             var asset = ScriptableObject.CreateInstance<MpbProfile>();
+            Dictionary<Shader, int> matNumDict = new();
             foreach (var ren in Renderers)
             {
                 var wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     var mat = ren.sharedMaterials[mi];
+                    if (matNumDict.ContainsKey(mat.shader))
+                        matNumDict[mat.shader] += 1;
+                    else
+                        matNumDict[mat.shader] = 1;
+
                     var targetInfo = wrapper.MatTargetInfoDict[mat];
-                    if (asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID)) continue;
-                    var matProps = new MaterialProps(mat, false);
-                    matProps.ID = targetInfo.ID;
-                    asset.MaterialPropsList.Add(matProps);
-                    asset.IdMaterialPropsDict.Add(targetInfo.ID, matProps);
+                    if (!asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID))
+                    {
+                        var matProps = new MaterialProps(mat, false);
+                        matProps.ID = targetInfo.ID;
+                        asset.MaterialPropsList.Add(matProps);
+                        asset.IdMaterialPropsDict.Add(targetInfo.ID, matProps);
+                    }
+                }
+            }
+
+            // 最も数が多いshaderをglobalに設定
+            int maxNum = 0;
+            foreach (var (shader, num) in matNumDict)
+            {
+                if (maxNum < num)
+                {
+                    asset.GlobalProps.Shader = shader;
+                    maxNum = num;
                 }
             }
 

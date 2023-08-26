@@ -144,11 +144,11 @@ namespace sui4.MaterialPropertyBaker
             foreach (var f in Floats)
                 f.UpdateShaderID();
         }
-        
+
         // add property with default value
         public void AddProperty(string propName, ShaderPropertyType spType)
         {
-            if(HasProperty(propName, spType)) return;
+            if (HasProperty(propName, spType)) return;
             switch (spType)
             {
                 case ShaderPropertyType.Color:

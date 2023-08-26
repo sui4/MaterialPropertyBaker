@@ -22,16 +22,16 @@ MonoBehaviour:
   m_Children: []
   m_Clips:
   - m_Version: 1
-    m_Start: 2.05
+    m_Start: 0
     m_ClipIn: 0
     m_Asset: {fileID: 1449796273918978053}
-    m_Duration: 5
+    m_Duration: 7.049999999999999
     m_TimeScale: 1
     m_ParentTrack: {fileID: -883686366589860192}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: -1
-    m_BlendOutDuration: 0.7666666666666666
+    m_BlendOutDuration: 0.7666666666666657
     m_MixInCurve:
       serializedVersion: 2
       m_Curve:
@@ -58,25 +58,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     m_MixOutCurve:
       serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
+      m_Curve: []
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -99,11 +81,29 @@ MonoBehaviour:
     m_ParentTrack: {fileID: -883686366589860192}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
-    m_BlendInDuration: 0.7666666666666666
+    m_BlendInDuration: 0.7666666666666657
     m_BlendOutDuration: -1
     m_MixInCurve:
       serializedVersion: 2
-      m_Curve: []
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -177,6 +177,7 @@ MonoBehaviour:
   m_Name: TargetGroupClip
   m_EditorClassIdentifier: 
   _mpbProfile: {fileID: 11400000, guid: 6e27ec416799c468ba185e51d3d1461a, type: 2}
+  _editable: 1
 --- !u!114 &8696572560199354807
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -190,3 +191,4 @@ MonoBehaviour:
   m_Name: TargetGroupClip
   m_EditorClassIdentifier: 
   _mpbProfile: {fileID: 11400000, guid: bf64cc0584b1f4ea394bd74fdee9cfbe, type: 2}
+  _editable: 1

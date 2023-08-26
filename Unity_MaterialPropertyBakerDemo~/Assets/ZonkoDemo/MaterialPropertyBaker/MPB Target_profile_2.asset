@@ -10,8 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 271143a54b244a328be05ac2a2cb4349, type: 3}
-  m_Name: MPB Target_profile 1
+  m_Name: MPB Target_profile_2
   m_EditorClassIdentifier: 
+  _globalProps:
+    _id: 
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 0}
+    _colors: []
+    _floats: []
   _materialPropsList:
   - _id: bodyB_eyepatch_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
@@ -21,33 +27,17 @@ MonoBehaviour:
   - _id: glowB_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
-    _colors:
-    - _name: _Color
-      _value: {r: 1, g: 1, b: 1, a: 1}
-    - _name: _EmissionColor
-      _value: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
-    - _name: _ShadeColor
-      _value: {r: 1, g: 1, b: 1, a: 1}
-    - _name: _OutlineColor
-      _value: {r: 0, g: 0, b: 0, a: 1}
-    _floats:
-    - _name: _BumpScale
-      _value: 1
-    - _name: _AlphaMode
-      _value: 0
+    _colors: []
+    _floats: []
   - _id: hair_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
-    _colors:
-    - _name: _ShadeColor
-      _value: {r: 1, g: 0.2216981, b: 0.2216981, a: 1}
+    _colors: []
     _floats: []
   - _id: face_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
-    _colors:
-    - _name: _Color
-      _value: {r: 1, g: 1, b: 1, a: 1}
+    _colors: []
     _floats: []
   - _id: eye_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}

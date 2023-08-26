@@ -12,6 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 271143a54b244a328be05ac2a2cb4349, type: 3}
   m_Name: MPB Target_profile
   m_EditorClassIdentifier: 
+  _globalProps:
+    _id: 
+    _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
+    _material: {fileID: 0}
+    _colors:
+    - _name: _ShadeColor
+      _value: {r: 0.8490566, g: 0.748932, b: 0.748932, a: 1}
+    - _name: _Color
+      _value: {r: 0.8113208, g: 0.5549128, b: 0.5549128, a: 1}
+    _floats: []
   _materialPropsList:
   - _id: bodyB_eyepatch_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
@@ -39,8 +49,10 @@ MonoBehaviour:
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
     _colors:
+    - _name: _ShadeColor
+      _value: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
     - _name: _Color
-      _value: {r: 0.2971698, g: 0.32428226, b: 1, a: 1}
+      _value: {r: 1, g: 1, b: 1, a: 1}
     _floats: []
   - _id: face_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}

@@ -65,11 +65,6 @@ namespace sui4.MaterialPropertyBaker.Timeline
             for (var i = 0; i < inputCount; i++)
             {
                 _isWarningLogged.Add(i, false);
-                var sp = (ScriptPlayable<TargetGroupBehaviour>)playable.GetInput(i);
-                var clip = sp.GetBehaviour().Clip;
-                if (clip.MpbProfile == null) continue;
-
-                foreach (var matProps in clip.MpbProfile.MaterialPropsList) matProps?.UpdateShaderID();
             }
 
             base.OnGraphStart(playable);
