@@ -26,12 +26,16 @@ MonoBehaviour:
       _value: 0
     - _name: _ShadingShiftFactor
       _value: 0
+    - _name: _AlphaMode
+      _value: 0
+    _ints: []
   _materialPropsList:
   - _id: bodyB_eyepatch_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: f3b67743523d08c4ba0cf3bcd43cfe67, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: glowB_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
@@ -49,11 +53,13 @@ MonoBehaviour:
       _value: 1
     - _name: _AlphaMode
       _value: 0
+    _ints: []
   - _id: hair_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: face_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
@@ -61,53 +67,64 @@ MonoBehaviour:
     - _name: _Color
       _value: {r: 1, g: 1, b: 1, a: 1}
     _floats: []
+    _ints: []
   - _id: eye_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 67d3c62cc58bb664297076c2a8afc92d, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: eyeKakusei_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: ab5fefbb4ef03534b87b0c88231a0391, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: eyeGuruguru_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: cfaaf8aceb6e2f846b0da533890b9928, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: emissionB_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: bodyB_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: bodyA_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: glowA_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: emissionA_NoOutline_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 595924341ce0d544eaee0ead9a192943, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: skinB_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 636913b334b91d94f8894a4e962bf8b7, type: 2}
     _colors: []
     _floats: []
+    _ints: []
   - _id: thunder_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: d42901c7bacb4df4e81658c82da712c4, type: 2}
     _colors: []
     _floats: []
+    _ints: []

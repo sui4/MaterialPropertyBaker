@@ -7,14 +7,6 @@ namespace sui4.MaterialPropertyBaker
 {
     public class Utils
     {
-        public static void CreatePropertyBlockFromProfile(out MaterialPropertyBlock mpb,
-            in BakedMaterialProperty preset)
-        {
-            mpb = new MaterialPropertyBlock();
-            var matProps = preset.MaterialProps;
-            UpdatePropertyBlockFromProps(ref mpb, matProps);
-        }
-
         public static void CreatePropertyBlockFromProps(out MaterialPropertyBlock mpb, in MaterialProps props)
         {
             mpb = new MaterialPropertyBlock();
@@ -28,14 +20,18 @@ namespace sui4.MaterialPropertyBaker
                 mpb.SetColor(c.ID, c.Value);
             foreach (var f in props.Floats)
                 mpb.SetFloat(f.ID, f.Value);
+            foreach (var i in props.Ints)
+                mpb.SetInteger(i.ID, i.Value);
         }
 
-        public static void UpdatePropertyBlockFromDict(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropMap,
-            Dictionary<int, float> fPropMap)
+        public static void UpdatePropertyBlockFromDict(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropDict,
+            Dictionary<int, float> fPropDict, Dictionary<int, int> iPropDict)
         {
-            foreach (var (shaderID, value) in cPropMap) mpb.SetColor(shaderID, value);
+            foreach (var (shaderID, value) in cPropDict) mpb.SetColor(shaderID, value);
 
-            foreach (var (shaderID, value) in fPropMap) mpb.SetFloat(shaderID, value);
+            foreach (var (shaderID, value) in fPropDict) mpb.SetFloat(shaderID, value);
+            
+            foreach (var (shaderID, value) in iPropDict) mpb.SetInteger(shaderID, value);
         }
 
         public static string UnderscoresToSpaces(string input)

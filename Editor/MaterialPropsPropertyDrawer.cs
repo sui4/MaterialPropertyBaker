@@ -8,6 +8,7 @@ namespace sui4.MaterialPropertyBaker
     {
         private SerializedProperty _colors;
         private SerializedProperty _floats;
+        private SerializedProperty _ints;
         private SerializedProperty _id;
 
         private SerializedProperty _property;
@@ -22,6 +23,7 @@ namespace sui4.MaterialPropertyBaker
             _shader = property.FindPropertyRelative("_shader");
             _colors = property.FindPropertyRelative("_colors");
             _floats = property.FindPropertyRelative("_floats");
+            _ints = property.FindPropertyRelative("_ints");
 
             EditorGUILayout.PropertyField(_id);
             EditorGUILayout.PropertyField(_shader);
@@ -32,11 +34,20 @@ namespace sui4.MaterialPropertyBaker
             PropsGUI(_colors, true);
             EditorGUI.indentLevel--;
 
-            // Floats
             EditorGUILayout.Space();
+
+            // Floats
             EditorGUILayout.LabelField("Floats", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
             PropsGUI(_floats);
+            EditorGUI.indentLevel--;
+            
+            EditorGUILayout.Space();
+            
+            // Ints
+            EditorGUILayout.LabelField("Ints", EditorStyles.boldLabel);
+            EditorGUI.indentLevel++;
+            PropsGUI(_ints);
             EditorGUI.indentLevel--;
 
             EditorGUI.EndProperty();

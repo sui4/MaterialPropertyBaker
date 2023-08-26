@@ -17,6 +17,7 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private List<Renderer> _renderers = new();
 
         private MaterialPropertyBlock _mpb; // to reduce GCAlloc
+        private static Dictionary<int, float> _usedPropWeightDict;
 
         public Dictionary<Renderer, MaterialTargetInfoSDictWrapper> RendererMatTargetInfoWrapperDict =>
             _rendererMatTargetInfoWrapperSDict.Dictionary;
@@ -148,12 +149,12 @@ namespace sui4.MaterialPropertyBaker
                     var defaultProps = DefaultMaterialPropsDict[mat];
                     // ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
                     _mpb = new MaterialPropertyBlock();
-                    HashSet<int> usedProperty = new();
+                    Dictionary<int, float> usedPropertyWeightDict = new();
                     foreach (var (profile, weight) in profileWeightDict)
                     {
                         if (mergedPropsDictDict[profile].TryGetValue(targetInfo.ID, out var props))
                         {
-                            SetPropertyBlock(props, weight, defaultProps, usedProperty, _mpb);
+                            SetPropertyBlock(props, weight, defaultProps, usedPropertyWeightDict, _mpb);
                         }
                     }
 
@@ -164,14 +165,14 @@ namespace sui4.MaterialPropertyBaker
 
         // materialから取得したdefault propertyに存在しないpropertyは無視する
         private static void SetPropertyBlock(MaterialProps targetProps, float weight, MaterialProps defaultProps,
-            ISet<int> usedProperty, MaterialPropertyBlock mpb)
+            Dictionary<int, float> usedPropWeightDict, MaterialPropertyBlock mpb)
         {
             foreach (var color in targetProps.Colors)
             {
                 var defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
                 if (defaultProp == null) continue;
                 var current = defaultProp.Value;
-                if (usedProperty.Add(defaultProp.ID) == false)
+                if (usedPropWeightDict.TryAdd(defaultProp.ID, weight) == false)
                     current = mpb.GetColor(defaultProp.ID); //already set
 
                 var diff = color.Value - defaultProp.Value;
@@ -183,11 +184,27 @@ namespace sui4.MaterialPropertyBaker
                 var prop = defaultProps.Floats.Find(c => c.ID == f.ID);
                 if (prop == null) continue;
                 var current = prop.Value;
-                if (usedProperty.Add(prop.ID) == false)
+                if (usedPropWeightDict.TryAdd(prop.ID, weight) == false)
                     current = mpb.GetFloat(prop.ID); // already set
 
                 var diff = f.Value - prop.Value;
                 mpb.SetFloat(prop.ID, current + diff * weight);
+            }
+
+            foreach (var i in targetProps.Ints)
+            {
+                var prop = defaultProps.Ints.Find(c => c.ID == i.ID);
+                if (prop == null) continue;
+                if (usedPropWeightDict.TryGetValue(prop.ID, out var storedWeight) && weight > storedWeight)
+                {
+                    mpb.SetInt(prop.ID, i.Value);
+                    usedPropWeightDict[prop.ID] = weight;
+                }
+                else
+                {
+                    mpb.SetInt(prop.ID, i.Value);
+                    usedPropWeightDict.Add(prop.ID, weight);
+                }
             }
         }
 
@@ -207,16 +224,20 @@ namespace sui4.MaterialPropertyBaker
         private static MaterialProps MergeMaterialProps(in IReadOnlyList<MaterialProps> layeredProps)
         {
             MaterialProps mergedProps = new();
-            Dictionary<string, MaterialProp<Color>> idColorDict = new();
+            Dictionary<int, MaterialProp<Color>> idColorDict = new();
             Dictionary<int, MaterialProp<float>> idFloatDict = new();
+            Dictionary<int, MaterialProp<int>> idIntDict = new();
             for (int li = 0; li < layeredProps.Count; li++)
             {
                 var target = layeredProps[li];
                 foreach (var colorProp in target.Colors)
-                    idColorDict[colorProp.Name] = colorProp;
+                    idColorDict[colorProp.ID] = colorProp;
 
                 foreach (var floatProp in target.Floats)
                     idFloatDict[floatProp.ID] = floatProp;
+                
+                foreach (var intProp in target.Ints)
+                    idIntDict[intProp.ID] = intProp;
             }
 
             foreach (var (_, colorProp) in idColorDict)
@@ -224,6 +245,9 @@ namespace sui4.MaterialPropertyBaker
 
             foreach (var (_, floatProp) in idFloatDict)
                 mergedProps.Floats.Add(floatProp);
+            
+            foreach (var (_, intProp) in idIntDict)
+                mergedProps.Ints.Add(intProp);
             return mergedProps;
         }
 

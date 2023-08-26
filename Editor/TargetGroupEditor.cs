@@ -8,7 +8,7 @@ namespace sui4.MaterialPropertyBaker
     [CustomEditor(typeof(TargetGroup))]
     public class TargetGroupEditor : Editor
     {
-        private List<bool> _rendererFoldoutList = new();
+        private readonly List<bool> _rendererFoldoutList = new();
 
         private SerializedProperty _rendererMatTargetInfoWrapperSDictProp;
         // private SerializedProperty _defaultProfileProp;

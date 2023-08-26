@@ -14,15 +14,17 @@ namespace sui4.MaterialPropertyBaker
         [SerializeField] private Material _material;
         [SerializeField] private List<MaterialProp<Color>> _colors = new();
         [SerializeField] private List<MaterialProp<float>> _floats = new();
+        [SerializeField] private List<MaterialProp<int>> _ints = new();
 
         public MaterialProps()
         {
         }
 
-        public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f)
+        public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f, List<MaterialProp<int>> i)
         {
             Colors.AddRange(c);
             Floats.AddRange(f);
+            Ints.AddRange(i);
             UpdateShaderID();
         }
 
@@ -50,41 +52,15 @@ namespace sui4.MaterialPropertyBaker
                             Floats.Add(new MaterialProp<float>(propName, f));
                             break;
                         case ShaderPropertyType.Int:
+                            var i = mat.GetInteger(propName);
+                            Ints.Add(new MaterialProp<int>(propName, i));
+                            break;
                         case ShaderPropertyType.Vector:
                         case ShaderPropertyType.Texture:
                         default:
                             break;
                     }
                 }
-        }
-
-        public MaterialProps(Material mat, MaterialPropertyConfig config)
-        {
-            for (var pi = 0; pi < mat.shader.GetPropertyCount(); pi++)
-            {
-                var propType = mat.shader.GetPropertyType(pi);
-                if (!IsSupportedType(propType)) continue;
-                var propName = mat.shader.GetPropertyName(pi);
-                if (!config.HasEditableProperty(propName)) continue;
-
-                switch (propType)
-                {
-                    case ShaderPropertyType.Color:
-                        var c = mat.GetColor(propName);
-                        Colors.Add(new MaterialProp<Color>(propName, c));
-                        break;
-                    case ShaderPropertyType.Float:
-                    case ShaderPropertyType.Range:
-                        var f = mat.GetFloat(propName);
-                        Floats.Add(new MaterialProp<float>(propName, f));
-                        break;
-                    case ShaderPropertyType.Int:
-                    case ShaderPropertyType.Vector:
-                    case ShaderPropertyType.Texture:
-                    default:
-                        break;
-                }
-            }
         }
 
         public string ID
@@ -116,10 +92,16 @@ namespace sui4.MaterialPropertyBaker
             get => _floats;
             set => _floats = value;
         }
+        
+        public List<MaterialProp<int>> Ints
+        {
+            get => _ints;
+            set => _ints = value;
+        }
 
         public bool IsEmpty()
         {
-            return Colors.Count == 0 && Floats.Count == 0;
+            return Colors.Count == 0 && Floats.Count == 0 && Ints.Count == 0;
         }
 
         public static bool IsSupportedType(ShaderPropertyType type)
@@ -129,7 +111,7 @@ namespace sui4.MaterialPropertyBaker
                 ShaderPropertyType.Color => true,
                 ShaderPropertyType.Float => true,
                 ShaderPropertyType.Range => true,
-                ShaderPropertyType.Int => false,
+                ShaderPropertyType.Int => true,
                 ShaderPropertyType.Vector => false,
                 ShaderPropertyType.Texture => false,
                 _ => false
@@ -143,6 +125,9 @@ namespace sui4.MaterialPropertyBaker
 
             foreach (var f in Floats)
                 f.UpdateShaderID();
+            
+            foreach (var i in Ints)
+                i.UpdateShaderID();
         }
 
         // add property with default value
@@ -159,6 +144,8 @@ namespace sui4.MaterialPropertyBaker
                     Floats.Add(new MaterialProp<float>(propName));
                     break;
                 case ShaderPropertyType.Int:
+                    Ints.Add(new MaterialProp<int>(propName));
+                    break;
                 case ShaderPropertyType.Vector:
                 case ShaderPropertyType.Texture:
                 default:
@@ -171,7 +158,6 @@ namespace sui4.MaterialPropertyBaker
         {
             if (HasProperty(propName, ShaderPropertyType.Float))
             {
-                // 既存のプロパティを更新
                 UpdateProperty(Floats, propName, value);
             }
             else
@@ -184,12 +170,23 @@ namespace sui4.MaterialPropertyBaker
         {
             if (HasProperty(propName, ShaderPropertyType.Color))
             {
-                // 既存のプロパティを更新
                 UpdateProperty(Colors, propName, value);
             }
             else
             {
                 Colors.Add(new MaterialProp<Color>(propName, value));
+            }
+        }
+        
+        public void SetInt(string propName, int value)
+        {
+            if (HasProperty(propName, ShaderPropertyType.Int))
+            {
+                UpdateProperty(Ints, propName, value);
+            }
+            else
+            {
+                Ints.Add(new MaterialProp<int>(propName, value));
             }
         }
 
@@ -216,47 +213,42 @@ namespace sui4.MaterialPropertyBaker
                 ShaderPropertyType.Color => Colors.Any(materialProp => materialProp.Name == propName),
                 ShaderPropertyType.Float => Floats.Any(materialProp => materialProp.Name == propName),
                 ShaderPropertyType.Range => Floats.Any(materialProp => materialProp.Name == propName),
-                ShaderPropertyType.Int => false,
+                ShaderPropertyType.Int => Ints.Any(materialProp => materialProp.Name == propName),
                 ShaderPropertyType.Vector => false,
                 ShaderPropertyType.Texture => false,
                 _ => false
             };
         }
 
-        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList)
+        public void GetCopyProperties(out List<MaterialProp<Color>> cList, out List<MaterialProp<float>> fList, out List<MaterialProp<int>> iList)
         {
-            cList = new List<MaterialProp<Color>>();
-            fList = new List<MaterialProp<float>>();
-            // 単純にやると、参照渡しになって、変更が同期されてしまうので、一旦コピー
-            // Listになってる各MaterialPropがクラスのため、参照になっちゃう
-            foreach (var colors in Colors)
-            {
-                var c = new MaterialProp<Color>
-                {
-                    Value = colors.Value,
-                    Name = colors.Name,
-                    ID = colors.ID
-                };
-                cList.Add(c);
-            }
+            // Listになってる各MaterialPropがクラスのため、単純にやると参照渡しになって、変更が同期されてしまう
+            CopyProperties(Colors, out cList);
+            CopyProperties(Floats, out fList);
+            CopyProperties(Ints, out iList);
+        }
 
-            foreach (var floats in Floats)
+        private void CopyProperties<T>(in List<MaterialProp<T>> baseProps, out List<MaterialProp<T>> targetProps)
+        {
+            targetProps = new List<MaterialProp<T>>();
+            foreach (var baseProp in baseProps)
             {
-                var f = new MaterialProp<float>
+                var prop = new MaterialProp<T>
                 {
-                    Value = floats.Value,
-                    Name = floats.Name,
-                    ID = floats.ID
+                    Value = baseProp.Value,
+                    Name = baseProp.Name,
+                    ID = baseProp.ID
                 };
-                fList.Add(f);
+                targetProps.Add(prop);
             }
         }
 
         public void CopyValuesFromOther(in MaterialProps other)
         {
-            other.GetCopyProperties(out var outC, out var outF);
+            other.GetCopyProperties(out var outC, out var outF, out var outI);
             Colors = outC;
             Floats = outF;
+            Ints = outI;
         }
     }
 
