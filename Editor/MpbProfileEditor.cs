@@ -13,6 +13,7 @@ namespace sui4.MaterialPropertyBaker
         private readonly List<bool> _floatsFoldoutList = new();
 
         private readonly List<bool> _propFoldoutList = new();
+        private SerializedProperty _globalPropsProp;
         private SerializedProperty _materialPropsListProp;
         private SerializedProperty _materialPropsProp;
         private MpbProfile Target => (MpbProfile)target;
@@ -164,21 +165,22 @@ namespace sui4.MaterialPropertyBaker
             {
                 var propName = shader.GetPropertyName(pi);
                 var propType = shader.GetPropertyType(pi);
+                var props = Target.MaterialPropsList[index];
                 if (isColor)
                 {
                     // すでに同じ名前のプロパティがある場合は追加しない
                     if (propType != ShaderPropertyType.Color ||
-                        Target.MaterialPropsList[index].Colors.Any(c => c.Name == propName))
+                        props.Colors.Any(c => c.Name == propName))
                         continue;
-
-                    AddPropertyToMenu(propName, addPropertyMenu, index, true);
+                    
+                    AddPropertyToMenu(propName, addPropertyMenu, props, true);
                 }
                 else if (propType is ShaderPropertyType.Float or ShaderPropertyType.Range)
                 {
                     // すでに同じ名前のプロパティがある場合は追加しない
-                    if (Target.MaterialPropsList[index].Floats.Any(f => f.Name == propName))
+                    if (props.Floats.Any(f => f.Name == propName))
                         continue;
-                    AddPropertyToMenu(propName, addPropertyMenu, index);
+                    AddPropertyToMenu(propName, addPropertyMenu, props);
                 }
             }
 
@@ -190,28 +192,29 @@ namespace sui4.MaterialPropertyBaker
             addPropertyMenu.ShowAsContext();
         }
 
-        private void AddPropertyToMenu(string propName, GenericMenu menu, int index, bool isColor = false)
+        private void AddPropertyToMenu(string propName, GenericMenu menu, MaterialProps props, bool isColor = false)
         {
-            menu.AddItem(new GUIContent(propName), false, data => OnAddProperty((string)data, index, isColor),
+            menu.AddItem(new GUIContent(propName), false, data => OnAddProperty((string)data, props, isColor),
                 propName);
         }
 
-        private void OnAddProperty(string propName, int index, bool isColor = false)
+        private void OnAddProperty(string propName, MaterialProps props, bool isColor = false)
         {
-            var material = Target.MaterialPropsList[index].Material;
+            var material = props.Material;
             if (isColor)
             {
                 var defaultColor = material == null ? Color.black : material.GetColor(propName);
                 var matProp = new MaterialProp<Color>(propName, defaultColor);
-                Target.MaterialPropsList[index].Colors.Add(matProp);
+                props.Colors.Add(matProp);
             }
             else
             {
                 var defaultFloat = material == null ? 0.0f : material.GetFloat(propName);
                 var matProp = new MaterialProp<float>(propName, defaultFloat);
-                Target.MaterialPropsList[index].Floats.Add(matProp);
+                props.Floats.Add(matProp);
             }
-
+            EditorUtility.SetDirty(target);
+            AssetDatabase.SaveAssetIfDirty(target);
             serializedObject.Update();
         }
     }

@@ -6,7 +6,14 @@ namespace sui4.MaterialPropertyBaker
     [CreateAssetMenu(fileName = "MbpProfile", menuName = "MaterialPropertyBaker/MpbProfile", order = 0)]
     public class MpbProfile : ScriptableObject
     {
+        [SerializeField] private MaterialProps _globalProps;
         [SerializeField] private List<MaterialProps> _materialPropsList = new();
+
+        public MaterialProps GlobalProps
+        {
+            get => _globalProps;
+            set => _globalProps = value;
+        }
         public List<MaterialProps> MaterialPropsList => _materialPropsList;
 
         public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; } =
