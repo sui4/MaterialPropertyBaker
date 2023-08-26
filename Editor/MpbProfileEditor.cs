@@ -240,7 +240,7 @@ namespace sui4.MaterialPropertyBaker
                             var controlCreated = false;
                             for (int ai = 0; ai < attribs.Count(); ai++)
                             {
-                                if (attribs[ai] == "Toggle" || attribs[ai] == "MaterialToggle")
+                                if (attribs[ai] == "Toggle" || attribs[ai] == "MaterialToggle" || attribs[ai] == "ToggleUI")
                                 {
                                     var flag = valueProp.floatValue != 0;
                                     flag = EditorGUILayout.Toggle(new GUIContent(label), flag);
