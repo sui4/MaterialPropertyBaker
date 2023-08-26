@@ -137,15 +137,15 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUI.indentLevel--;
             }
             
-            // Ints
-            _globalIntsFoldout = EditorGUILayout.Foldout(_globalIntsFoldout, "Ints");
-            SessionState.SetBool(IntsFoldoutKeyAt("global"), _globalIntsFoldout);
-            if (_globalIntsFoldout)
-            {
-                EditorGUI.indentLevel++;
-                PropsGUI(ints, Target.GlobalProps, ShaderPropertyType.Int);
-                EditorGUI.indentLevel--;
-            }
+            // // Ints
+            // _globalIntsFoldout = EditorGUILayout.Foldout(_globalIntsFoldout, "Ints");
+            // SessionState.SetBool(IntsFoldoutKeyAt("global"), _globalIntsFoldout);
+            // if (_globalIntsFoldout)
+            // {
+            //     EditorGUI.indentLevel++;
+            //     PropsGUI(ints, Target.GlobalProps, ShaderPropertyType.Int);
+            //     EditorGUI.indentLevel--;
+            // }
 
             EditorGUI.indentLevel--;
         }
@@ -187,15 +187,15 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUI.indentLevel--;
             }
             
-            // Ints
-            _intsFoldoutList[index] = EditorGUILayout.Foldout(_intsFoldoutList[index], "Ints");
-            SessionState.SetBool(IntsFoldoutKeyAt(key), _intsFoldoutList[index]);
-            if (_intsFoldoutList[index])
-            {
-                EditorGUI.indentLevel++;
-                PropsGUI(ints, Target.MaterialPropsList[index], ShaderPropertyType.Int);
-                EditorGUI.indentLevel--;
-            }
+            // // Ints
+            // _intsFoldoutList[index] = EditorGUILayout.Foldout(_intsFoldoutList[index], "Ints");
+            // SessionState.SetBool(IntsFoldoutKeyAt(key), _intsFoldoutList[index]);
+            // if (_intsFoldoutList[index])
+            // {
+            //     EditorGUI.indentLevel++;
+            //     PropsGUI(ints, Target.MaterialPropsList[index], ShaderPropertyType.Int);
+            //     EditorGUI.indentLevel--;
+            // }
         }
 
         private void PropsGUI(SerializedProperty propsList, MaterialProps matProps, ShaderPropertyType targetPropType)
