@@ -250,18 +250,37 @@ namespace sui4.MaterialPropertyBaker
         public void CreateMpbProfileAsset()
         {
             var asset = ScriptableObject.CreateInstance<MpbProfile>();
+            Dictionary<Shader, int> matNumDict = new();
             foreach (var ren in Renderers)
             {
                 var wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     var mat = ren.sharedMaterials[mi];
+                    if(matNumDict.ContainsKey(mat.shader))
+                        matNumDict[mat.shader] += 1;
+                    else
+                        matNumDict[mat.shader] = 1;
+
                     var targetInfo = wrapper.MatTargetInfoDict[mat];
-                    if (asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID)) continue;
-                    var matProps = new MaterialProps(mat, false);
-                    matProps.ID = targetInfo.ID;
-                    asset.MaterialPropsList.Add(matProps);
-                    asset.IdMaterialPropsDict.Add(targetInfo.ID, matProps);
+                    if (!asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID))
+                    {
+                        var matProps = new MaterialProps(mat, false);
+                        matProps.ID = targetInfo.ID;
+                        asset.MaterialPropsList.Add(matProps);
+                        asset.IdMaterialPropsDict.Add(targetInfo.ID, matProps);
+                    }
+                }
+            }
+
+            // 最も数が多いshaderをglobalに設定
+            int maxNum = 0;
+            foreach (var (shader, num) in matNumDict)
+            {
+                if (maxNum < num)
+                {
+                    asset.GlobalProps.Shader = shader;
+                    maxNum = num;
                 }
             }
 
