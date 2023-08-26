@@ -380,7 +380,7 @@ namespace sui4.MaterialPropertyBaker
                 // 隠しプロパティは追加しない
                 var si = shader.FindPropertyIndex(propName);
                 var flags = shader.GetPropertyFlags(si);
-                if (flags == ShaderPropertyFlags.HideInInspector) continue;
+                if (flags.HasFlag(ShaderPropertyFlags.HideInInspector)) continue;
                 switch (propType)
                 {
                     // すでに同じ名前のプロパティがある場合は追加しない
