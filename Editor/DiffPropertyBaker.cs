@@ -15,7 +15,7 @@ namespace sui4.MaterialPropertyBaker
         private List<bool> _baseFoldoutList = new();
         private List<bool> _targetFoldoutList = new();
 
-        private Dictionary<string, List<BaseTargetValueHolder>> _diffPropsDict = new();
+        private readonly Dictionary<string, List<BaseTargetValueHolder>> _diffPropsDict = new();
 
         [MenuItem("MaterialPropertyBaker/Diff Property Baker")]
         private static void ShowWindow()
@@ -100,6 +100,10 @@ namespace sui4.MaterialPropertyBaker
                                 var floatValue = isBase ? prop.BaseFloatValue : prop.TargetFloatValue;
                                 EditorGUILayout.FloatField(new GUIContent(prop.PropName), floatValue);
                                 break;
+                            case ShaderPropertyType.Int:
+                                var intValue = isBase ? prop.BaseIntValue : prop.TargetIntValue;
+                                EditorGUILayout.IntField(new GUIContent(prop.PropName), intValue);
+                                break;
                             default:
                                 Debug.LogWarning(
                                     $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
@@ -112,7 +116,7 @@ namespace sui4.MaterialPropertyBaker
 
         private void BakeButton()
         {
-            GUI.enabled = isValid();
+            GUI.enabled = IsValid();
             var tmp = GUI.backgroundColor;
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Bake Different Properties"))
@@ -125,7 +129,7 @@ namespace sui4.MaterialPropertyBaker
             GUI.enabled = true;
         }
 
-        private bool isValid()
+        private bool IsValid()
         {
             return _baseProfile != null && _targetProfile != null;
         }
@@ -166,6 +170,9 @@ namespace sui4.MaterialPropertyBaker
                             case ShaderPropertyType.Range:
                                 targetMatProps.SetFloat(prop.PropName, prop.TargetFloatValue);
                                 break;
+                            case ShaderPropertyType.Int:
+                                targetMatProps.SetInt(prop.PropName, prop.TargetIntValue);
+                                break;
                             default:
                                 Debug.LogWarning(
                                     $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
@@ -191,8 +198,10 @@ namespace sui4.MaterialPropertyBaker
             public ShaderPropertyType PropType;
             public Color BaseColorValue;
             public float BaseFloatValue;
+            public int BaseIntValue;
             public Color TargetColorValue;
             public float TargetFloatValue;
+            public int TargetIntValue;
         }
 
         private static void GetDifferentProperties(Material baseMat, Material targetMat,
@@ -206,12 +215,17 @@ namespace sui4.MaterialPropertyBaker
                 return;
             }
 
-
             for (var pi = 0; pi < baseMat.shader.GetPropertyCount(); pi++)
             {
                 var propName = baseMat.shader.GetPropertyName(pi);
                 var propType = baseMat.shader.GetPropertyType(pi);
 
+                var baseTargetValueHolder = new BaseTargetValueHolder()
+                {
+                    PropName = propName,
+                    Material = baseMat,
+                    PropType = propType,
+                };
                 switch (propType)
                 {
                     case ShaderPropertyType.Color:
@@ -219,15 +233,9 @@ namespace sui4.MaterialPropertyBaker
                         var targetColor = targetMat.GetColor(propName);
                         if (baseColor != targetColor)
                         {
-                            var prop = new BaseTargetValueHolder()
-                            {
-                                PropName = propName,
-                                Material = baseMat,
-                                PropType = propType,
-                                BaseColorValue = baseColor,
-                                TargetColorValue = targetColor,
-                            };
-                            differentProps.Add(prop);
+                            baseTargetValueHolder.BaseColorValue = baseColor;
+                            baseTargetValueHolder.TargetColorValue = targetColor;
+                            differentProps.Add(baseTargetValueHolder);
                         }
 
                         break;
@@ -237,19 +245,23 @@ namespace sui4.MaterialPropertyBaker
                         var targetFloat = targetMat.GetFloat(propName);
                         if (Math.Abs(baseFloat - targetFloat) > tolerance)
                         {
-                            var prop = new BaseTargetValueHolder()
-                            {
-                                PropName = propName,
-                                Material = baseMat,
-                                PropType = propType,
-                                BaseFloatValue = baseFloat,
-                                TargetFloatValue = targetFloat,
-                            };
-                            differentProps.Add(prop);
+                            baseTargetValueHolder.BaseFloatValue = baseFloat;
+                            baseTargetValueHolder.TargetFloatValue = targetFloat;
+                            differentProps.Add(baseTargetValueHolder);
                         }
 
                         break;
                     case ShaderPropertyType.Int:
+                        var baseInt = baseMat.GetInteger(propName);
+                        var targetInt = targetMat.GetInteger(propName);
+                        if (baseInt != targetInt)
+                        {
+                            baseTargetValueHolder.BaseIntValue = baseInt;
+                            baseTargetValueHolder.TargetIntValue = targetInt;
+                            differentProps.Add(baseTargetValueHolder);
+                        }
+
+                        break;
                     case ShaderPropertyType.Texture:
                     case ShaderPropertyType.Vector:
                     default:
