@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/ZonkoDemo/Zonko.unity
+    guid: 2aeb0f47bb4a99c429952e5d5ed8627a
   m_configObjects: {}

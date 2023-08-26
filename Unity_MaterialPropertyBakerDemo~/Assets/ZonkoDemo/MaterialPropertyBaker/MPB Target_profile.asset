@@ -18,10 +18,14 @@ MonoBehaviour:
     _material: {fileID: 0}
     _colors:
     - _name: _ShadeColor
-      _value: {r: 0.8490566, g: 0.748932, b: 0.748932, a: 1}
+      _value: {r: 0.4716981, g: 0.20247419, b: 0.20247419, a: 1}
     - _name: _Color
-      _value: {r: 0.8113208, g: 0.5549128, b: 0.5549128, a: 1}
-    _floats: []
+      _value: {r: 0.6415094, g: 0.38430044, b: 0.38430044, a: 1}
+    _floats:
+    - _name: _BumpScale
+      _value: 0
+    - _name: _ShadingShiftFactor
+      _value: 0
   _materialPropsList:
   - _id: bodyB_eyepatch_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
@@ -48,11 +52,7 @@ MonoBehaviour:
   - _id: hair_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
     _material: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
-    _colors:
-    - _name: _ShadeColor
-      _value: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
-    - _name: _Color
-      _value: {r: 1, g: 1, b: 1, a: 1}
+    _colors: []
     _floats: []
   - _id: face_mtoon
     _shader: {fileID: 4800000, guid: e0edbf68d81d1f340ae8b110086b7063, type: 3}
