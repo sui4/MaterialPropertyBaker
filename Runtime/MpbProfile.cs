@@ -14,12 +14,14 @@ namespace sui4.MaterialPropertyBaker
             get => _globalProps;
             set => _globalProps = value;
         }
+
         public List<MaterialProps> MaterialPropsList => _materialPropsList;
 
         public Dictionary<string, MaterialProps> IdMaterialPropsDict { get; } =
             new();
 
         public List<string> Warnings { get; } = new();
+
         private void OnEnable()
         {
             OnValidate();

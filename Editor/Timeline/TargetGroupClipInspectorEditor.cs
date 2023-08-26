@@ -23,7 +23,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         {
             if (target == null) return;
             serializedObject.Update();
-            
+
             PresetRefGUI();
             EditorGUILayout.Separator();
             using (new EditorGUILayout.VerticalScope("box"))
@@ -85,7 +85,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 var profileToSave = ScriptableObject.Instantiate(Target.MpbProfile);
                 var defaultName = $"{profileToSave.name}";
-                EditorUtils.CreateAsset(profileToSave, out var saved, typeof(MpbProfile), defaultName, "Save as New", "");
+                EditorUtils.CreateAsset(profileToSave, out var saved, typeof(MpbProfile), defaultName, "Save as New",
+                    "");
                 if (saved)
                 {
                     Target.MpbProfile = saved as MpbProfile;
@@ -94,6 +95,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                     serializedObject.Update();
                 }
             }
+
             GUI.backgroundColor = tmp;
         }
     }

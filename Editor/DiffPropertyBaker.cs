@@ -16,6 +16,7 @@ namespace sui4.MaterialPropertyBaker
         private List<bool> _targetFoldoutList = new();
 
         private Dictionary<string, List<BaseTargetValueHolder>> _diffPropsDict = new();
+
         [MenuItem("MaterialPropertyBaker/Diff Property Baker")]
         private static void ShowWindow()
         {
@@ -35,6 +36,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 Validate();
             }
+
             EditorGUILayout.Separator();
             BakeButton();
             EditorGUILayout.Separator();
@@ -55,7 +57,8 @@ namespace sui4.MaterialPropertyBaker
                 using (new EditorGUILayout.VerticalScope())
                 {
                     EditorGUILayout.LabelField("Target Profile", EditorStyles.boldLabel);
-                    _targetProfile = EditorGUILayout.ObjectField(_targetProfile, typeof(MpbProfile), false) as MpbProfile;
+                    _targetProfile =
+                        EditorGUILayout.ObjectField(_targetProfile, typeof(MpbProfile), false) as MpbProfile;
                     EditorGUI.indentLevel++;
                     MaterialPropertyGUI(_targetProfile, false);
                     EditorGUI.indentLevel--;
@@ -70,15 +73,15 @@ namespace sui4.MaterialPropertyBaker
 
         private void MaterialPropertyGUI(MpbProfile profile, bool isBase)
         {
-            if(profile == null) return;
-            
+            if (profile == null) return;
+
             foreach (var matProps in profile.MaterialPropsList)
             {
                 var foldout = SessionState.GetBool(matProps.ID, false);
                 foldout = EditorGUILayout.Foldout(foldout, matProps.ID);
                 SessionState.SetBool(matProps.ID, foldout);
                 if (!foldout) continue;
-                
+
                 using (new EditorGUI.IndentLevelScope())
                 {
                     EditorGUILayout.ObjectField(matProps.Material, typeof(Material), false);
@@ -98,24 +101,26 @@ namespace sui4.MaterialPropertyBaker
                                 EditorGUILayout.FloatField(new GUIContent(prop.PropName), floatValue);
                                 break;
                             default:
-                                Debug.LogWarning($"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
+                                Debug.LogWarning(
+                                    $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
                                 break;
                         }
                     }
                 }
             }
         }
-        
+
         private void BakeButton()
         {
             GUI.enabled = isValid();
             var tmp = GUI.backgroundColor;
             GUI.backgroundColor = Color.green;
-            if(GUILayout.Button("Bake Different Properties"))
+            if (GUILayout.Button("Bake Different Properties"))
             {
                 BakeDifferentProperties();
                 Validate();
             }
+
             GUI.backgroundColor = tmp;
             GUI.enabled = true;
         }
@@ -124,12 +129,12 @@ namespace sui4.MaterialPropertyBaker
         {
             return _baseProfile != null && _targetProfile != null;
         }
-        
+
         private void Validate()
         {
             _diffPropsDict.Clear();
-            if(_baseProfile == null || _targetProfile == null) return;
-            
+            if (_baseProfile == null || _targetProfile == null) return;
+
             foreach (var (id, baseMatProps) in _baseProfile.IdMaterialPropsDict)
             {
                 if (_targetProfile.IdMaterialPropsDict.TryGetValue(id, out var targetMatProps))
@@ -139,14 +144,13 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        
 
 
         private void BakeDifferentProperties()
         {
-            if(_baseProfile == null || _targetProfile == null) return;
+            if (_baseProfile == null || _targetProfile == null) return;
             Validate();
-            
+
             foreach (var (id, diffProps) in _diffPropsDict)
             {
                 if (_targetProfile.IdMaterialPropsDict.TryGetValue(id, out var targetMatProps))
@@ -163,7 +167,8 @@ namespace sui4.MaterialPropertyBaker
                                 targetMatProps.SetFloat(prop.PropName, prop.TargetFloatValue);
                                 break;
                             default:
-                                Debug.LogWarning($"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
+                                Debug.LogWarning(
+                                    $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
                                 break;
                         }
                     }
@@ -189,7 +194,9 @@ namespace sui4.MaterialPropertyBaker
             public Color TargetColorValue;
             public float TargetFloatValue;
         }
-        private static void GetDifferentProperties(Material baseMat, Material targetMat, out List<BaseTargetValueHolder> differentProps)
+
+        private static void GetDifferentProperties(Material baseMat, Material targetMat,
+            out List<BaseTargetValueHolder> differentProps)
         {
             differentProps = new List<BaseTargetValueHolder>();
             const float tolerance = 0.0001f;
@@ -199,7 +206,7 @@ namespace sui4.MaterialPropertyBaker
                 return;
             }
 
-            
+
             for (var pi = 0; pi < baseMat.shader.GetPropertyCount(); pi++)
             {
                 var propName = baseMat.shader.GetPropertyName(pi);
@@ -222,6 +229,7 @@ namespace sui4.MaterialPropertyBaker
                             };
                             differentProps.Add(prop);
                         }
+
                         break;
                     case ShaderPropertyType.Float:
                     case ShaderPropertyType.Range:
@@ -239,6 +247,7 @@ namespace sui4.MaterialPropertyBaker
                             };
                             differentProps.Add(prop);
                         }
+
                         break;
                     case ShaderPropertyType.Int:
                     case ShaderPropertyType.Texture:
@@ -249,6 +258,5 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        
     }
 }

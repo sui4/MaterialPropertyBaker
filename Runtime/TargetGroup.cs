@@ -137,6 +137,7 @@ namespace sui4.MaterialPropertyBaker
                 MergeGlobalProps(profile, out var mergedPropsDict);
                 mergedPropsDictDict[profile] = mergedPropsDict;
             }
+
             foreach (var ren in Renderers)
             {
                 var wrapper = RendererMatTargetInfoWrapperDict[ren];
@@ -152,7 +153,6 @@ namespace sui4.MaterialPropertyBaker
                     {
                         if (mergedPropsDictDict[profile].TryGetValue(targetInfo.ID, out var props))
                         {
-                            Debug.Log(props.ID);
                             SetPropertyBlock(props, weight, defaultProps, usedProperty, _mpb);
                         }
                     }
@@ -161,7 +161,7 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-        
+
         private static void SetPropertyBlock(MaterialProps targetProps, float weight, MaterialProps defaultProps,
             ISet<int> usedProperty, MaterialPropertyBlock mpb)
         {
@@ -189,14 +189,14 @@ namespace sui4.MaterialPropertyBaker
                 mpb.SetFloat(prop.ID, current + diff * weight);
             }
         }
-        
+
         // 個別に設定された値を優先する
         private static void MergeGlobalProps(MpbProfile profile, out Dictionary<string, MaterialProps> mergedPropsDict)
         {
             mergedPropsDict = new Dictionary<string, MaterialProps>();
             foreach (var (id, props) in profile.IdMaterialPropsDict)
             {
-                var mergedProps = MergeMaterialProps(new MaterialProps[2]{profile.GlobalProps, props});
+                var mergedProps = MergeMaterialProps(new MaterialProps[2] { profile.GlobalProps, props });
                 mergedPropsDict[id] = mergedProps;
             }
         }

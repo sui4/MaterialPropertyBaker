@@ -14,7 +14,7 @@ namespace sui4.MaterialPropertyBaker
         private readonly List<bool> _floatsFoldoutList = new();
         private bool _globalColorsFoldout = true;
         private bool _globalFloatsFoldout = true;
-        
+
         private SerializedProperty _globalPropsProp;
         private SerializedProperty _materialPropsListProp;
         private SerializedProperty _materialPropsProp;
@@ -89,6 +89,7 @@ namespace sui4.MaterialPropertyBaker
                             EditorGUI.indentLevel--;
                         }
                     }
+
                     EditorGUI.indentLevel--;
                 }
 
@@ -104,7 +105,7 @@ namespace sui4.MaterialPropertyBaker
             var shader = globalPropsProp.FindPropertyRelative("_shader");
             var colors = globalPropsProp.FindPropertyRelative("_colors");
             var floats = globalPropsProp.FindPropertyRelative("_floats");
-            
+
             EditorGUILayout.LabelField("Global Properties", EditorStyles.boldLabel);
 
             EditorGUI.indentLevel++;
@@ -129,6 +130,7 @@ namespace sui4.MaterialPropertyBaker
                 PropsGUI(floats, Target.GlobalProps, false);
                 EditorGUI.indentLevel--;
             }
+
             EditorGUI.indentLevel--;
         }
 
@@ -220,7 +222,7 @@ namespace sui4.MaterialPropertyBaker
                     if (propType != ShaderPropertyType.Color ||
                         matProps.Colors.Any(c => c.Name == propName))
                         continue;
-                    
+
                     AddPropertyToMenu(propName, addPropertyMenu, matProps, true);
                 }
                 else if (propType is ShaderPropertyType.Float or ShaderPropertyType.Range)
@@ -261,6 +263,7 @@ namespace sui4.MaterialPropertyBaker
                 var matProp = new MaterialProp<float>(propName, defaultFloat);
                 props.Floats.Add(matProp);
             }
+
             EditorUtility.SetDirty(target);
             AssetDatabase.SaveAssetIfDirty(target);
             serializedObject.Update();
