@@ -97,6 +97,9 @@ namespace sui4.MaterialPropertyBaker
 
             List<Renderer> renderers = new();
             _target.GetComponentsInChildren(true, renderers);
+            // mesh renderer, skinned mesh renderer以外を取り除く
+            renderers = renderers.Where(ren =>
+                ren is MeshRenderer || ren is SkinnedMeshRenderer).ToList();
             var renderersToRemove = new List<Renderer>();
             foreach (var ren in Renderers)
             {
@@ -235,7 +238,7 @@ namespace sui4.MaterialPropertyBaker
 
                 foreach (var floatProp in target.Floats)
                     idFloatDict[floatProp.ID] = floatProp;
-                
+
                 foreach (var intProp in target.Ints)
                     idIntDict[intProp.ID] = intProp;
             }
@@ -245,7 +248,7 @@ namespace sui4.MaterialPropertyBaker
 
             foreach (var (_, floatProp) in idFloatDict)
                 mergedProps.Floats.Add(floatProp);
-            
+
             foreach (var (_, intProp) in idIntDict)
                 mergedProps.Ints.Add(intProp);
             return mergedProps;
