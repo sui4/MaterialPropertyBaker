@@ -10,6 +10,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
     [DisplayName("Material Property Baker/TargetGroup Track")]
     public class TargetGroupTrack : TrackAsset
     {
+        [SerializeField] private MpbProfile _profileToOverrideDefault;
+        public MpbProfile ProfileToOverrideDefault => _profileToOverrideDefault;
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject director, int inputCount)
         {
             var mixer = ScriptPlayable<TargetGroupMixerBehaviour>.Create(graph, inputCount);
@@ -19,6 +21,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 targetGroup.OnValidate();
                 timelineMixer.BindingTargetGroup = targetGroup;
+                timelineMixer.ProfileToOverrideDefault = _profileToOverrideDefault;
             }
 
             return mixer;
