@@ -15,8 +15,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
             if (target == null) return;
             serializedObject.Update();
             var targetTrack = (TargetGroupTrack) target;
-            EditorGUILayout.HelpBox("このProfileはTimelineにClipがない場合やDestroy時に適用されます。", MessageType.Info);
-            EditorGUILayout.HelpBox("このEditorからProfileを編集した場合、タイムラインのシークバーを動かさないと反映されません", MessageType.Info);
+            EditorGUILayout.HelpBox("このProfileはTimelineのDestroy時に適用されます。", MessageType.Info);
+            EditorGUILayout.HelpBox("最後のクリップのProfileを設定することで、ControlTrack遷移時のちらつきをなくせます", MessageType.Info);
             PropertyGroupEditor(targetTrack.ProfileToOverrideDefault);
         }
         
