@@ -81,8 +81,16 @@ namespace sui4.MaterialPropertyBaker.Timeline
         public override void OnPlayableDestroy(Playable playable)
         {
             if (BindingTargetGroup == null) return;
-
-            BindingTargetGroup.ResetToDefault();
+            if(this.TrackAsset != null && this.TrackAsset.ProfileToOverrideDefault != null)
+            {
+                _profileWeightDict.Clear();
+                _profileWeightDict.Add(this.TrackAsset.ProfileToOverrideDefault, 1f);
+                BindingTargetGroup.SetPropertyBlock(_profileWeightDict);
+            }
+            else
+            {
+                BindingTargetGroup.ResetToDefault();
+            }
         }
     }
 }
