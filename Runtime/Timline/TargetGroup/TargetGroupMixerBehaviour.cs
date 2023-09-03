@@ -10,7 +10,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
         private readonly Dictionary<MpbProfile, float> _profileWeightDict = new();
 
         public TargetGroup BindingTargetGroup;
-        public MpbProfile ProfileToOverrideDefault;
+        public TargetGroupTrack TrackAsset;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
@@ -52,10 +52,10 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
             if (totalWeight > 0f)
                 BindingTargetGroup.SetPropertyBlock(_profileWeightDict);
-            else if (ProfileToOverrideDefault != null)
+            else if (this.TrackAsset != null && this.TrackAsset.ProfileToOverrideDefault != null)
             {
                 _profileWeightDict.Clear();
-                _profileWeightDict.Add(ProfileToOverrideDefault, 1f);
+                _profileWeightDict.Add(this.TrackAsset.ProfileToOverrideDefault, 1f);
                 BindingTargetGroup.SetPropertyBlock(_profileWeightDict);
             }
             else

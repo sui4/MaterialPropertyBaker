@@ -21,7 +21,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 targetGroup.OnValidate();
                 timelineMixer.BindingTargetGroup = targetGroup;
-                timelineMixer.ProfileToOverrideDefault = _profileToOverrideDefault;
+                timelineMixer.TrackAsset = this;
             }
 
             return mixer;
