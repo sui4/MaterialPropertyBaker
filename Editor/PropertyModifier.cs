@@ -189,7 +189,8 @@ namespace sui4.MaterialPropertyBaker
                         Material copiedMat = _copiedMaterialList[index];
                         if (copiedMat == null)
                         {
-                            _copiedMaterialList[index] = copiedMat = new Material(mat);
+                            _copiedMaterialList[index] = new Material(mat);
+                            ApplyBakedPropsToMat(materialProps, _copiedMaterialList[index]);
                         }
                         MaterialProperty[] materialProperties =
                             MaterialEditor.GetMaterialProperties(new Object[] { copiedMat });
@@ -274,6 +275,19 @@ namespace sui4.MaterialPropertyBaker
                             $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
                         break;
                 }
+            }
+        }
+
+        private void ApplyBakedPropsToMat(MaterialProps matProps, Material targetMat)
+        {
+            foreach (MaterialProp<Color> colorProp in matProps.Colors)
+            {
+                targetMat.SetColor(colorProp.Name, colorProp.Value);
+            }
+
+            foreach (MaterialProp<float> floatProp in matProps.Floats)
+            {
+                targetMat.SetFloat(floatProp.Name, floatProp.Value);
             }
         }
 
