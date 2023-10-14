@@ -10,13 +10,12 @@ namespace sui4.MaterialPropertyBaker
     public class DiffPropertyBaker : EditorWindow
     {
         private MpbProfile _baseProfile;
-        private MpbProfile _targetProfile;
 
         private List<bool> _baseFoldoutList = new();
-        private List<bool> _targetFoldoutList = new();
 
-        private readonly Dictionary<string, List<BaseTargetValueHolder>> _diffPropsDict = new();
+        private readonly Dictionary<string, DiffHolder> _diffHolderDict = new();
 
+        private Vector2 _scrollPos = Vector2.zero; 
         [MenuItem("MaterialPropertyBaker/Diff Property Baker")]
         private static void ShowWindow()
         {
@@ -27,88 +26,125 @@ namespace sui4.MaterialPropertyBaker
 
         private void OnEnable()
         {
-            Validate();
         }
 
         private void OnGUI()
         {
-            if (GUILayout.Button("Validate"))
+            EditorGUILayout.HelpBox("2つのマテリアルを比較し、異なる値を持つプロパティを保存します。", MessageType.Info);
+            
+            var prevBase = _baseProfile;
+            using (new EditorGUILayout.VerticalScope())
             {
-                Validate();
+                EditorGUILayout.LabelField("Base Profile", EditorStyles.boldLabel);
+                _baseProfile = EditorGUILayout.ObjectField(_baseProfile, typeof(MpbProfile), allowSceneObjects:false) as MpbProfile;
+                EditorGUI.indentLevel++;
+                using (var scroll = new EditorGUILayout.ScrollViewScope(_scrollPos))
+                {
+                    MaterialPropertyGUI(_baseProfile);
+                    _scrollPos = scroll.scrollPosition;
+                }
+                EditorGUI.indentLevel--;
+            }
+            if(_baseProfile != prevBase)
+            {
+                Refresh();
             }
 
             EditorGUILayout.Separator();
             BakeButton();
             EditorGUILayout.Separator();
+        }
 
-            using (new GUILayout.HorizontalScope())
+        private void Refresh()
+        {
+            _diffHolderDict.Clear();
+            Register(_baseProfile);
+        }
+
+        private void Register(MpbProfile profile)
+        {
+            foreach (MaterialProps matProps in profile.MaterialPropsList)
             {
-                var prevBase = _baseProfile;
-                var prevTarget = _targetProfile;
-                using (new EditorGUILayout.VerticalScope())
-                {
-                    EditorGUILayout.LabelField("Base Profile", EditorStyles.boldLabel);
-                    _baseProfile = EditorGUILayout.ObjectField(_baseProfile, typeof(MpbProfile), false) as MpbProfile;
-                    EditorGUI.indentLevel++;
-                    MaterialPropertyGUI(_baseProfile, true);
-                    EditorGUI.indentLevel--;
-                }
-
-                using (new EditorGUILayout.VerticalScope())
-                {
-                    EditorGUILayout.LabelField("Target Profile", EditorStyles.boldLabel);
-                    _targetProfile =
-                        EditorGUILayout.ObjectField(_targetProfile, typeof(MpbProfile), false) as MpbProfile;
-                    EditorGUI.indentLevel++;
-                    MaterialPropertyGUI(_targetProfile, false);
-                    EditorGUI.indentLevel--;
-                }
-
-                if (prevBase != _baseProfile || prevTarget != _targetProfile)
-                {
-                    Validate();
-                }
+                _diffHolderDict.Add(matProps.ID, new DiffHolder());
             }
         }
 
-        private void MaterialPropertyGUI(MpbProfile profile, bool isBase)
+        private void MaterialPropertyGUI(MpbProfile profile)
         {
             if (profile == null) return;
 
-            foreach (var matProps in profile.MaterialPropsList)
+            foreach (MaterialProps matProps in profile.MaterialPropsList)
             {
-                var foldout = SessionState.GetBool(matProps.ID, false);
+                bool foldout = SessionState.GetBool(profile.name + matProps.ID, true);
                 foldout = EditorGUILayout.Foldout(foldout, matProps.ID);
-                SessionState.SetBool(matProps.ID, foldout);
+                SessionState.SetBool(profile.name + matProps.ID, foldout);
                 if (!foldout) continue;
 
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.ObjectField(matProps.Material, typeof(Material), false);
-                    if (!_diffPropsDict.TryGetValue(matProps.ID, out var diffProps)) continue;
-
-                    foreach (var prop in diffProps)
+                    using (new EditorGUI.DisabledScope(true))
                     {
-                        switch (prop.PropType)
+                        EditorGUILayout.ObjectField(new GUIContent("base material") ,matProps.Material, typeof(Material), allowSceneObjects:false);
+                    }
+
+                    if (!_diffHolderDict.TryGetValue(matProps.ID, out DiffHolder diffHolder))
+                    {
+                        _diffHolderDict.Add(matProps.ID, new DiffHolder());
+                        diffHolder = _diffHolderDict[matProps.ID];
+                    }
+                    Material prevTarget = diffHolder.TargetMaterial;
+                    diffHolder.TargetMaterial = EditorGUILayout.ObjectField(new GUIContent("target material"), diffHolder.TargetMaterial, typeof(Material), allowSceneObjects:false) as Material;
+
+                    if (diffHolder.TargetMaterial != prevTarget)
+                    {
+                        if (diffHolder.TargetMaterial != null)
                         {
-                            case ShaderPropertyType.Color:
-                                var colorValue = isBase ? prop.BaseColorValue : prop.TargetColorValue;
-                                EditorGUILayout.ColorField(new GUIContent(prop.PropName), colorValue, true, true, true);
-                                break;
-                            case ShaderPropertyType.Float:
-                            case ShaderPropertyType.Range:
-                                var floatValue = isBase ? prop.BaseFloatValue : prop.TargetFloatValue;
-                                EditorGUILayout.FloatField(new GUIContent(prop.PropName), floatValue);
-                                break;
-                            case ShaderPropertyType.Int:
-                                var intValue = isBase ? prop.BaseIntValue : prop.TargetIntValue;
-                                EditorGUILayout.IntField(new GUIContent(prop.PropName), intValue);
-                                break;
-                            default:
-                                Debug.LogWarning(
-                                    $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
-                                break;
+                            GetDifferentProperties(matProps.Material, diffHolder.TargetMaterial, out diffHolder.DiffProps);
                         }
+                        else
+                        {
+                            diffHolder.DiffProps.Clear();
+                        }
+                    }
+                    if(diffHolder.TargetMaterial == null) continue;
+                    EditorGUILayout.LabelField("Different Properties", EditorStyles.boldLabel);
+                    EditorGUI.indentLevel++;
+                    PropertiesGUI(diffHolder);
+                    EditorGUI.indentLevel--;
+                }
+            }
+        }
+
+        private static void PropertiesGUI(DiffHolder diffHolder)
+        {
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("Base Value");
+                EditorGUILayout.LabelField("Target Value");
+            }
+            foreach (BaseTargetValueHolder prop in diffHolder.DiffProps)
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    switch (prop.PropType)
+                    {
+                        case ShaderPropertyType.Color:
+                            EditorGUILayout.ColorField(new GUIContent(prop.PropName), prop.BaseColorValue, true, true, true);
+                            EditorGUILayout.ColorField(new GUIContent(prop.PropName), prop.TargetColorValue, true, true, true);
+                            break;
+                        case ShaderPropertyType.Float:
+                        case ShaderPropertyType.Range:
+                            EditorGUILayout.FloatField(new GUIContent(prop.PropName), prop.BaseFloatValue);
+                            EditorGUILayout.FloatField(new GUIContent(prop.PropName), prop.TargetFloatValue);
+                            break;
+                        case ShaderPropertyType.Int:
+                            EditorGUILayout.IntField(new GUIContent(prop.PropName), prop.BaseIntValue);
+                            EditorGUILayout.IntField(new GUIContent(prop.PropName), prop.TargetIntValue);
+                            break;
+                        default:
+                            Debug.LogWarning(
+                                $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
+                            break;
                     }
                 }
             }
@@ -117,49 +153,31 @@ namespace sui4.MaterialPropertyBaker
         private void BakeButton()
         {
             GUI.enabled = IsValid();
-            var tmp = GUI.backgroundColor;
+            Color cache = GUI.backgroundColor;
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Bake Different Properties"))
             {
                 BakeDifferentProperties();
-                Validate();
             }
 
-            GUI.backgroundColor = tmp;
+            GUI.backgroundColor = cache;
             GUI.enabled = true;
         }
 
         private bool IsValid()
         {
-            return _baseProfile != null && _targetProfile != null;
+            return _baseProfile != null;
         }
-
-        private void Validate()
-        {
-            _diffPropsDict.Clear();
-            if (_baseProfile == null || _targetProfile == null) return;
-
-            foreach (var (id, baseMatProps) in _baseProfile.IdMaterialPropsDict)
-            {
-                if (_targetProfile.IdMaterialPropsDict.TryGetValue(id, out var targetMatProps))
-                {
-                    GetDifferentProperties(baseMatProps.Material, targetMatProps.Material, out var diffProps);
-                    _diffPropsDict.Add(id, diffProps);
-                }
-            }
-        }
-
 
         private void BakeDifferentProperties()
         {
-            if (_baseProfile == null || _targetProfile == null) return;
-            Validate();
+            if (_baseProfile == null) return;
 
-            foreach (var (id, diffProps) in _diffPropsDict)
+            foreach ((string id, DiffHolder diffHolder) in _diffHolderDict)
             {
-                if (_targetProfile.IdMaterialPropsDict.TryGetValue(id, out var targetMatProps))
+                if (_baseProfile.IdMaterialPropsDict.TryGetValue(id, out MaterialProps targetMatProps))
                 {
-                    foreach (var prop in diffProps)
+                    foreach (BaseTargetValueHolder prop in diffHolder.DiffProps)
                     {
                         switch (prop.PropType)
                         {
@@ -182,19 +200,26 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
 
-            if (EditorUtility.DisplayDialog("Bake Succeeded",
-                    $"Properties baked to {_targetProfile.name}",
+            if (EditorUtility.DisplayDialog(
+                    "Bake Succeeded",
+                    $"Properties baked to {_baseProfile.name}",
                     "OK"))
             {
                 Close();
-                Selection.activeObject = _targetProfile;
+                Selection.activeObject = _baseProfile;
             }
+        }
+
+        private class DiffHolder
+        {
+            public Material BaseMaterial;
+            public Material TargetMaterial;
+            public List<BaseTargetValueHolder> DiffProps = new();
         }
 
         private class BaseTargetValueHolder
         {
             public string PropName;
-            public Material Material;
             public ShaderPropertyType PropType;
             public Color BaseColorValue;
             public float BaseFloatValue;
@@ -217,20 +242,19 @@ namespace sui4.MaterialPropertyBaker
 
             for (var pi = 0; pi < baseMat.shader.GetPropertyCount(); pi++)
             {
-                var propName = baseMat.shader.GetPropertyName(pi);
-                var propType = baseMat.shader.GetPropertyType(pi);
+                string propName = baseMat.shader.GetPropertyName(pi);
+                ShaderPropertyType propType = baseMat.shader.GetPropertyType(pi);
 
                 var baseTargetValueHolder = new BaseTargetValueHolder()
                 {
                     PropName = propName,
-                    Material = baseMat,
                     PropType = propType,
                 };
                 switch (propType)
                 {
                     case ShaderPropertyType.Color:
-                        var baseColor = baseMat.GetColor(propName);
-                        var targetColor = targetMat.GetColor(propName);
+                        Color baseColor = baseMat.GetColor(propName);
+                        Color targetColor = targetMat.GetColor(propName);
                         if (baseColor != targetColor)
                         {
                             baseTargetValueHolder.BaseColorValue = baseColor;
@@ -241,8 +265,8 @@ namespace sui4.MaterialPropertyBaker
                         break;
                     case ShaderPropertyType.Float:
                     case ShaderPropertyType.Range:
-                        var baseFloat = baseMat.GetFloat(propName);
-                        var targetFloat = targetMat.GetFloat(propName);
+                        float baseFloat = baseMat.GetFloat(propName);
+                        float targetFloat = targetMat.GetFloat(propName);
                         if (Math.Abs(baseFloat - targetFloat) > tolerance)
                         {
                             baseTargetValueHolder.BaseFloatValue = baseFloat;
@@ -252,8 +276,8 @@ namespace sui4.MaterialPropertyBaker
 
                         break;
                     case ShaderPropertyType.Int:
-                        var baseInt = baseMat.GetInteger(propName);
-                        var targetInt = targetMat.GetInteger(propName);
+                        int baseInt = baseMat.GetInteger(propName);
+                        int targetInt = targetMat.GetInteger(propName);
                         if (baseInt != targetInt)
                         {
                             baseTargetValueHolder.BaseIntValue = baseInt;

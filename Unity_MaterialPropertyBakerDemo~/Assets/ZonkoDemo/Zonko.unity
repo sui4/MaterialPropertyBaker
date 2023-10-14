@@ -123,163 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &142872937
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 142872939}
-  - component: {fileID: 142872938}
-  m_Layer: 0
-  m_Name: MPB Target
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &142872938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 142872937}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b87c12f3aa94e84ab3687fed7e84c76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _target: {fileID: 5812421858489974717}
-  _rendererMatTargetInfoWrapperSDict:
-    _keys:
-    - {fileID: 5812421858489974716}
-    - {fileID: 5812421858489974715}
-    - {fileID: 5812421858489974714}
-    - {fileID: 5812421858489974713}
-    - {fileID: 5812421858489974712}
-    - {fileID: 5812421858489974711}
-    - {fileID: 5812421858489974710}
-    - {fileID: 5812421858489974709}
-    - {fileID: 5812421858489974708}
-    _values:
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: f3b67743523d08c4ba0cf3bcd43cfe67, type: 2}
-        - {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
-        _values:
-        - _id: bodyB_eyepatch_mtoon
-          _material: {fileID: 2100000, guid: f3b67743523d08c4ba0cf3bcd43cfe67, type: 2}
-        - _id: glowB_mtoon
-          _material: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
-        _values:
-        - _id: hair_mtoon
-          _material: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
-        _values:
-        - _id: face_mtoon
-          _material: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
-        - {fileID: 2100000, guid: 67d3c62cc58bb664297076c2a8afc92d, type: 2}
-        - {fileID: 2100000, guid: ab5fefbb4ef03534b87b0c88231a0391, type: 2}
-        - {fileID: 2100000, guid: cfaaf8aceb6e2f846b0da533890b9928, type: 2}
-        _values:
-        - _id: face_mtoon
-          _material: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
-        - _id: eye_mtoon
-          _material: {fileID: 2100000, guid: 67d3c62cc58bb664297076c2a8afc92d, type: 2}
-        - _id: eyeKakusei_mtoon
-          _material: {fileID: 2100000, guid: ab5fefbb4ef03534b87b0c88231a0391, type: 2}
-        - _id: eyeGuruguru_mtoon
-          _material: {fileID: 2100000, guid: cfaaf8aceb6e2f846b0da533890b9928, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
-        - {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
-        - {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
-        _values:
-        - _id: emissionB_mtoon
-          _material: {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
-        - _id: glowB_mtoon
-          _material: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
-        - _id: bodyB_mtoon
-          _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
-        - {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
-        - {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
-        _values:
-        - _id: bodyA_mtoon
-          _material: {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
-        - _id: bodyB_mtoon
-          _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
-        - _id: glowA_mtoon
-          _material: {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: 595924341ce0d544eaee0ead9a192943, type: 2}
-        - {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
-        _values:
-        - _id: emissionA_NoOutline_mtoon
-          _material: {fileID: 2100000, guid: 595924341ce0d544eaee0ead9a192943, type: 2}
-        - _id: emissionB_mtoon
-          _material: {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
-        - {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
-        - {fileID: 2100000, guid: 636913b334b91d94f8894a4e962bf8b7, type: 2}
-        - {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
-        _values:
-        - _id: bodyA_mtoon
-          _material: {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
-        - _id: bodyB_mtoon
-          _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
-        - _id: skinB_mtoon
-          _material: {fileID: 2100000, guid: 636913b334b91d94f8894a4e962bf8b7, type: 2}
-        - _id: glowA_mtoon
-          _material: {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
-    - _matTargetInfoSDict:
-        _keys:
-        - {fileID: 2100000, guid: d42901c7bacb4df4e81658c82da712c4, type: 2}
-        _values:
-        - _id: thunder_mtoon
-          _material: {fileID: 2100000, guid: d42901c7bacb4df4e81658c82da712c4, type: 2}
-  _renderers:
-  - {fileID: 5812421858489974716}
-  - {fileID: 5812421858489974715}
-  - {fileID: 5812421858489974714}
-  - {fileID: 5812421858489974713}
-  - {fileID: 5812421858489974712}
-  - {fileID: 5812421858489974711}
-  - {fileID: 5812421858489974710}
-  - {fileID: 5812421858489974709}
-  - {fileID: 5812421858489974708}
---- !u!4 &142872939
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 142872937}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00033590198, y: 1.4850566, z: 0.010314763}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &276830324
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,7 +156,7 @@ PlayableDirector:
   m_InitialTime: 0
   m_SceneBindings:
   - key: {fileID: -883686366589860192, guid: 79591e58db659a647b4be8102d825e3a, type: 2}
-    value: {fileID: 142872938}
+    value: {fileID: 5812421858489974718}
   m_ExposedReferences:
     m_References: []
 --- !u!4 &276830326
@@ -580,7 +423,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9113800332721717738, guid: c232ad4a2a0ecdd48b47eff4262c2a99, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5812421858489974718}
   m_SourcePrefab: {fileID: 100100000, guid: c232ad4a2a0ecdd48b47eff4262c2a99, type: 3}
 --- !u!137 &5812421858489974708 stripped
 SkinnedMeshRenderer:
@@ -632,3 +478,128 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 9113800332721717738, guid: c232ad4a2a0ecdd48b47eff4262c2a99, type: 3}
   m_PrefabInstance: {fileID: 5812421858489974707}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5812421858489974718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5812421858489974717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b87c12f3aa94e84ab3687fed7e84c76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 5812421858489974717}
+  _rendererMatTargetInfoWrapperSDict:
+    _keys:
+    - {fileID: 5812421858489974716}
+    - {fileID: 5812421858489974715}
+    - {fileID: 5812421858489974714}
+    - {fileID: 5812421858489974713}
+    - {fileID: 5812421858489974712}
+    - {fileID: 5812421858489974711}
+    - {fileID: 5812421858489974710}
+    - {fileID: 5812421858489974709}
+    - {fileID: 5812421858489974708}
+    _values:
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: f3b67743523d08c4ba0cf3bcd43cfe67, type: 2}
+        - {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
+        _values:
+        - _id: bodyB_eyepatch_mtoon
+          _material: {fileID: 2100000, guid: f3b67743523d08c4ba0cf3bcd43cfe67, type: 2}
+        - _id: glowB_mtoon
+          _material: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
+        _values:
+        - _id: hair_mtoon
+          _material: {fileID: 2100000, guid: 65173ce0454f2aa4d9a1b3e637306bba, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
+        _values:
+        - _id: face_mtoon
+          _material: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
+        - {fileID: 2100000, guid: 67d3c62cc58bb664297076c2a8afc92d, type: 2}
+        - {fileID: 2100000, guid: ab5fefbb4ef03534b87b0c88231a0391, type: 2}
+        - {fileID: 2100000, guid: cfaaf8aceb6e2f846b0da533890b9928, type: 2}
+        _values:
+        - _id: face_mtoon
+          _material: {fileID: 2100000, guid: d1c7279a4d2aa184098c3148dcc9e6f5, type: 2}
+        - _id: eye_mtoon
+          _material: {fileID: 2100000, guid: 67d3c62cc58bb664297076c2a8afc92d, type: 2}
+        - _id: eyeKakusei_mtoon
+          _material: {fileID: 2100000, guid: ab5fefbb4ef03534b87b0c88231a0391, type: 2}
+        - _id: eyeGuruguru_mtoon
+          _material: {fileID: 2100000, guid: cfaaf8aceb6e2f846b0da533890b9928, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
+        - {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
+        - {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+        _values:
+        - _id: emissionB_mtoon
+          _material: {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
+        - _id: glowB_mtoon
+          _material: {fileID: 2100000, guid: f577bac54c3f17a4583d49f9b8554d6e, type: 2}
+        - _id: bodyB_mtoon
+          _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
+        - {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+        - {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
+        _values:
+        - _id: bodyA_mtoon
+          _material: {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
+        - _id: bodyB_mtoon
+          _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+        - _id: glowA_mtoon
+          _material: {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: 595924341ce0d544eaee0ead9a192943, type: 2}
+        - {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
+        _values:
+        - _id: emissionA_NoOutline_mtoon
+          _material: {fileID: 2100000, guid: 595924341ce0d544eaee0ead9a192943, type: 2}
+        - _id: emissionB_mtoon
+          _material: {fileID: 2100000, guid: 581d5fc169b41a143a0708c36f779933, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
+        - {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+        - {fileID: 2100000, guid: 636913b334b91d94f8894a4e962bf8b7, type: 2}
+        - {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
+        _values:
+        - _id: bodyA_mtoon
+          _material: {fileID: 2100000, guid: 8663e44f496e114408429137960a9a7d, type: 2}
+        - _id: bodyB_mtoon
+          _material: {fileID: 2100000, guid: 2d50d4af4f9a6604d9a3be9858ac8d50, type: 2}
+        - _id: skinB_mtoon
+          _material: {fileID: 2100000, guid: 636913b334b91d94f8894a4e962bf8b7, type: 2}
+        - _id: glowA_mtoon
+          _material: {fileID: 2100000, guid: b1587db322a48f540864b9ea99d9a458, type: 2}
+    - _matTargetInfoSDict:
+        _keys:
+        - {fileID: 2100000, guid: d42901c7bacb4df4e81658c82da712c4, type: 2}
+        _values:
+        - _id: thunder_mtoon
+          _material: {fileID: 2100000, guid: d42901c7bacb4df4e81658c82da712c4, type: 2}
+  _renderers:
+  - {fileID: 5812421858489974716}
+  - {fileID: 5812421858489974715}
+  - {fileID: 5812421858489974714}
+  - {fileID: 5812421858489974713}
+  - {fileID: 5812421858489974712}
+  - {fileID: 5812421858489974711}
+  - {fileID: 5812421858489974710}
+  - {fileID: 5812421858489974709}
+  - {fileID: 5812421858489974708}
