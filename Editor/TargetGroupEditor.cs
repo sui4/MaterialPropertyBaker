@@ -68,7 +68,7 @@ namespace sui4.MaterialPropertyBaker
             CreateBakedPropertyGroupGUI();
             EditorGUILayout.Separator();
 
-            if (GUILayout.Button("Validate"))
+            if (GUILayout.Button("Validate & Fix"))
             {
                 Target.OnValidate();
             }
