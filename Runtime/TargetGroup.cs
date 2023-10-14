@@ -39,6 +39,10 @@ namespace sui4.MaterialPropertyBaker
         public void OnValidate()
         {
             Warnings.Clear();
+            if (_target == null)
+            {
+                _target = this.gameObject;
+            }
 
             SyncRenderer();
             SyncMaterial();
