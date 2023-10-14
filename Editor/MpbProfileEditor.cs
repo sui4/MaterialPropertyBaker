@@ -355,62 +355,21 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        private static void ParseShaderAttribute(IEnumerable<string> propAttributes, out List<string> attribs,
-            out List<string> parameters)
-        {
-            attribs = new List<string>();
-            parameters = new List<string>();
-            foreach (var attr in propAttributes)
-            {
-                if (attr.IndexOf("Space", StringComparison.Ordinal) == 0) continue;
-                if (attr.IndexOf("Header", StringComparison.Ordinal) == 0) continue;
 
-                var matches = Regex.Matches(attr, @".*(?=\()"); //括弧の前を抽出
-                if (matches.Count != 0)
-                {
-                    attribs.Add(matches[0].Value);
-                    var paramMatches = Regex.Matches(attr, @"(?<=\().*(?=\))"); //括弧内を抽出
-                    parameters.Add(paramMatches.Count != 0 ? paramMatches[0].Value : null);
-                }
-                else
-                {
-                    //括弧がない場合
-                    attribs.Add(attr);
-                    parameters.Add(null);
-                }
-            }
-        }
-
-        private static bool IsMatchShaderType(ShaderPropertyType s1, ShaderPropertyType s2)
-        {
-            if (s1 == s2) return true;
-            switch (s1)
-            {
-                case ShaderPropertyType.Float when s2 == ShaderPropertyType.Range:
-                case ShaderPropertyType.Range when s2 == ShaderPropertyType.Float:
-                    return true;
-                case ShaderPropertyType.Color:
-                case ShaderPropertyType.Vector:
-                case ShaderPropertyType.Texture:
-                case ShaderPropertyType.Int:
-                default:
-                    return false;
-            }
-        }
-
+        // for popup menu
         private void ShowNewRecorderMenu(MaterialProps matProps, ShaderPropertyType targetPropType)
         {
             var addPropertyMenu = new GenericMenu();
-            var shader = matProps.Shader;
+            Shader shader = matProps.Shader;
             for (var pi = 0; pi < shader.GetPropertyCount(); pi++)
             {
-                var propName = shader.GetPropertyName(pi);
-                var propType = shader.GetPropertyType(pi);
-                if (!IsMatchShaderType(targetPropType, propType)) continue;
+                string propName = shader.GetPropertyName(pi);
+                ShaderPropertyType propType = shader.GetPropertyType(pi);
+                if (!MPBEditorUtils.IsMatchShaderType(targetPropType, propType)) continue;
 
                 // 隠しプロパティは追加しない
-                var si = shader.FindPropertyIndex(propName);
-                var flags = shader.GetPropertyFlags(si);
+                int si = shader.FindPropertyIndex(propName);
+                ShaderPropertyFlags flags = shader.GetPropertyFlags(si);
                 if (flags.HasFlag(ShaderPropertyFlags.HideInInspector)) continue;
                 switch (propType)
                 {

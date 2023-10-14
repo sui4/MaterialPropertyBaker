@@ -77,7 +77,7 @@ namespace sui4.MaterialPropertyBaker
             _renderersFoldout = EditorGUILayout.Foldout(_renderersFoldout, "Renderers");
             SessionState.SetBool(RenderersFoldoutKey, _renderersFoldout);
 
-            EditorUtils.WarningGUI(Target.Warnings);
+            MPBEditorUtils.WarningGUI(Target.Warnings);
 
             if (_renderersFoldout)
             {

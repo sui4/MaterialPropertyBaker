@@ -85,7 +85,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
             {
                 var profileToSave = ScriptableObject.Instantiate(Target.MpbProfile);
                 var defaultName = $"{profileToSave.name}";
-                EditorUtils.CreateAsset(profileToSave, out var saved, typeof(MpbProfile), defaultName, "Save as New",
+                MPBEditorUtils.CreateAsset(profileToSave, out var saved, typeof(MpbProfile), defaultName, "Save as New",
                     "");
                 if (saved)
                 {
