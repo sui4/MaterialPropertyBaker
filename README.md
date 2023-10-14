@@ -39,3 +39,10 @@ Git Submoduleを使うことでバージョン管理が用意になります。
 
 ## 補助ツール
 
+### Diff Baker
+
+切り替えたい値のセットが他のマテリアルとして保存されてる場合におすすめです。
+Profileに紐付けられてるマテリアルと対象のマテリアルを比較して値が異なるプロパティをProfileに保存します。
+ツールバー `MaterialPropertyBaker/DiffBaker`よりウィンドウを開きます。
+
+![image-20231014205902161](README.assets/diff-baker.png)
