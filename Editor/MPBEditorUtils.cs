@@ -9,8 +9,91 @@ using Object = UnityEngine.Object;
 
 namespace sui4.MaterialPropertyBaker
 {
+    public class DiffHolder
+    {
+        public Material BaseMaterial;
+        public Material TargetMaterial;
+        public List<BaseTargetValueHolder> DiffProps = new();
+    }
+
+    public class BaseTargetValueHolder
+    {
+        public string PropName;
+        public ShaderPropertyType PropType;
+        public Color BaseColorValue;
+        public float BaseFloatValue;
+        public int BaseIntValue;
+        public Color TargetColorValue;
+        public float TargetFloatValue;
+        public int TargetIntValue;
+    }
     public static class MPBEditorUtils
     {
+        public static void GetDifferentProperties(Material baseMat, Material targetMat,
+            out List<BaseTargetValueHolder> differentProps)
+        {
+            differentProps = new List<BaseTargetValueHolder>();
+            const float tolerance = 0.0001f;
+            if (baseMat.shader != targetMat.shader)
+            {
+                Debug.LogWarning($"{baseMat.name} and {targetMat.name} have different shaders.");
+                return;
+            }
+
+            for (var pi = 0; pi < baseMat.shader.GetPropertyCount(); pi++)
+            {
+                string propName = baseMat.shader.GetPropertyName(pi);
+                ShaderPropertyType propType = baseMat.shader.GetPropertyType(pi);
+
+                var baseTargetValueHolder = new BaseTargetValueHolder()
+                {
+                    PropName = propName,
+                    PropType = propType,
+                };
+                switch (propType)
+                {
+                    case ShaderPropertyType.Color:
+                        Color baseColor = baseMat.GetColor(propName);
+                        Color targetColor = targetMat.GetColor(propName);
+                        if (baseColor != targetColor)
+                        {
+                            baseTargetValueHolder.BaseColorValue = baseColor;
+                            baseTargetValueHolder.TargetColorValue = targetColor;
+                            differentProps.Add(baseTargetValueHolder);
+                        }
+
+                        break;
+                    case ShaderPropertyType.Float:
+                    case ShaderPropertyType.Range:
+                        float baseFloat = baseMat.GetFloat(propName);
+                        float targetFloat = targetMat.GetFloat(propName);
+                        if (Math.Abs(baseFloat - targetFloat) > tolerance)
+                        {
+                            baseTargetValueHolder.BaseFloatValue = baseFloat;
+                            baseTargetValueHolder.TargetFloatValue = targetFloat;
+                            differentProps.Add(baseTargetValueHolder);
+                        }
+
+                        break;
+                    case ShaderPropertyType.Int:
+                        int baseInt = baseMat.GetInteger(propName);
+                        int targetInt = targetMat.GetInteger(propName);
+                        if (baseInt != targetInt)
+                        {
+                            baseTargetValueHolder.BaseIntValue = baseInt;
+                            baseTargetValueHolder.TargetIntValue = targetInt;
+                            differentProps.Add(baseTargetValueHolder);
+                        }
+
+                        break;
+                    case ShaderPropertyType.Texture:
+                    case ShaderPropertyType.Vector:
+                    default:
+                        // not supported
+                        break;
+                }
+            }
+        }
         public static bool IsMatchShaderType(ShaderPropertyType s1, ShaderPropertyType s2)
         {
             if (s1 == s2) return true;
