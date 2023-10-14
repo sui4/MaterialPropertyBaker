@@ -23,6 +23,7 @@ namespace sui4.MaterialPropertyBaker
         private SerializedProperty _materialPropsListProp;
         private SerializedProperty _materialPropsProp;
         private readonly List<MaterialEditor> _materialEditor = new();
+        private readonly List<Material> _copiedMaterialList = new();
 
         private Vector2 _scrollPos;
 
@@ -70,6 +71,7 @@ namespace sui4.MaterialPropertyBaker
             for (int i = 0; i < _materialPropsListProp.arraySize; i++)
             {
                 _materialEditor.Add(null);
+                _copiedMaterialList.Add(null);
             }
         }
 
@@ -147,6 +149,7 @@ namespace sui4.MaterialPropertyBaker
             int index, IList<bool> editorFoldout, IList<bool> colorsFoldoutList, IList<bool> floatsFoldoutList,
             IList<bool> intsFoldoutList)
         {
+            MaterialProps materialProps = targetProfile.MaterialPropsList[index];
             SerializedProperty id = materialPropsProp.FindPropertyRelative("_id");
             SerializedProperty material = materialPropsProp.FindPropertyRelative("_material");
             SerializedProperty shader = materialPropsProp.FindPropertyRelative("_shader");
@@ -156,16 +159,16 @@ namespace sui4.MaterialPropertyBaker
 
             EditorGUILayout.PropertyField(id, new GUIContent("ID"));
             EditorGUILayout.PropertyField(material);
-            Material mat = material.objectReferenceValue as Material;
+            var mat = material.objectReferenceValue as Material;
             bool isMaterialNull = mat == null;
             using (new EditorGUI.DisabledScope(!isMaterialNull))
             {
                 EditorGUILayout.PropertyField(shader);
             }
 
-            _editorFoldoutList[index] = EditorGUILayout.Foldout(_editorFoldoutList[index], "Material Editor & Properties");
-            SessionState.SetBool(EditorFoldoutKeyAt(targetProfile.name, id.stringValue), _editorFoldoutList[index]);
-            if (_editorFoldoutList[index])
+            editorFoldout[index] = EditorGUILayout.Foldout(editorFoldout[index], "Material Editor & Properties");
+            SessionState.SetBool(EditorFoldoutKeyAt(targetProfile.name, id.stringValue), editorFoldout[index]);
+            if (editorFoldout[index])
             {
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -183,8 +186,13 @@ namespace sui4.MaterialPropertyBaker
                             _materialEditor[index] = (MaterialEditor)Editor.CreateEditor(mat);
                         }
 
+                        Material copiedMat = _copiedMaterialList[index];
+                        if (copiedMat == null)
+                        {
+                            _copiedMaterialList[index] = copiedMat = new Material(mat);
+                        }
                         MaterialProperty[] materialProperties =
-                            MaterialEditor.GetMaterialProperties(new Object[] { mat });
+                            MaterialEditor.GetMaterialProperties(new Object[] { copiedMat });
                         // _materialEditor[index].PropertiesGUI();
                         if (_materialEditor[index].customShaderGUI != null)
                         {
@@ -202,6 +210,11 @@ namespace sui4.MaterialPropertyBaker
                     using (new GUILayout.VerticalScope())
                     {
                         EditorGUILayout.LabelField("Baked Properties", EditorStyles.boldLabel);
+                        if (GUILayout.Button("Bake Modified Properties"))
+                        {
+                            MPBEditorUtils.GetDifferentProperties(mat, _copiedMaterialList[index], out List<BaseTargetValueHolder> differentProps);
+                            BakeToMatProps(materialProps, differentProps);
+                        }
                         var targetShader = shader.objectReferenceValue as Shader;
                         string key = string.IsNullOrWhiteSpace(id.stringValue) ? index.ToString() : id.stringValue;
                         // Colors
@@ -236,6 +249,30 @@ namespace sui4.MaterialPropertyBaker
                         //     EditorGUI.indentLevel--;
                         // }
                     }
+                }
+            }
+        }
+
+        private static void BakeToMatProps(MaterialProps matProps, List<BaseTargetValueHolder> diffProps)
+        {
+            foreach (BaseTargetValueHolder prop in diffProps)
+            {
+                switch (prop.PropType)
+                {
+                    case ShaderPropertyType.Color:
+                        matProps.SetColor(prop.PropName, prop.TargetColorValue);
+                        break;
+                    case ShaderPropertyType.Float:
+                    case ShaderPropertyType.Range:
+                        matProps.SetFloat(prop.PropName, prop.TargetFloatValue);
+                        break;
+                    case ShaderPropertyType.Int:
+                        matProps.SetInt(prop.PropName, prop.TargetIntValue);
+                        break;
+                    default:
+                        Debug.LogWarning(
+                            $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
+                        break;
                 }
             }
         }
