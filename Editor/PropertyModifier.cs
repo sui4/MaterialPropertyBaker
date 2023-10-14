@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -14,13 +15,17 @@ namespace sui4.MaterialPropertyBaker
         private MpbProfile _profile;
         private SerializedObject _serializedObject;
         private readonly List<bool> _propFoldoutList = new();
+        private readonly List<bool> _editorFoldoutList = new();
         private readonly List<bool> _colorsFoldoutList = new();
         private readonly List<bool> _floatsFoldoutList = new();
         private readonly List<bool> _intsFoldoutList = new();
-        
+
         private SerializedProperty _materialPropsListProp;
         private SerializedProperty _materialPropsProp;
-        
+        private readonly List<MaterialEditor> _materialEditor = new();
+
+        private Vector2 _scrollPos;
+
         [MenuItem("MaterialPropertyBaker/PropertyModifier")]
         private static void ShowWindow()
         {
@@ -30,22 +35,24 @@ namespace sui4.MaterialPropertyBaker
         }
 
         private static string PropFoldoutKeyAt(string targetName, string id) => $"{targetName}_propFoldout_{id}";
+        private static string EditorFoldoutKeyAt(string targetName, string id) => $"{targetName}_editorFoldout_{id}";
         private static string ColorsFoldoutKeyAt(string targetName, string id) => $"{targetName}_colorsFoldout_{id}";
         private static string FloatsFoldoutKeyAt(string targetName, string id) => $"{targetName}_floatsFoldout_{id}";
         private static string IntsFoldoutKeyAt(string targetName, string id) => $"{targetName}_intsFoldout_{id}";
 
         private void OnSwitchProfile()
         {
-            if(_profile == null) return;
+            if (_profile == null) return;
             _serializedObject = new SerializedObject(_profile);
             _materialPropsListProp = _serializedObject.FindProperty("_materialPropsList");
+
             UpdateFoldoutList(_profile);
         }
 
         private void UpdateFoldoutList(MpbProfile profile)
         {
-            if(profile == null) return;
-            
+            if (profile == null) return;
+
             for (int i = _propFoldoutList.Count; i < _materialPropsListProp.arraySize; i++)
             {
                 string id = string.IsNullOrWhiteSpace(profile.MaterialPropsList[i].ID)
@@ -53,26 +60,37 @@ namespace sui4.MaterialPropertyBaker
                     : profile.MaterialPropsList[i].ID;
                 string targetName = profile.name;
                 _propFoldoutList.Add(SessionState.GetBool(PropFoldoutKeyAt(targetName, id), true));
+                _editorFoldoutList.Add(SessionState.GetBool(EditorFoldoutKeyAt(targetName, id), true));
                 _colorsFoldoutList.Add(SessionState.GetBool(ColorsFoldoutKeyAt(targetName, id), true));
                 _floatsFoldoutList.Add(SessionState.GetBool(FloatsFoldoutKeyAt(targetName, id), true));
                 _intsFoldoutList.Add(SessionState.GetBool(IntsFoldoutKeyAt(targetName, id), true));
             }
+
+            _materialEditor.Clear();
+            for (int i = 0; i < _materialPropsListProp.arraySize; i++)
+            {
+                _materialEditor.Add(null);
+            }
         }
+
+        private void OnEnable()
+        {
+            OnSwitchProfile();
+        }
+
         private void OnGUI()
         {
             EditorGUILayout.HelpBox("MaterialのInspector GUIでプロパティの値を調整できます", MessageType.Info);
-            
+
             MpbProfile prevProfile = _profile;
             _profile = EditorGUILayout.ObjectField("TargetProfile", _profile, typeof(MpbProfile), false) as MpbProfile;
-            
-            if(_profile != prevProfile)
+
+            if (_profile != prevProfile)
             {
                 OnSwitchProfile();
             }
-            if(_profile == null)
-            {
-                return;
-            }
+
+            if (_profile == null) return;
 
             _serializedObject.Update();
             if (_materialPropsListProp.arraySize > _propFoldoutList.Count)
@@ -83,9 +101,9 @@ namespace sui4.MaterialPropertyBaker
             MPBEditorUtils.WarningGUI(_profile.Warnings);
             using (var change = new EditorGUI.ChangeCheckScope())
             {
-                using (new GUILayout.VerticalScope("box"))
+                using (var scrollScope = new EditorGUILayout.ScrollViewScope(_scrollPos))
                 {
-                    EditorGUILayout.LabelField("Per Property Settings", EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField("Per ID Settings", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
                     // per id settings
                     for (var i = 0; i < _materialPropsListProp.arraySize; i++)
@@ -107,12 +125,14 @@ namespace sui4.MaterialPropertyBaker
                         if (_propFoldoutList[i])
                         {
                             EditorGUI.indentLevel++;
-                            MaterialPropsGUI(_profile ,_materialPropsProp, i, _colorsFoldoutList, _floatsFoldoutList, _intsFoldoutList);
+                            MaterialPropsGUI(_profile, _materialPropsProp, i, _editorFoldoutList, _colorsFoldoutList,
+                                _floatsFoldoutList, _intsFoldoutList);
                             EditorGUI.indentLevel--;
                         }
                     }
 
                     EditorGUI.indentLevel--;
+                    _scrollPos = scrollScope.scrollPosition;
                 }
 
                 if (change.changed)
@@ -122,8 +142,10 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
+
         private void MaterialPropsGUI(MpbProfile targetProfile, SerializedProperty materialPropsProp,
-            int index, IList<bool> colorsFoldoutList, IList<bool> floatsFoldoutList, IList<bool> intsFoldoutList)
+            int index, IList<bool> editorFoldout, IList<bool> colorsFoldoutList, IList<bool> floatsFoldoutList,
+            IList<bool> intsFoldoutList)
         {
             SerializedProperty id = materialPropsProp.FindPropertyRelative("_id");
             SerializedProperty material = materialPropsProp.FindPropertyRelative("_material");
@@ -134,45 +156,92 @@ namespace sui4.MaterialPropertyBaker
 
             EditorGUILayout.PropertyField(id, new GUIContent("ID"));
             EditorGUILayout.PropertyField(material);
-            using (new EditorGUI.DisabledScope(material.objectReferenceValue != null))
+            Material mat = material.objectReferenceValue as Material;
+            bool isMaterialNull = mat == null;
+            using (new EditorGUI.DisabledScope(!isMaterialNull))
             {
                 EditorGUILayout.PropertyField(shader);
             }
 
-            var targetShader = shader.objectReferenceValue as Shader;
-            string key = string.IsNullOrWhiteSpace(id.stringValue) ? index.ToString() : id.stringValue;
-            // Colors
-            colorsFoldoutList[index] = EditorGUILayout.Foldout(colorsFoldoutList[index], "Colors");
-            SessionState.SetBool(ColorsFoldoutKeyAt(targetProfile.name, key), colorsFoldoutList[index]);
-            if (colorsFoldoutList[index])
+            _editorFoldoutList[index] = EditorGUILayout.Foldout(_editorFoldoutList[index], "Material Editor & Properties");
+            SessionState.SetBool(EditorFoldoutKeyAt(targetProfile.name, id.stringValue), _editorFoldoutList[index]);
+            if (_editorFoldoutList[index])
             {
-                EditorGUI.indentLevel++;
-                PropsGUI(colors, targetProfile.MaterialPropsList[index], ShaderPropertyType.Color, targetShader);
-                EditorGUI.indentLevel--;
-            }
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (!isMaterialNull)
+                    {
+                        if (_materialEditor[index] == null)
+                        {
+                            _materialEditor[index] = (MaterialEditor)Editor.CreateEditor(mat);
+                        }
+                        else if (_materialEditor[index].target != material.objectReferenceValue)
+                        {
+                            MaterialEditor tmp = _materialEditor[index];
+                            DestroyImmediate(tmp);
+                            _materialEditor[index] = null;
+                            _materialEditor[index] = (MaterialEditor)Editor.CreateEditor(mat);
+                        }
 
-            // Floats
-            floatsFoldoutList[index] = EditorGUILayout.Foldout(floatsFoldoutList[index], "Floats");
-            SessionState.SetBool(FloatsFoldoutKeyAt(targetProfile.name, key), floatsFoldoutList[index]);
-            if (floatsFoldoutList[index])
-            {
-                EditorGUI.indentLevel++;
-                PropsGUI(floats, targetProfile.MaterialPropsList[index], ShaderPropertyType.Float, targetShader);
-                EditorGUI.indentLevel--;
-            }
+                        MaterialProperty[] materialProperties =
+                            MaterialEditor.GetMaterialProperties(new Object[] { mat });
+                        // _materialEditor[index].PropertiesGUI();
+                        if (_materialEditor[index].customShaderGUI != null)
+                        {
+                            using (new GUILayout.VerticalScope("box"))
+                            {
+                                EditorGUILayout.LabelField("Material Editor", EditorStyles.boldLabel);
+                                EditorGUI.indentLevel++;
+                                _materialEditor[index].customShaderGUI
+                                    .OnGUI(_materialEditor[index], materialProperties);
+                                EditorGUI.indentLevel--;
+                            }
+                        }
+                    }
 
-            // // Ints
-            // intsFoldoutList[index] = EditorGUILayout.Foldout(intsFoldoutList[index], "Ints");
-            // SessionState.SetBool(IntsFoldoutKeyAt(key), intsFoldoutList[index]);
-            // if (intsFoldoutList[index])
-            // {
-            //     EditorGUI.indentLevel++;
-            //     PropsGUI(ints, Target.MaterialPropsList[index], ShaderPropertyType.Int);
-            //     EditorGUI.indentLevel--;
-            // }
+                    using (new GUILayout.VerticalScope())
+                    {
+                        EditorGUILayout.LabelField("Baked Properties", EditorStyles.boldLabel);
+                        var targetShader = shader.objectReferenceValue as Shader;
+                        string key = string.IsNullOrWhiteSpace(id.stringValue) ? index.ToString() : id.stringValue;
+                        // Colors
+                        colorsFoldoutList[index] = EditorGUILayout.Foldout(colorsFoldoutList[index], "Colors");
+                        SessionState.SetBool(ColorsFoldoutKeyAt(targetProfile.name, key), colorsFoldoutList[index]);
+                        if (colorsFoldoutList[index])
+                        {
+                            EditorGUI.indentLevel++;
+                            PropsGUI(colors, targetProfile.MaterialPropsList[index], ShaderPropertyType.Color,
+                                targetShader);
+                            EditorGUI.indentLevel--;
+                        }
+
+                        // Floats
+                        floatsFoldoutList[index] = EditorGUILayout.Foldout(floatsFoldoutList[index], "Floats");
+                        SessionState.SetBool(FloatsFoldoutKeyAt(targetProfile.name, key), floatsFoldoutList[index]);
+                        if (floatsFoldoutList[index])
+                        {
+                            EditorGUI.indentLevel++;
+                            PropsGUI(floats, targetProfile.MaterialPropsList[index], ShaderPropertyType.Float,
+                                targetShader);
+                            EditorGUI.indentLevel--;
+                        }
+
+                        // // Ints
+                        // intsFoldoutList[index] = EditorGUILayout.Foldout(intsFoldoutList[index], "Ints");
+                        // SessionState.SetBool(IntsFoldoutKeyAt(key), intsFoldoutList[index]);
+                        // if (intsFoldoutList[index])
+                        // {
+                        //     EditorGUI.indentLevel++;
+                        //     PropsGUI(ints, Target.MaterialPropsList[index], ShaderPropertyType.Int);
+                        //     EditorGUI.indentLevel--;
+                        // }
+                    }
+                }
+            }
         }
 
-        private static void PropsGUI(SerializedProperty propsList, MaterialProps matProps, ShaderPropertyType targetPropType,
+        private static void PropsGUI(SerializedProperty propsList, MaterialProps matProps,
+            ShaderPropertyType targetPropType,
             Shader targetShader)
         {
             if (propsList.arraySize == 0)
@@ -189,7 +258,8 @@ namespace sui4.MaterialPropertyBaker
                 // attribute がある場合は、attribute を適用する
                 int si = targetShader.FindPropertyIndex(property.stringValue);
                 string[] shaderAttributes = targetShader.GetPropertyAttributes(si);
-                MPBEditorUtils.ParseShaderAttribute(shaderAttributes, out List<string> attribs, out List<string> attribValues);
+                MPBEditorUtils.ParseShaderAttribute(shaderAttributes, out List<string> attribs,
+                    out List<string> attribValues);
                 // 最後の要素が適用されるため、逆順にする
                 attribs.Reverse();
                 attribValues.Reverse();
@@ -211,7 +281,8 @@ namespace sui4.MaterialPropertyBaker
                             var controlCreated = false;
                             for (var ai = 0; ai < attribs.Count(); ai++)
                             {
-                                if (attribs[ai] == "Toggle" || attribs[ai] == "MaterialToggle" || attribs[ai] == "ToggleUI")
+                                if (attribs[ai] == "Toggle" || attribs[ai] == "MaterialToggle" ||
+                                    attribs[ai] == "ToggleUI")
                                 {
                                     bool flag = valueProp.floatValue != 0;
                                     flag = EditorGUILayout.Toggle(new GUIContent(label), flag);
@@ -224,7 +295,7 @@ namespace sui4.MaterialPropertyBaker
                                     string tmp = Regex.Replace(attribValues[ai], @"\s", "");
                                     string[] enumValues = tmp.Split(',');
                                     if (enumValues.Length % 2 != 0) break; // 名前と値がペアになっていない→無効
-                                    
+
                                     int enumNum = enumValues.Length / 2;
                                     var enumNames = new string[enumNum];
                                     var enumInts = new int[enumNum];
@@ -242,13 +313,15 @@ namespace sui4.MaterialPropertyBaker
                                             errorOccured = true;
                                             break;
                                         }
-                                        if((int)valueProp.floatValue == enumInts[ei])
+
+                                        if ((int)valueProp.floatValue == enumInts[ei])
                                         {
                                             selected = ei;
                                         }
                                     }
+
                                     if (errorOccured) continue;
-                                    
+
                                     selected = EditorGUILayout.Popup(label, selected, enumNames);
                                     valueProp.floatValue = enumInts[selected];
                                     controlCreated = true;
@@ -310,6 +383,5 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
-
     }
 }
