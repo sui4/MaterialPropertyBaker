@@ -27,11 +27,11 @@ namespace sui4.MaterialPropertyBaker
 
         private Vector2 _scrollPos;
 
-        [MenuItem("MaterialPropertyBaker/PropertyModifier")]
+        [MenuItem("MaterialPropertyBaker/Edit with Material Inspector")]
         private static void ShowWindow()
         {
             var window = GetWindow<PropertyModifier>();
-            window.titleContent = new GUIContent("PropertyModifier");
+            window.titleContent = new GUIContent("Edit with Material Inspector");
             window.Show();
         }
 
