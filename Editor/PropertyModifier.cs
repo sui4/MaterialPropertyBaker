@@ -191,6 +191,7 @@ namespace sui4.MaterialPropertyBaker
                         {
                             _copiedMaterialList[index] = new Material(mat);
                             ApplyBakedPropsToMat(materialProps, _copiedMaterialList[index]);
+                            copiedMat = _copiedMaterialList[index];
                         }
                         MaterialProperty[] materialProperties =
                             MaterialEditor.GetMaterialProperties(new Object[] { copiedMat });
