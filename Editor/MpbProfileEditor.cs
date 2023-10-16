@@ -70,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
 
                 using (new GUILayout.VerticalScope("box"))
                 {
-                    EditorGUILayout.LabelField("Per Property Settings", EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField("Per ID Settings", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
                     // per id settings
                     for (var i = 0; i < _materialPropsListProp.arraySize; i++)
