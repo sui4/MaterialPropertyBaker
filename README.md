@@ -12,6 +12,12 @@ UnityのPackage Managerの`Add package from git URL...` に以下URLを入れる
 https://github.com/sui4/MaterialPropertyBaker.git
 ```
 
+`#`の後にブランチ名、タグ名を入れることで特定のタグ、ブランチを指定することが可能
+
+```
+https://github.com/sui4/MaterialPropertyBaker.git#{tag,branch}
+```
+
 ### ダウンロード後、ローカルで導入
 
 1. 任意のフォルダに git clone や ZIPとしてMaterialPropertyBakerをダウンロード
