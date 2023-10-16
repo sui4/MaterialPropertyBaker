@@ -24,7 +24,7 @@ https://github.com/sui4/MaterialPropertyBaker.git#{tag,branch}
 
 2. UnityのPackage Managerの`Add package from disk...` からダウンロードしたフォルダ直下にある`package.json`を選択することで導入可能
 
-Git Submoduleを使うことでバージョン管理が用意になります。
+Git Submoduleを使うことでバージョン管理が容易になります。
 
 ## 注意事項
 
