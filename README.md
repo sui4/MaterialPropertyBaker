@@ -12,13 +12,19 @@ UnityのPackage Managerの`Add package from git URL...` に以下URLを入れる
 https://github.com/sui4/MaterialPropertyBaker.git
 ```
 
+`#`の後にブランチ名、タグ名を入れることで特定のタグ、ブランチを指定することが可能
+
+```
+https://github.com/sui4/MaterialPropertyBaker.git#{tag,branch}
+```
+
 ### ダウンロード後、ローカルで導入
 
 1. 任意のフォルダに git clone や ZIPとしてMaterialPropertyBakerをダウンロード
 
 2. UnityのPackage Managerの`Add package from disk...` からダウンロードしたフォルダ直下にある`package.json`を選択することで導入可能
 
-Git Submoduleを使うことでバージョン管理が用意になります。
+Git Submoduleを使うことでバージョン管理が容易になります。
 
 ## 注意事項
 
@@ -42,7 +48,9 @@ Git Submoduleを使うことでバージョン管理が用意になります。
 ### Diff Baker
 
 切り替えたい値のセットが他のマテリアルとして保存されてる場合におすすめです。
+
 Profileに紐付けられてるマテリアルと対象のマテリアルを比較して値が異なるプロパティをProfileに保存します。
+
 ツールバー `MaterialPropertyBaker/Diff Property Baker`よりウィンドウを開けます。
 
 ![image-20231014205902161](README.assets/diff-baker.png)
@@ -50,8 +58,11 @@ Profileに紐付けられてるマテリアルと対象のマテリアルを比�
 ### Edit with Material Inspector
 
 対象のマテリアルのインスペクターを使って値を調整・Bakeすることができます。
+
 編集したいProfileをセットすると、IDごとに紐付けられてるマテリアルのインスペクターが表示されます。このインスペクターからプロパティを編集してください。
+
 `Bake Modified Properties`を押すと、元のマテリアルと値が違うプロパティがProfileにBakeされます。
+
 ※なお、元々ProfileにBakeされているプロパティがある場合、マテリアルのインスペクタには適用された状態で表示されます。
 
 ツールバー `MaterialPropertyBaker/Edit with Material Inspector`よりウィンドウを開けます。

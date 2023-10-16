@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Object = UnityEngine.Object;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -29,6 +28,12 @@ namespace sui4.MaterialPropertyBaker
     }
     public static class MPBEditorUtils
     {
+        [MenuItem("MaterialPropertyBaker/Manual")]
+        public static void OpenManual()
+        {
+            Application.OpenURL("https://github.com/sui4/MaterialPropertyBaker");
+        }
+        
         // 2つのマテリアルのプロパティを比較して、違うものをpropHoldersに格納する
         public static void GetDifferentProperties(Material baseMat, Material targetMat,
             out List<BaseTargetValueHolder> propHolders)
@@ -209,7 +214,7 @@ namespace sui4.MaterialPropertyBaker
             {
                 if (!AssetDatabase.IsMainAsset(scriptableObject))
                 {
-                    Object.DestroyImmediate(scriptableObject);
+                    UnityEngine.Object.DestroyImmediate(scriptableObject);
                 }
 
                 scriptableObject = null;
@@ -240,7 +245,7 @@ namespace sui4.MaterialPropertyBaker
                 Debug.LogError("Failed to export : target object is null.");
             }
 
-            exported = Object.Instantiate(scriptableObject);
+            exported = UnityEngine.Object.Instantiate(scriptableObject);
             EditorUtility.SetDirty(exported);
 
             if (File.Exists(path))
