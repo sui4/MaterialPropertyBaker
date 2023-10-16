@@ -29,10 +29,11 @@ namespace sui4.MaterialPropertyBaker
     }
     public static class MPBEditorUtils
     {
+        // 2つのマテリアルのプロパティを比較して、違うものをpropHoldersに格納する
         public static void GetDifferentProperties(Material baseMat, Material targetMat,
-            out List<BaseTargetValueHolder> differentProps)
+            out List<BaseTargetValueHolder> propHolders)
         {
-            differentProps = new List<BaseTargetValueHolder>();
+            propHolders = new List<BaseTargetValueHolder>();
             const float tolerance = 0.0001f;
             if (baseMat.shader != targetMat.shader)
             {
@@ -59,7 +60,7 @@ namespace sui4.MaterialPropertyBaker
                         {
                             baseTargetValueHolder.BaseColorValue = baseColor;
                             baseTargetValueHolder.TargetColorValue = targetColor;
-                            differentProps.Add(baseTargetValueHolder);
+                            propHolders.Add(baseTargetValueHolder);
                         }
 
                         break;
@@ -71,7 +72,7 @@ namespace sui4.MaterialPropertyBaker
                         {
                             baseTargetValueHolder.BaseFloatValue = baseFloat;
                             baseTargetValueHolder.TargetFloatValue = targetFloat;
-                            differentProps.Add(baseTargetValueHolder);
+                            propHolders.Add(baseTargetValueHolder);
                         }
 
                         break;
@@ -82,7 +83,7 @@ namespace sui4.MaterialPropertyBaker
                         {
                             baseTargetValueHolder.BaseIntValue = baseInt;
                             baseTargetValueHolder.TargetIntValue = targetInt;
-                            differentProps.Add(baseTargetValueHolder);
+                            propHolders.Add(baseTargetValueHolder);
                         }
 
                         break;
