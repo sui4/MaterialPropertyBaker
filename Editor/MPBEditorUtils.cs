@@ -29,10 +29,11 @@ namespace sui4.MaterialPropertyBaker
     }
     public static class MPBEditorUtils
     {
+        // 2つのマテリアルのプロパティを比較して、違うものをpropHoldersに格納する
         public static void GetDifferentProperties(Material baseMat, Material targetMat,
-            out List<BaseTargetValueHolder> differentProps)
+            out List<BaseTargetValueHolder> propHolders)
         {
-            differentProps = new List<BaseTargetValueHolder>();
+            propHolders = new List<BaseTargetValueHolder>();
             const float tolerance = 0.0001f;
             if (baseMat.shader != targetMat.shader)
             {
@@ -59,7 +60,7 @@ namespace sui4.MaterialPropertyBaker
                         {
                             baseTargetValueHolder.BaseColorValue = baseColor;
                             baseTargetValueHolder.TargetColorValue = targetColor;
-                            differentProps.Add(baseTargetValueHolder);
+                            propHolders.Add(baseTargetValueHolder);
                         }
 
                         break;
@@ -71,7 +72,7 @@ namespace sui4.MaterialPropertyBaker
                         {
                             baseTargetValueHolder.BaseFloatValue = baseFloat;
                             baseTargetValueHolder.TargetFloatValue = targetFloat;
-                            differentProps.Add(baseTargetValueHolder);
+                            propHolders.Add(baseTargetValueHolder);
                         }
 
                         break;
@@ -82,7 +83,7 @@ namespace sui4.MaterialPropertyBaker
                         {
                             baseTargetValueHolder.BaseIntValue = baseInt;
                             baseTargetValueHolder.TargetIntValue = targetInt;
-                            differentProps.Add(baseTargetValueHolder);
+                            propHolders.Add(baseTargetValueHolder);
                         }
 
                         break;
@@ -94,6 +95,58 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
+
+        // すでにMaterialPropsにあるプロパティの値をtargetMatから取得してpropHoldersに格納する
+        public static void GetLatestValueOfBakedProperties(MaterialProps matProps, Material targetMat, ref List<BaseTargetValueHolder> propHolders)
+        {
+            if (matProps.Shader != targetMat.shader)
+            {
+                Debug.LogWarning($"Baked properties and Material({targetMat.name}) have different shaders.");
+                return;
+            }
+
+            for (var pi = 0; pi < targetMat.shader.GetPropertyCount(); pi++)
+            {
+                string propName = targetMat.shader.GetPropertyName(pi);
+                ShaderPropertyType propType = targetMat.shader.GetPropertyType(pi);
+                
+                if (!matProps.HasProperty(propName, propType)) continue;
+
+                var baseTargetValueHolder = new BaseTargetValueHolder()
+                {
+                    PropName = propName,
+                    PropType = propType,
+                };
+                switch (propType)
+                {
+                    case ShaderPropertyType.Color:
+                        Color targetColor = targetMat.GetColor(propName);
+                        baseTargetValueHolder.TargetColorValue = targetColor;
+                        propHolders.Add(baseTargetValueHolder);
+
+                        break;
+                    case ShaderPropertyType.Float:
+                    case ShaderPropertyType.Range:
+                        float targetFloat = targetMat.GetFloat(propName);
+                        baseTargetValueHolder.TargetFloatValue = targetFloat;
+                        propHolders.Add(baseTargetValueHolder);
+
+                        break;
+                    case ShaderPropertyType.Int:
+                        int targetInt = targetMat.GetInteger(propName);
+                        baseTargetValueHolder.TargetIntValue = targetInt;
+                        propHolders.Add(baseTargetValueHolder);
+
+                        break;
+                    case ShaderPropertyType.Texture:
+                    case ShaderPropertyType.Vector:
+                    default:
+                        // not supported
+                        break;
+                }
+            }
+        }
+        
         
         // float と range はともにfloatのため一致した型として扱う
         public static bool IsMatchShaderType(ShaderPropertyType s1, ShaderPropertyType s2)

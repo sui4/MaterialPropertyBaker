@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
@@ -215,6 +214,7 @@ namespace sui4.MaterialPropertyBaker
                         if (GUILayout.Button("Bake Modified Properties"))
                         {
                             MPBEditorUtils.GetDifferentProperties(mat, _copiedMaterialList[index], out List<BaseTargetValueHolder> differentProps);
+                            MPBEditorUtils.GetLatestValueOfBakedProperties(materialProps, _copiedMaterialList[index], ref differentProps);
                             BakeToMatProps(materialProps, differentProps);
                             EditorUtility.SetDirty(_profile);
                             AssetDatabase.SaveAssetIfDirty(_profile);
