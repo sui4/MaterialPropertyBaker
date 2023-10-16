@@ -200,6 +200,9 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
 
+            EditorUtility.SetDirty(_baseProfile);
+            AssetDatabase.SaveAssetIfDirty(_baseProfile);
+
             if (EditorUtility.DisplayDialog(
                     "Bake Succeeded",
                     $"Properties baked to {_baseProfile.name}",
