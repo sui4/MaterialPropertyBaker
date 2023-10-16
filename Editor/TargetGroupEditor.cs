@@ -38,7 +38,7 @@ namespace sui4.MaterialPropertyBaker
 
         private void Validate()
         {
-            for (var i = _rendererFoldoutList.Count; i < _renderersProp.arraySize; i++)
+            for (int i = _rendererFoldoutList.Count; i < _renderersProp.arraySize; i++)
             {
                 _rendererFoldoutList.Add(SessionState.GetBool(RendererFoldoutKeyAt(i), true));
             }
@@ -84,8 +84,8 @@ namespace sui4.MaterialPropertyBaker
                 EditorGUI.indentLevel++;
                 for (int ri = 0; ri < _renderersProp.arraySize; ri++)
                 {
-                    var rendererProp = _renderersProp.GetArrayElementAtIndex(ri);
-                    var (rendererKeysProp, matStatusSDictWrapperValuesProp) =
+                    SerializedProperty rendererProp = _renderersProp.GetArrayElementAtIndex(ri);
+                    (SerializedProperty rendererKeysProp, SerializedProperty matStatusSDictWrapperValuesProp) =
                         SerializedDictionaryUtil.GetKeyValueListSerializedProperty(
                             _rendererMatTargetInfoWrapperSDictProp);
                     using (new EditorGUILayout.VerticalScope("box"))
@@ -115,19 +115,19 @@ namespace sui4.MaterialPropertyBaker
             EditorGUI.indentLevel++;
 
             if (Target.RendererMatTargetInfoWrapperDict.TryGetValue(currentRenderer,
-                    out var matTargetInfoSDictWrapper))
+                    out MaterialTargetInfoSDictWrapper matTargetInfoSDictWrapper))
             {
-                var index = Target.RendererMatTargetInfoWrapperSDict.Keys.IndexOf(currentRenderer);
-                var (_, materialStatusSDictWrapperProp) =
+                int index = Target.RendererMatTargetInfoWrapperSDict.Keys.IndexOf(currentRenderer);
+                (_, SerializedProperty materialStatusSDictWrapperProp) =
                     SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(index, rendererKeysProp,
                         matStatusSDictWrapperListProps);
-                var (matListProp, targetInfoListProp) = GetSerializedPropertyFrom(materialStatusSDictWrapperProp);
+                (SerializedProperty matListProp, SerializedProperty targetInfoListProp) = GetSerializedPropertyFrom(materialStatusSDictWrapperProp);
 
                 // foreachで回すと、要素の変更時にエラーが出るので、forで回す
                 // 今回ここでは要素数を変えないため、index out of rangeは起きない
                 for (int mi = 0; mi < matTargetInfoSDictWrapper.MatTargetInfoDict.Count; mi++)
                 {
-                    var (materialProp, targetInfoProp) =
+                    (SerializedProperty materialProp, SerializedProperty targetInfoProp) =
                         SerializedDictionaryUtil.GetKeyValueSerializedPropertyAt(mi, matListProp, targetInfoListProp);
 
                     MaterialGUI(materialProp, targetInfoProp);
@@ -174,7 +174,7 @@ namespace sui4.MaterialPropertyBaker
         {
             if (matTargetInfoSDictWrapperProp == null)
                 throw new NullReferenceException("matTargetInfoSDictWrapperProp is null");
-            var matTargetInfoSDictProp = matTargetInfoSDictWrapperProp.FindPropertyRelative("_matTargetInfoSDict");
+            SerializedProperty matTargetInfoSDictProp = matTargetInfoSDictWrapperProp.FindPropertyRelative("_matTargetInfoSDict");
             if (matTargetInfoSDictProp == null) throw new NullReferenceException("matTargetInfoSDictProp is null");
             return SerializedDictionaryUtil.GetKeyValueListSerializedProperty(matTargetInfoSDictProp);
         }

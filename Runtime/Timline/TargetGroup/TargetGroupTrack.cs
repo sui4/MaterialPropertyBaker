@@ -12,8 +12,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
     {
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject director, int inputCount)
         {
-            var mixer = ScriptPlayable<TargetGroupMixerBehaviour>.Create(graph, inputCount);
-            var timelineMixer = mixer.GetBehaviour();
+            ScriptPlayable<TargetGroupMixerBehaviour> mixer = ScriptPlayable<TargetGroupMixerBehaviour>.Create(graph, inputCount);
+            TargetGroupMixerBehaviour timelineMixer = mixer.GetBehaviour();
             var targetGroup = GetBindingComponent<TargetGroup>(this, director);
             if (targetGroup != null)
             {

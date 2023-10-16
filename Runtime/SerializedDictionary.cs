@@ -29,7 +29,7 @@ namespace sui4.MaterialPropertyBaker
             _keys.Clear();
             _values.Clear();
 
-            foreach (var keyPair in Dictionary)
+            foreach (KeyValuePair<TKey, TValue> keyPair in Dictionary)
             {
                 _keys.Add(keyPair.Key);
                 _values.Add(keyPair.Value);

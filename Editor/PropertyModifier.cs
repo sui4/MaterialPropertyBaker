@@ -273,6 +273,8 @@ namespace sui4.MaterialPropertyBaker
                     case ShaderPropertyType.Int:
                         matProps.SetInt(prop.PropName, prop.TargetIntValue);
                         break;
+                    case ShaderPropertyType.Vector:
+                    case ShaderPropertyType.Texture:
                     default:
                         Debug.LogWarning(
                             $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");

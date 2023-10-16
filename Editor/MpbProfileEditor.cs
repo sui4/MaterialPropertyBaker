@@ -70,7 +70,7 @@ namespace sui4.MaterialPropertyBaker
 
                 using (new GUILayout.VerticalScope("box"))
                 {
-                    EditorGUILayout.LabelField("Per Property Settings", EditorStyles.boldLabel);
+                    EditorGUILayout.LabelField("Per ID Settings", EditorStyles.boldLabel);
                     EditorGUI.indentLevel++;
                     // per id settings
                     for (var i = 0; i < _materialPropsListProp.arraySize; i++)
@@ -109,10 +109,10 @@ namespace sui4.MaterialPropertyBaker
 
         private void GlobalPropertyGUI(SerializedProperty globalPropsProp)
         {
-            var shader = globalPropsProp.FindPropertyRelative("_shader");
-            var colors = globalPropsProp.FindPropertyRelative("_colors");
-            var floats = globalPropsProp.FindPropertyRelative("_floats");
-            var ints = globalPropsProp.FindPropertyRelative("_ints");
+            SerializedProperty shader = globalPropsProp.FindPropertyRelative("_shader");
+            SerializedProperty colors = globalPropsProp.FindPropertyRelative("_colors");
+            SerializedProperty floats = globalPropsProp.FindPropertyRelative("_floats");
+            SerializedProperty ints = globalPropsProp.FindPropertyRelative("_ints");
 
             EditorGUILayout.LabelField("Global Properties", EditorStyles.boldLabel);
 

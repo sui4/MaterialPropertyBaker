@@ -52,11 +52,11 @@ namespace sui4.MaterialPropertyBaker
         private void RetrieveInitialProps()
         {
             DefaultMaterialPropsDict.Clear();
-            foreach (var ren in Renderers)
+            foreach (Renderer ren in Renderers)
             {
                 if (ren == null) continue;
-                var wrapper = RendererMatTargetInfoWrapperDict[ren];
-                foreach (var mat in wrapper.MatTargetInfoDict.Keys)
+                MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
+                foreach (Material mat in wrapper.MatTargetInfoDict.Keys)
                 {
                     var defaultProps = new MaterialProps(mat);
                     DefaultMaterialPropsDict.TryAdd(mat, defaultProps);
@@ -66,23 +66,23 @@ namespace sui4.MaterialPropertyBaker
 
         private void SyncMaterial()
         {
-            foreach (var ren in Renderers)
+            foreach (Renderer ren in Renderers)
             {
                 if (ren == null) continue;
                 RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
 
-                var matTargetInfoSDictWrapper = RendererMatTargetInfoWrapperDict[ren];
+                MaterialTargetInfoSDictWrapper matTargetInfoSDictWrapper = RendererMatTargetInfoWrapperDict[ren];
                 // 削除されたmaterialを取り除く
                 var matKeysToRemove = new List<Material>();
-                foreach (var mat in matTargetInfoSDictWrapper.MatTargetInfoDict.Keys)
+                foreach (Material mat in matTargetInfoSDictWrapper.MatTargetInfoDict.Keys)
                     if (!ren.sharedMaterials.Contains(mat))
                         matKeysToRemove.Add(mat);
 
-                foreach (var mat in matKeysToRemove)
+                foreach (Material mat in matKeysToRemove)
                     matTargetInfoSDictWrapper.MatTargetInfoDict.Remove(mat);
 
                 // 追加されたmaterialを追加する
-                foreach (var mat in ren.sharedMaterials)
+                foreach (Material mat in ren.sharedMaterials)
                 {
                     if (matTargetInfoSDictWrapper.MatTargetInfoDict.ContainsKey(mat)) continue;
                     var targetInfo = new TargetInfo
@@ -103,28 +103,28 @@ namespace sui4.MaterialPropertyBaker
             _target.GetComponentsInChildren(true, renderers);
             // mesh renderer, skinned mesh renderer以外を取り除く
             renderers = renderers.Where(ren =>
-                ren is MeshRenderer || ren is SkinnedMeshRenderer).ToList();
+                ren is MeshRenderer or SkinnedMeshRenderer).ToList();
             var renderersToRemove = new List<Renderer>();
-            foreach (var ren in Renderers)
+            foreach (Renderer ren in Renderers)
             {
                 if (renderers.Contains(ren)) continue;
                 renderersToRemove.Add(ren);
             }
 
-            foreach (var ren in renderersToRemove)
+            foreach (Renderer ren in renderersToRemove)
             {
                 Renderers.Remove(ren);
                 RendererMatTargetInfoWrapperDict.Remove(ren);
             }
 
             var renderersToAdd = new List<Renderer>();
-            foreach (var ren in renderers)
+            foreach (Renderer ren in renderers)
             {
                 if (Renderers.Contains(ren)) continue;
                 renderersToAdd.Add(ren);
             }
 
-            foreach (var ren in renderersToAdd)
+            foreach (Renderer ren in renderersToAdd)
             {
                 Renderers.Add(ren);
                 RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
@@ -140,26 +140,26 @@ namespace sui4.MaterialPropertyBaker
         {
             // merge global profile
             Dictionary<MpbProfile, Dictionary<string, MaterialProps>> mergedPropsDictDict = new();
-            foreach (var (profile, _) in profileWeightDict)
+            foreach ((MpbProfile profile, float _) in profileWeightDict)
             {
-                MergeGlobalProps(profile, out var mergedPropsDict);
+                MergeGlobalProps(profile, out Dictionary<string, MaterialProps> mergedPropsDict);
                 mergedPropsDictDict[profile] = mergedPropsDict;
             }
 
-            foreach (var ren in Renderers)
+            foreach (Renderer ren in Renderers)
             {
-                var wrapper = RendererMatTargetInfoWrapperDict[ren];
+                MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
-                    var mat = ren.sharedMaterials[mi];
-                    var targetInfo = wrapper.MatTargetInfoDict[mat];
-                    var defaultProps = DefaultMaterialPropsDict[mat];
+                    Material mat = ren.sharedMaterials[mi];
+                    TargetInfo targetInfo = wrapper.MatTargetInfoDict[mat];
+                    MaterialProps defaultProps = DefaultMaterialPropsDict[mat];
                     // ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
                     _mpb = new MaterialPropertyBlock();
                     Dictionary<int, float> usedPropertyWeightDict = new();
-                    foreach (var (profile, weight) in profileWeightDict)
+                    foreach ((MpbProfile profile, float weight) in profileWeightDict)
                     {
-                        if (mergedPropsDictDict[profile].TryGetValue(targetInfo.ID, out var props))
+                        if (mergedPropsDictDict[profile].TryGetValue(targetInfo.ID, out MaterialProps props))
                         {
                             SetPropertyBlock(props, weight, defaultProps, usedPropertyWeightDict, _mpb);
                         }
@@ -174,33 +174,33 @@ namespace sui4.MaterialPropertyBaker
         private static void SetPropertyBlock(MaterialProps targetProps, float weight, MaterialProps defaultProps,
             Dictionary<int, float> usedPropWeightDict, MaterialPropertyBlock mpb)
         {
-            foreach (var color in targetProps.Colors)
+            foreach (MaterialProp<Color> color in targetProps.Colors)
             {
-                var defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
+                MaterialProp<Color> defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
                 if (defaultProp == null) continue;
-                var current = defaultProp.Value;
+                Color current = defaultProp.Value;
                 if (usedPropWeightDict.TryAdd(defaultProp.ID, weight) == false)
                     current = mpb.GetColor(defaultProp.ID); //already set
 
-                var diff = color.Value - defaultProp.Value;
+                Color diff = color.Value - defaultProp.Value;
                 mpb.SetColor(defaultProp.ID, current + diff * weight);
             }
 
-            foreach (var f in targetProps.Floats)
+            foreach (MaterialProp<float> f in targetProps.Floats)
             {
-                var prop = defaultProps.Floats.Find(c => c.ID == f.ID);
+                MaterialProp<float> prop = defaultProps.Floats.Find(c => c.ID == f.ID);
                 if (prop == null) continue;
-                var current = prop.Value;
+                float current = prop.Value;
                 if (usedPropWeightDict.TryAdd(prop.ID, weight) == false)
                     current = mpb.GetFloat(prop.ID); // already set
 
-                var diff = f.Value - prop.Value;
+                float diff = f.Value - prop.Value;
                 mpb.SetFloat(prop.ID, current + diff * weight);
             }
 
-            foreach (var i in targetProps.Ints)
+            foreach (MaterialProp<int> i in targetProps.Ints)
             {
-                var prop = defaultProps.Ints.Find(c => c.ID == i.ID);
+                MaterialProp<int> prop = defaultProps.Ints.Find(c => c.ID == i.ID);
                 if (prop == null) continue;
                 if (usedPropWeightDict.TryGetValue(prop.ID, out var storedWeight) && weight > storedWeight)
                 {
@@ -219,9 +219,9 @@ namespace sui4.MaterialPropertyBaker
         private static void MergeGlobalProps(MpbProfile profile, out Dictionary<string, MaterialProps> mergedPropsDict)
         {
             mergedPropsDict = new Dictionary<string, MaterialProps>();
-            foreach (var (id, props) in profile.IdMaterialPropsDict)
+            foreach ((string id, MaterialProps props) in profile.IdMaterialPropsDict)
             {
-                var mergedProps = MergeMaterialProps(new MaterialProps[2] { profile.GlobalProps, props });
+                MaterialProps mergedProps = MergeMaterialProps(new MaterialProps[2] { profile.GlobalProps, props });
                 mergedPropsDict[id] = mergedProps;
             }
         }
@@ -236,24 +236,24 @@ namespace sui4.MaterialPropertyBaker
             Dictionary<int, MaterialProp<int>> idIntDict = new();
             for (int li = 0; li < layeredProps.Count; li++)
             {
-                var target = layeredProps[li];
-                foreach (var colorProp in target.Colors)
+                MaterialProps target = layeredProps[li];
+                foreach (MaterialProp<Color> colorProp in target.Colors)
                     idColorDict[colorProp.ID] = colorProp;
 
-                foreach (var floatProp in target.Floats)
+                foreach (MaterialProp<float> floatProp in target.Floats)
                     idFloatDict[floatProp.ID] = floatProp;
 
-                foreach (var intProp in target.Ints)
+                foreach (MaterialProp<int> intProp in target.Ints)
                     idIntDict[intProp.ID] = intProp;
             }
 
-            foreach (var (_, colorProp) in idColorDict)
+            foreach ((int _, MaterialProp<Color> colorProp) in idColorDict)
                 mergedProps.Colors.Add(colorProp);
 
-            foreach (var (_, floatProp) in idFloatDict)
+            foreach ((int _, MaterialProp<float> floatProp) in idFloatDict)
                 mergedProps.Floats.Add(floatProp);
 
-            foreach (var (_, intProp) in idIntDict)
+            foreach ((int _, MaterialProp<int> intProp) in idIntDict)
                 mergedProps.Ints.Add(intProp);
             return mergedProps;
         }
@@ -261,7 +261,7 @@ namespace sui4.MaterialPropertyBaker
         public void ResetPropertyBlock()
         {
             _mpb = new MaterialPropertyBlock();
-            foreach (var ren in Renderers)
+            foreach (Renderer ren in Renderers)
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                     ren.SetPropertyBlock(_mpb, mi);
         }
@@ -277,18 +277,18 @@ namespace sui4.MaterialPropertyBaker
         {
             var asset = ScriptableObject.CreateInstance<MpbProfile>();
             Dictionary<Shader, int> matNumDict = new();
-            foreach (var ren in Renderers)
+            foreach (Renderer ren in Renderers)
             {
-                var wrapper = RendererMatTargetInfoWrapperDict[ren];
+                MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
-                    var mat = ren.sharedMaterials[mi];
+                    Material mat = ren.sharedMaterials[mi];
                     if (matNumDict.ContainsKey(mat.shader))
                         matNumDict[mat.shader] += 1;
                     else
                         matNumDict[mat.shader] = 1;
 
-                    var targetInfo = wrapper.MatTargetInfoDict[mat];
+                    TargetInfo targetInfo = wrapper.MatTargetInfoDict[mat];
                     if (!asset.IdMaterialPropsDict.ContainsKey(targetInfo.ID))
                     {
                         var matProps = new MaterialProps(mat, false);
@@ -301,7 +301,7 @@ namespace sui4.MaterialPropertyBaker
 
             // 最も数が多いshaderをglobalに設定
             int maxNum = 0;
-            foreach (var (shader, num) in matNumDict)
+            foreach ((Shader shader, int num) in matNumDict)
             {
                 if (maxNum < num)
                 {

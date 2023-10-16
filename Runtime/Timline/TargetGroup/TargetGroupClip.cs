@@ -22,8 +22,8 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
-            var playable = ScriptPlayable<TargetGroupBehaviour>.Create(graph, _template);
-            var behaviour = playable.GetBehaviour();
+            ScriptPlayable<TargetGroupBehaviour> playable = ScriptPlayable<TargetGroupBehaviour>.Create(graph, _template);
+            TargetGroupBehaviour behaviour = playable.GetBehaviour();
             behaviour.Clip = this;
 
             return playable;

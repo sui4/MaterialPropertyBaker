@@ -79,14 +79,13 @@ namespace sui4.MaterialPropertyBaker.Timeline
 
         private void SaveAsButtonGUI()
         {
-            var tmp = GUI.backgroundColor;
+            Color cache = GUI.backgroundColor;
             GUI.backgroundColor = Color.green;
             if (GUILayout.Button("Clone"))
             {
-                var profileToSave = ScriptableObject.Instantiate(Target.MpbProfile);
+                MpbProfile profileToSave = ScriptableObject.Instantiate(Target.MpbProfile);
                 var defaultName = $"{profileToSave.name}";
-                MPBEditorUtils.CreateAsset(profileToSave, out var saved, typeof(MpbProfile), defaultName, "Save as New",
-                    "");
+                MPBEditorUtils.CreateAsset(profileToSave, out ScriptableObject saved, typeof(MpbProfile), defaultName, "Save as New", "");
                 if (saved)
                 {
                     Target.MpbProfile = saved as MpbProfile;
@@ -96,7 +95,7 @@ namespace sui4.MaterialPropertyBaker.Timeline
                 }
             }
 
-            GUI.backgroundColor = tmp;
+            GUI.backgroundColor = cache;
         }
     }
 }

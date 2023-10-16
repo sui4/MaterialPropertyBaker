@@ -16,22 +16,22 @@ namespace sui4.MaterialPropertyBaker
         // 既存のPropertyBlockに追加する, プロパティが重複している場合は上書きする
         public static void UpdatePropertyBlockFromProps(ref MaterialPropertyBlock mpb, in MaterialProps props)
         {
-            foreach (var c in props.Colors)
+            foreach (MaterialProp<Color> c in props.Colors)
                 mpb.SetColor(c.ID, c.Value);
-            foreach (var f in props.Floats)
+            foreach (MaterialProp<float> f in props.Floats)
                 mpb.SetFloat(f.ID, f.Value);
-            foreach (var i in props.Ints)
+            foreach (MaterialProp<int> i in props.Ints)
                 mpb.SetInteger(i.ID, i.Value);
         }
 
         public static void UpdatePropertyBlockFromDict(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropDict,
             Dictionary<int, float> fPropDict, Dictionary<int, int> iPropDict)
         {
-            foreach (var (shaderID, value) in cPropDict) mpb.SetColor(shaderID, value);
+            foreach ((int shaderID, Color value) in cPropDict) mpb.SetColor(shaderID, value);
 
-            foreach (var (shaderID, value) in fPropDict) mpb.SetFloat(shaderID, value);
+            foreach ((int shaderID, float value) in fPropDict) mpb.SetFloat(shaderID, value);
             
-            foreach (var (shaderID, value) in iPropDict) mpb.SetInteger(shaderID, value);
+            foreach ((int shaderID, int value) in iPropDict) mpb.SetInteger(shaderID, value);
         }
 
         public static string UnderscoresToSpaces(string input)
@@ -50,7 +50,7 @@ namespace sui4.MaterialPropertyBaker
         public static string MakeFileNameSafe(string fileName)
         {
             // ファイル名に使えない記号: \ / : * ? " < > |
-            var pattern = "[\\\\/:*?\"<>|]";
+            const string pattern = "[\\\\/:*?\"<>|]";
 
             // 正規表現を使って、指定した記号をハイフンに置き換える
             return Regex.Replace(fileName, pattern, "-");
@@ -59,8 +59,7 @@ namespace sui4.MaterialPropertyBaker
 #if UNITY_EDITOR
         public static void CreateAsset(ScriptableObject assetToSave, string defaultName, string title, string message)
         {
-            var path = EditorUtility.SaveFilePanelInProject(title, defaultName, "asset",
-                message);
+            string path = EditorUtility.SaveFilePanelInProject(title, defaultName, "asset", message);
             if (string.IsNullOrEmpty(path))
             {
                 Debug.LogError("Failed to Create Asset: Invalid Path");

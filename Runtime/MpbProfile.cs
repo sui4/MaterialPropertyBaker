@@ -26,7 +26,7 @@ namespace sui4.MaterialPropertyBaker
         {
             OnValidate();
             GlobalProps.UpdateShaderID();
-            foreach (var matProps in MaterialPropsList)
+            foreach (MaterialProps matProps in MaterialPropsList)
                 matProps.UpdateShaderID();
         }
 
@@ -34,7 +34,7 @@ namespace sui4.MaterialPropertyBaker
         {
             IdMaterialPropsDict.Clear();
             Warnings.Clear();
-            foreach (var matProps in MaterialPropsList)
+            foreach (MaterialProps matProps in MaterialPropsList)
             {
                 if (matProps.Material)
                 {

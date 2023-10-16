@@ -94,6 +94,8 @@ namespace sui4.MaterialPropertyBaker
                 }
             }
         }
+        
+        // float と range はともにfloatのため一致した型として扱う
         public static bool IsMatchShaderType(ShaderPropertyType s1, ShaderPropertyType s2)
         {
             if (s1 == s2) return true;
@@ -110,21 +112,22 @@ namespace sui4.MaterialPropertyBaker
                     return false;
             }
         }
+        
         public static void ParseShaderAttribute(IEnumerable<string> propAttributes, out List<string> attribs,
             out List<string> parameters)
         {
             attribs = new List<string>();
             parameters = new List<string>();
-            foreach (var attr in propAttributes)
+            foreach (string attr in propAttributes)
             {
                 if (attr.IndexOf("Space", StringComparison.Ordinal) == 0) continue;
                 if (attr.IndexOf("Header", StringComparison.Ordinal) == 0) continue;
 
-                var matches = Regex.Matches(attr, @".*(?=\()"); //括弧の前を抽出
+                MatchCollection matches = Regex.Matches(attr, @".*(?=\()"); //括弧の前を抽出
                 if (matches.Count != 0)
                 {
                     attribs.Add(matches[0].Value);
-                    var paramMatches = Regex.Matches(attr, @"(?<=\().*(?=\))"); //括弧内を抽出
+                    MatchCollection paramMatches = Regex.Matches(attr, @"(?<=\().*(?=\))"); //括弧内を抽出
                     parameters.Add(paramMatches.Count != 0 ? paramMatches[0].Value : null);
                 }
                 else
@@ -140,7 +143,7 @@ namespace sui4.MaterialPropertyBaker
             // helpBox
             if (warnings.Count > 0)
             {
-                foreach (var warning in warnings)
+                foreach (string warning in warnings)
                 {
                     EditorGUILayout.HelpBox(warning, MessageType.Warning);
                 }
@@ -163,7 +166,7 @@ namespace sui4.MaterialPropertyBaker
         public static void CreateAsset(in ScriptableObject assetToSave, out ScriptableObject saved, Type type,
             string defaultName, string title, string message)
         {
-            var path = EditorUtility.SaveFilePanelInProject(title, defaultName, "asset",
+            string path = EditorUtility.SaveFilePanelInProject(title, defaultName, "asset",
                 message);
             ExportScriptableObject(assetToSave, path, out saved, type);
         }
@@ -190,7 +193,7 @@ namespace sui4.MaterialPropertyBaker
             if (File.Exists(path))
             {
                 Debug.Log($"{type}: delete existing: {path}");
-                var success = AssetDatabase.DeleteAsset(path);
+                bool success = AssetDatabase.DeleteAsset(path);
                 if (!success)
                 {
                     Debug.LogError($"{type}: failed to delete existing: {path}");

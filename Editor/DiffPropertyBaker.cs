@@ -32,7 +32,7 @@ namespace sui4.MaterialPropertyBaker
         {
             EditorGUILayout.HelpBox("2つのマテリアルを比較し、異なる値を持つプロパティを保存します。", MessageType.Info);
             
-            var prevBase = _baseProfile;
+            MpbProfile prevBase = _baseProfile;
             using (new EditorGUILayout.VerticalScope())
             {
                 EditorGUILayout.LabelField("Base Profile", EditorStyles.boldLabel);
@@ -141,6 +141,8 @@ namespace sui4.MaterialPropertyBaker
                             EditorGUILayout.IntField(new GUIContent(prop.PropName), prop.BaseIntValue);
                             EditorGUILayout.IntField(new GUIContent(prop.PropName), prop.TargetIntValue);
                             break;
+                        case ShaderPropertyType.Vector:
+                        case ShaderPropertyType.Texture:
                         default:
                             Debug.LogWarning(
                                 $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
@@ -191,6 +193,8 @@ namespace sui4.MaterialPropertyBaker
                             case ShaderPropertyType.Int:
                                 targetMatProps.SetInt(prop.PropName, prop.TargetIntValue);
                                 break;
+                            case ShaderPropertyType.Vector:
+                            case ShaderPropertyType.Texture:
                             default:
                                 Debug.LogWarning(
                                     $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
