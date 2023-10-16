@@ -43,6 +43,18 @@ Git Submoduleを使うことでバージョン管理が用意になります。
 
 切り替えたい値のセットが他のマテリアルとして保存されてる場合におすすめです。
 Profileに紐付けられてるマテリアルと対象のマテリアルを比較して値が異なるプロパティをProfileに保存します。
-ツールバー `MaterialPropertyBaker/DiffBaker`よりウィンドウを開きます。
+ツールバー `MaterialPropertyBaker/Diff Property Baker`よりウィンドウを開けます。
 
 ![image-20231014205902161](README.assets/diff-baker.png)
+
+### Edit with Material Inspector
+
+対象のマテリアルのインスペクターを使って値を調整・Bakeすることができます。
+編集したいProfileをセットすると、IDごとに紐付けられてるマテリアルのインスペクターが表示されます。このインスペクターからプロパティを編集してください。
+`Bake Modified Properties`を押すと、元のマテリアルと値が違うプロパティがProfileにBakeされます。
+※なお、元々ProfileにBakeされているプロパティがある場合、マテリアルのインスペクタには適用された状態で表示されます。
+
+ツールバー `MaterialPropertyBaker/Edit with Material Inspector`よりウィンドウを開けます。
+
+![image-20231016180634786](README.assets/edit-property-with-material-inspector)
+
