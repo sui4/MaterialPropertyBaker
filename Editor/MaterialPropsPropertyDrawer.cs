@@ -55,12 +55,12 @@ namespace sui4.MaterialPropertyBaker
 
         private void PropsGUI(SerializedProperty propsList, bool isColor = false)
         {
-            for (int i = 0; i < propsList.arraySize; i++)
+            for (var i = 0; i < propsList.arraySize; i++)
             {
                 SerializedProperty prop = propsList.GetArrayElementAtIndex(i);
                 _property = prop.FindPropertyRelative("_name");
                 _value = prop.FindPropertyRelative("_value");
-                var label = Utils.UnderscoresToSpaces(_property.stringValue);
+                string label = Utils.UnderscoresToSpaces(_property.stringValue);
                 label = label.Length == 0 ? " " : label;
                 if (isColor)
                 {

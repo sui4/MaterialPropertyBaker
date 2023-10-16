@@ -22,7 +22,7 @@ namespace sui4.MaterialPropertyBaker
 
         public static List<Material> GetMaterialsByShaderName(in string shaderName, in string[] guids)
         {
-            List<Material> materialsWithShader = new List<Material>();
+            List<Material> materialsWithShader = new();
 
             bool filter = !string.IsNullOrEmpty(shaderName);
             foreach (string guid in guids)
