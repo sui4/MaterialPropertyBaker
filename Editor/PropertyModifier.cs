@@ -216,6 +216,8 @@ namespace sui4.MaterialPropertyBaker
                         {
                             MPBEditorUtils.GetDifferentProperties(mat, _copiedMaterialList[index], out List<BaseTargetValueHolder> differentProps);
                             BakeToMatProps(materialProps, differentProps);
+                            EditorUtility.SetDirty(_profile);
+                            AssetDatabase.SaveAssetIfDirty(_profile);
                         }
                         var targetShader = shader.objectReferenceValue as Shader;
                         string key = string.IsNullOrWhiteSpace(id.stringValue) ? index.ToString() : id.stringValue;
