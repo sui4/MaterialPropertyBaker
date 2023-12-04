@@ -84,6 +84,11 @@ namespace sui4.MaterialPropertyBaker
                 // 追加されたmaterialを追加する
                 foreach (Material mat in ren.sharedMaterials)
                 {
+                    if (mat == null)
+                    {
+                        Debug.LogWarning($"MPB TargetGroup: {ren.name} has null material.", ren);
+                        continue;
+                    }
                     if (matTargetInfoSDictWrapper.MatTargetInfoDict.ContainsKey(mat)) continue;
                     var targetInfo = new TargetInfo
                     {
@@ -283,6 +288,11 @@ namespace sui4.MaterialPropertyBaker
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     Material mat = ren.sharedMaterials[mi];
+                    if (mat == null)
+                    {
+                        Debug.LogWarning($"MPB TargetGroup: {ren.name} has null material.", ren);
+                        continue;
+                    }
                     if (matNumDict.ContainsKey(mat.shader))
                         matNumDict[mat.shader] += 1;
                     else
