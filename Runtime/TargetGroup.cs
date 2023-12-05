@@ -75,11 +75,17 @@ namespace sui4.MaterialPropertyBaker
                 // 削除されたmaterialを取り除く
                 var matKeysToRemove = new List<Material>();
                 foreach (Material mat in matTargetInfoSDictWrapper.MatTargetInfoDict.Keys)
+                {
                     if (!ren.sharedMaterials.Contains(mat))
+                    {
                         matKeysToRemove.Add(mat);
+                    }
+                }
 
                 foreach (Material mat in matKeysToRemove)
+                {
                     matTargetInfoSDictWrapper.MatTargetInfoDict.Remove(mat);
+                }
 
                 // 追加されたmaterialを追加する
                 foreach (Material mat in ren.sharedMaterials)
