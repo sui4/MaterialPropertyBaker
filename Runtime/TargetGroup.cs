@@ -296,7 +296,7 @@ namespace sui4.MaterialPropertyBaker
             _mpb = new MaterialPropertyBlock();
             foreach (Renderer ren in Renderers)
             {
-                if(ren == null) continue;
+                if(ren == null || !ren.enabled) continue;
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     if (ren.sharedMaterials[mi] != null)
