@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -58,6 +59,7 @@ namespace sui4.MaterialPropertyBaker
                 MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 foreach (Material mat in wrapper.MatTargetInfoDict.Keys)
                 {
+                    Assert.IsNotNull(mat);
                     var defaultProps = new MaterialProps(mat);
                     DefaultMaterialPropsDict.TryAdd(mat, defaultProps);
                 }
@@ -75,11 +77,17 @@ namespace sui4.MaterialPropertyBaker
                 // 削除されたmaterialを取り除く
                 var matKeysToRemove = new List<Material>();
                 foreach (Material mat in matTargetInfoSDictWrapper.MatTargetInfoDict.Keys)
+                {
                     if (!ren.sharedMaterials.Contains(mat))
+                    {
                         matKeysToRemove.Add(mat);
+                    }
+                }
 
                 foreach (Material mat in matKeysToRemove)
+                {
                     matTargetInfoSDictWrapper.MatTargetInfoDict.Remove(mat);
+                }
 
                 // 追加されたmaterialを追加する
                 foreach (Material mat in ren.sharedMaterials)
@@ -112,8 +120,10 @@ namespace sui4.MaterialPropertyBaker
             var renderersToRemove = new List<Renderer>();
             foreach (Renderer ren in Renderers)
             {
-                if (renderers.Contains(ren)) continue;
-                renderersToRemove.Add(ren);
+                if (!renderers.Contains(ren))
+                {
+                    renderersToRemove.Add(ren);
+                }
             }
 
             foreach (Renderer ren in renderersToRemove)
@@ -122,17 +132,13 @@ namespace sui4.MaterialPropertyBaker
                 RendererMatTargetInfoWrapperDict.Remove(ren);
             }
 
-            var renderersToAdd = new List<Renderer>();
             foreach (Renderer ren in renderers)
             {
-                if (Renderers.Contains(ren)) continue;
-                renderersToAdd.Add(ren);
-            }
-
-            foreach (Renderer ren in renderersToAdd)
-            {
-                Renderers.Add(ren);
-                RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
+                if (!Renderers.Contains(ren))
+                {
+                    Renderers.Add(ren);
+                    RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
+                }
             }
         }
 
@@ -153,20 +159,23 @@ namespace sui4.MaterialPropertyBaker
 
             foreach (Renderer ren in Renderers)
             {
+                if(ren == null) continue;
                 MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     Material mat = ren.sharedMaterials[mi];
+                    if (mat == null) continue;
                     TargetInfo targetInfo = wrapper.MatTargetInfoDict[mat];
                     MaterialProps defaultProps = DefaultMaterialPropsDict[mat];
-                    // ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
                     _mpb = new MaterialPropertyBlock();
-                    Dictionary<int, float> usedPropertyWeightDict = new();
+                    // profileごとに扱うpropertyは異なるため、どのプロパティがどのweightで使われたかを保存する
+                    Dictionary<int, float> usedPropertyWeightDict = new(); 
                     foreach ((MpbProfile profile, float weight) in profileWeightDict)
                     {
+                        // 同じtargetに対するpropertyの値をマージする
                         if (mergedPropsDictDict[profile].TryGetValue(targetInfo.ID, out MaterialProps props))
                         {
-                            SetPropertyBlock(props, weight, defaultProps, usedPropertyWeightDict, _mpb);
+                            AccumulatePropertyAndUpdatePropertyBlock(props, weight, defaultProps, usedPropertyWeightDict, _mpb);
                         }
                     }
 
@@ -175,42 +184,44 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        // materialから取得したdefault propertyに存在しないpropertyは無視する
-        private static void SetPropertyBlock(MaterialProps targetProps, float weight, MaterialProps defaultProps,
+        // targetPropsの値にweightをかけあわせた値を既存の値に足し合わせ、それを新たな値としてmpbにセットする
+        // ※materialから取得したdefault propertyに存在しないpropertyは無視する
+        private static void AccumulatePropertyAndUpdatePropertyBlock(MaterialProps propsToAdd, float weight, MaterialProps defaultProps,
             Dictionary<int, float> usedPropWeightDict, MaterialPropertyBlock mpb)
         {
-            foreach (MaterialProp<Color> color in targetProps.Colors)
+            foreach (MaterialProp<Color> color in propsToAdd.Colors)
             {
                 MaterialProp<Color> defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
                 if (defaultProp == null) continue;
-                Color current = defaultProp.Value;
-                if (usedPropWeightDict.TryAdd(defaultProp.ID, weight) == false)
-                    current = mpb.GetColor(defaultProp.ID); //already set
-
+                // 一度目の場合はdefaultの値を、2回目以降は重み付き和がmpbにセットされてるのでそれを使う
+                Color current = usedPropWeightDict.TryAdd(defaultProp.ID, weight) ? defaultProp.Value : mpb.GetColor(defaultProp.ID);
                 Color diff = color.Value - defaultProp.Value;
                 mpb.SetColor(defaultProp.ID, current + diff * weight);
             }
 
-            foreach (MaterialProp<float> f in targetProps.Floats)
+            foreach (MaterialProp<float> f in propsToAdd.Floats)
             {
                 MaterialProp<float> prop = defaultProps.Floats.Find(c => c.ID == f.ID);
                 if (prop == null) continue;
-                float current = prop.Value;
-                if (usedPropWeightDict.TryAdd(prop.ID, weight) == false)
-                    current = mpb.GetFloat(prop.ID); // already set
-
+                // colorと同様
+                float current = usedPropWeightDict.TryAdd(prop.ID, weight) ? prop.Value : mpb.GetFloat(prop.ID);
                 float diff = f.Value - prop.Value;
                 mpb.SetFloat(prop.ID, current + diff * weight);
             }
 
-            foreach (MaterialProp<int> i in targetProps.Ints)
+            foreach (MaterialProp<int> i in propsToAdd.Ints)
             {
                 MaterialProp<int> prop = defaultProps.Ints.Find(c => c.ID == i.ID);
                 if (prop == null) continue;
-                if (usedPropWeightDict.TryGetValue(prop.ID, out var storedWeight) && weight > storedWeight)
+                // int型は重み付き和が求められないため、weightが大きい方を優先する
+                // NOTE: 重み付き和をもとめたあとに近い値に丸めるという方法もありそう。ただ、どのタイミングで丸めるかが問題になりそう
+                if (usedPropWeightDict.TryGetValue(prop.ID, out float storedWeight))
                 {
-                    mpb.SetInt(prop.ID, i.Value);
-                    usedPropWeightDict[prop.ID] = weight;
+                    if (weight > storedWeight)
+                    {
+                        mpb.SetInt(prop.ID, i.Value);
+                        usedPropWeightDict[prop.ID] = weight; 
+                    }
                 }
                 else
                 {
@@ -220,7 +231,7 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        // 個別に設定された値を優先する
+        // globalと個別の両方で同じPropertyの値が設定されていた場合、個別に設定された値を優先する
         private static void MergeGlobalProps(MpbProfile profile, out Dictionary<string, MaterialProps> mergedPropsDict)
         {
             mergedPropsDict = new Dictionary<string, MaterialProps>();
@@ -232,6 +243,7 @@ namespace sui4.MaterialPropertyBaker
         }
 
 
+        // mergeするのはpropertyの項目のみ。各propertyの値はmergeしない
         // layerが上(indexが大きい)のを優先する
         private static MaterialProps MergeMaterialProps(in IReadOnlyList<MaterialProps> layeredProps)
         {
@@ -267,8 +279,16 @@ namespace sui4.MaterialPropertyBaker
         {
             _mpb = new MaterialPropertyBlock();
             foreach (Renderer ren in Renderers)
+            {
+                if(ren == null) continue;
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
-                    ren.SetPropertyBlock(_mpb, mi);
+                {
+                    if (ren.sharedMaterials[mi] != null)
+                    {
+                        ren.SetPropertyBlock(_mpb, mi);
+                    }
+                } 
+            }
         }
 
         public void ResetToDefault()
@@ -284,6 +304,7 @@ namespace sui4.MaterialPropertyBaker
             Dictionary<Shader, int> matNumDict = new();
             foreach (Renderer ren in Renderers)
             {
+                if(ren == null) continue;
                 MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
