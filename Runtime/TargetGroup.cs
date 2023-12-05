@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -31,6 +32,19 @@ namespace sui4.MaterialPropertyBaker
 
         public Dictionary<Material, MaterialProps> DefaultMaterialPropsDict { get; } = new();
 
+        public static bool _verboseMode = false; // output debug log if true
+        
+#if UNITY_EDITOR
+        private const string MenuPath = "MaterialPropertyBaker/MPB TargetGroup/Output Verbose Log"; 
+        [MenuItem(MenuPath)]
+        private static void ToggleVerboseMode()
+        {
+            _verboseMode = Menu.GetChecked(MenuPath);
+            _verboseMode = !_verboseMode;
+            Menu.SetChecked(MenuPath, _verboseMode);
+        }
+#endif
+        
         private void OnEnable()
         {
             OnValidate();
@@ -94,7 +108,8 @@ namespace sui4.MaterialPropertyBaker
                 {
                     if (mat == null)
                     {
-                        Debug.LogWarning($"MPB TargetGroup: {ren.name} has null material.", ren);
+                        if(_verboseMode)
+                            Debug.LogWarning($"MPB TargetGroup: {ren.name} has null material.", ren);
                         continue;
                     }
                     if (matTargetInfoSDictWrapper.MatTargetInfoDict.ContainsKey(mat)) continue;
