@@ -164,14 +164,15 @@ namespace sui4.MaterialPropertyBaker
                     if (mat == null) continue;
                     TargetInfo targetInfo = wrapper.MatTargetInfoDict[mat];
                     MaterialProps defaultProps = DefaultMaterialPropsDict[mat];
-                    // ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
                     _mpb = new MaterialPropertyBlock();
-                    Dictionary<int, float> usedPropertyWeightDict = new();
+                    // profileごとに扱うpropertyは異なるため、どのプロパティがどのweightで使われたかを保存する
+                    Dictionary<int, float> usedPropertyWeightDict = new(); 
                     foreach ((MpbProfile profile, float weight) in profileWeightDict)
                     {
+                        // 同じtargetに対するpropertyの値をマージする
                         if (mergedPropsDictDict[profile].TryGetValue(targetInfo.ID, out MaterialProps props))
                         {
-                            SetPropertyBlock(props, weight, defaultProps, usedPropertyWeightDict, _mpb);
+                            AccumulatePropertyAndUpdatePropertyBlock(props, weight, defaultProps, usedPropertyWeightDict, _mpb);
                         }
                     }
 
@@ -180,35 +181,32 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        // materialから取得したdefault propertyに存在しないpropertyは無視する
-        private static void SetPropertyBlock(MaterialProps targetProps, float weight, MaterialProps defaultProps,
+        // targetPropsの値にweightをかけあわせた値を既存の値に足し合わせ、それを新たな値としてmpbにセットする
+        // ※materialから取得したdefault propertyに存在しないpropertyは無視する
+        private static void AccumulatePropertyAndUpdatePropertyBlock(MaterialProps propsToAdd, float weight, MaterialProps defaultProps,
             Dictionary<int, float> usedPropWeightDict, MaterialPropertyBlock mpb)
         {
-            foreach (MaterialProp<Color> color in targetProps.Colors)
+            foreach (MaterialProp<Color> color in propsToAdd.Colors)
             {
                 MaterialProp<Color> defaultProp = defaultProps.Colors.Find(c => c.ID == color.ID);
                 if (defaultProp == null) continue;
-                Color current = defaultProp.Value;
-                if (usedPropWeightDict.TryAdd(defaultProp.ID, weight) == false)
-                    current = mpb.GetColor(defaultProp.ID); //already set
-
+                // 一度目の場合はdefaultの値を、2回目以降は重み付き和がmpbにセットされてるのでそれを使う
+                Color current = usedPropWeightDict.TryAdd(defaultProp.ID, weight) ? defaultProp.Value : mpb.GetColor(defaultProp.ID);
                 Color diff = color.Value - defaultProp.Value;
                 mpb.SetColor(defaultProp.ID, current + diff * weight);
             }
 
-            foreach (MaterialProp<float> f in targetProps.Floats)
+            foreach (MaterialProp<float> f in propsToAdd.Floats)
             {
                 MaterialProp<float> prop = defaultProps.Floats.Find(c => c.ID == f.ID);
                 if (prop == null) continue;
-                float current = prop.Value;
-                if (usedPropWeightDict.TryAdd(prop.ID, weight) == false)
-                    current = mpb.GetFloat(prop.ID); // already set
-
+                // colorと同様
+                float current = usedPropWeightDict.TryAdd(prop.ID, weight) ? prop.Value : mpb.GetFloat(prop.ID);
                 float diff = f.Value - prop.Value;
                 mpb.SetFloat(prop.ID, current + diff * weight);
             }
 
-            foreach (MaterialProp<int> i in targetProps.Ints)
+            foreach (MaterialProp<int> i in propsToAdd.Ints)
             {
                 MaterialProp<int> prop = defaultProps.Ints.Find(c => c.ID == i.ID);
                 if (prop == null) continue;
