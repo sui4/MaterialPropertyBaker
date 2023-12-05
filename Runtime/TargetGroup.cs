@@ -172,9 +172,10 @@ namespace sui4.MaterialPropertyBaker
                 mergedPropsDictDict[profile] = mergedPropsDict;
             }
 
+            // TODO: ここはもっと計算量を減らせるはず
             foreach (Renderer ren in Renderers)
             {
-                if(ren == null) continue;
+                if(ren == null || !ren.enabled) continue;
                 MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
