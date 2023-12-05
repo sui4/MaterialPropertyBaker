@@ -210,10 +210,15 @@ namespace sui4.MaterialPropertyBaker
             {
                 MaterialProp<int> prop = defaultProps.Ints.Find(c => c.ID == i.ID);
                 if (prop == null) continue;
-                if (usedPropWeightDict.TryGetValue(prop.ID, out var storedWeight) && weight > storedWeight)
+                // int型は重み付き和が求められないため、weightが大きい方を優先する
+                // NOTE: 重み付き和をもとめたあとに近い値に丸めるという方法もありそう。ただ、どのタイミングで丸めるかが問題になりそう
+                if (usedPropWeightDict.TryGetValue(prop.ID, out float storedWeight))
                 {
-                    mpb.SetInt(prop.ID, i.Value);
-                    usedPropWeightDict[prop.ID] = weight;
+                    if (weight > storedWeight)
+                    {
+                        mpb.SetInt(prop.ID, i.Value);
+                        usedPropWeightDict[prop.ID] = weight; 
+                    }
                 }
                 else
                 {
