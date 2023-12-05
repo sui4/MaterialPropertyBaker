@@ -12,6 +12,6 @@
   "name": "jp.sui4.materialpropertybaker",
   "repository": "github:sui4/MaterialPropertyBaker",
   "unity": "2021.3",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "type": "tool"
 }
