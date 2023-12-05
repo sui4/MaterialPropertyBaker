@@ -157,6 +157,7 @@ namespace sui4.MaterialPropertyBaker
 
             foreach (Renderer ren in Renderers)
             {
+                if(ren == null) continue;
                 MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
@@ -275,13 +276,16 @@ namespace sui4.MaterialPropertyBaker
         {
             _mpb = new MaterialPropertyBlock();
             foreach (Renderer ren in Renderers)
+            {
+                if(ren == null) continue;
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     if (ren.sharedMaterials[mi] != null)
                     {
                         ren.SetPropertyBlock(_mpb, mi);
                     }
-                }
+                } 
+            }
         }
 
         public void ResetToDefault()
@@ -297,6 +301,7 @@ namespace sui4.MaterialPropertyBaker
             Dictionary<Shader, int> matNumDict = new();
             foreach (Renderer ren in Renderers)
             {
+                if(ren == null) continue;
                 MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
