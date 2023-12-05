@@ -118,8 +118,10 @@ namespace sui4.MaterialPropertyBaker
             var renderersToRemove = new List<Renderer>();
             foreach (Renderer ren in Renderers)
             {
-                if (renderers.Contains(ren)) continue;
-                renderersToRemove.Add(ren);
+                if (!renderers.Contains(ren))
+                {
+                    renderersToRemove.Add(ren);
+                }
             }
 
             foreach (Renderer ren in renderersToRemove)
@@ -128,17 +130,13 @@ namespace sui4.MaterialPropertyBaker
                 RendererMatTargetInfoWrapperDict.Remove(ren);
             }
 
-            var renderersToAdd = new List<Renderer>();
             foreach (Renderer ren in renderers)
             {
-                if (Renderers.Contains(ren)) continue;
-                renderersToAdd.Add(ren);
-            }
-
-            foreach (Renderer ren in renderersToAdd)
-            {
-                Renderers.Add(ren);
-                RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
+                if (!Renderers.Contains(ren))
+                {
+                    Renderers.Add(ren);
+                    RendererMatTargetInfoWrapperDict.TryAdd(ren, new MaterialTargetInfoSDictWrapper());
+                }
             }
         }
 
