@@ -22,9 +22,12 @@ namespace sui4.MaterialPropertyBaker
 
         public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f, List<MaterialProp<int>> i)
         {
-            Colors.AddRange(c);
-            Floats.AddRange(f);
-            Ints.AddRange(i);
+            CopyProperties(c, out List<MaterialProp<Color>> deepCopiedColors);
+            CopyProperties(f, out List<MaterialProp<float>> deepCopiedFloats);
+            CopyProperties(i, out List<MaterialProp<int>> deepCopiedInts);
+            _colors = deepCopiedColors;
+            _floats = deepCopiedFloats;
+            _ints = deepCopiedInts;
             UpdateShaderID();
         }
 
@@ -83,23 +86,11 @@ namespace sui4.MaterialPropertyBaker
             set => _material = value;
         }
 
-        public List<MaterialProp<Color>> Colors
-        {
-            get => _colors;
-            set => _colors = value;
-        }
+        public List<MaterialProp<Color>> Colors => _colors;
 
-        public List<MaterialProp<float>> Floats
-        {
-            get => _floats;
-            set => _floats = value;
-        }
-        
-        public List<MaterialProp<int>> Ints
-        {
-            get => _ints;
-            set => _ints = value;
-        }
+        public List<MaterialProp<float>> Floats => _floats;
+
+        public List<MaterialProp<int>> Ints => _ints;
 
         public bool IsEmpty()
         {
@@ -201,7 +192,6 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-
         public bool HasProperty(string propName, ShaderPropertyType spType)
         {
             if (IsSupportedType(spType))
@@ -253,9 +243,9 @@ namespace sui4.MaterialPropertyBaker
                 out List<MaterialProp<Color>> outC,
                 out List<MaterialProp<float>> outF,
                 out List<MaterialProp<int>> outI);
-            Colors = outC;
-            Floats = outF;
-            Ints = outI;
+            _colors = outC;
+            _floats = outF;
+            _ints = outI;
         }
     }
 
