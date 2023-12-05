@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace sui4.MaterialPropertyBaker
 {
@@ -58,6 +59,7 @@ namespace sui4.MaterialPropertyBaker
                 MaterialTargetInfoSDictWrapper wrapper = RendererMatTargetInfoWrapperDict[ren];
                 foreach (Material mat in wrapper.MatTargetInfoDict.Keys)
                 {
+                    Assert.IsNotNull(mat);
                     var defaultProps = new MaterialProps(mat);
                     DefaultMaterialPropsDict.TryAdd(mat, defaultProps);
                 }
@@ -229,7 +231,7 @@ namespace sui4.MaterialPropertyBaker
             }
         }
 
-        // 個別に設定された値を優先する
+        // globalと個別の両方で同じPropertyの値が設定されていた場合、個別に設定された値を優先する
         private static void MergeGlobalProps(MpbProfile profile, out Dictionary<string, MaterialProps> mergedPropsDict)
         {
             mergedPropsDict = new Dictionary<string, MaterialProps>();
@@ -241,6 +243,7 @@ namespace sui4.MaterialPropertyBaker
         }
 
 
+        // mergeするのはpropertyの項目のみ。各propertyの値はmergeしない
         // layerが上(indexが大きい)のを優先する
         private static MaterialProps MergeMaterialProps(in IReadOnlyList<MaterialProps> layeredProps)
         {
