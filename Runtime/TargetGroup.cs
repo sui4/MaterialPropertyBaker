@@ -157,6 +157,7 @@ namespace sui4.MaterialPropertyBaker
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
                 {
                     Material mat = ren.sharedMaterials[mi];
+                    if (mat == null) continue;
                     TargetInfo targetInfo = wrapper.MatTargetInfoDict[mat];
                     MaterialProps defaultProps = DefaultMaterialPropsDict[mat];
                     // ren.GetPropertyBlock(_mpb, mi); // 初期化時にsetしてるため、ここで例外は発生しないはず
@@ -268,7 +269,12 @@ namespace sui4.MaterialPropertyBaker
             _mpb = new MaterialPropertyBlock();
             foreach (Renderer ren in Renderers)
                 for (var mi = 0; mi < ren.sharedMaterials.Length; mi++)
-                    ren.SetPropertyBlock(_mpb, mi);
+                {
+                    if (ren.sharedMaterials[mi] != null)
+                    {
+                        ren.SetPropertyBlock(_mpb, mi);
+                    }
+                }
         }
 
         public void ResetToDefault()
