@@ -172,7 +172,8 @@ namespace sui4.MaterialPropertyBaker
                 mergedPropsDictDict[profile] = mergedPropsDict;
             }
 
-            // TODO: ここはもっと計算量を減らせるはず
+            // TODO: ここはもっと計算量を減らせるはず。targetごとに一度計算すれば良いので、事前計算して結果をまとめておく
+            // ただ、メモリの使用量が増えるので、どちらが良いかは検討が必要
             foreach (Renderer ren in Renderers)
             {
                 if(ren == null || !ren.enabled) continue;
@@ -185,7 +186,7 @@ namespace sui4.MaterialPropertyBaker
                     MaterialProps defaultProps = DefaultMaterialPropsDict[mat];
                     _mpb = new MaterialPropertyBlock();
                     // profileごとに扱うpropertyは異なるため、どのプロパティがどのweightで使われたかを保存する
-                    Dictionary<int, float> usedPropertyWeightDict = new(); 
+                    Dictionary<int, float> usedPropertyWeightDict = new();
                     foreach ((MpbProfile profile, float weight) in profileWeightDict)
                     {
                         // 同じtargetに対するpropertyの値をマージする
