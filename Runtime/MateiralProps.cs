@@ -22,9 +22,9 @@ namespace sui4.MaterialPropertyBaker
 
         public MaterialProps(List<MaterialProp<Color>> c, List<MaterialProp<float>> f, List<MaterialProp<int>> i)
         {
-            Colors.AddRange(c);
-            Floats.AddRange(f);
-            Ints.AddRange(i);
+            Colors = new List<MaterialProp<Color>>(c);
+            Floats = new List<MaterialProp<float>>(f);
+            Ints = new List<MaterialProp<int>>(i);
             UpdateShaderID();
         }
 
