@@ -265,30 +265,36 @@ namespace sui4.MaterialPropertyBaker
         private static MaterialProps MergeMaterialProps(in IReadOnlyList<MaterialProps> layeredProps)
         {
             MaterialProps mergedProps = new();
-            Dictionary<int, MaterialProp<Color>> idColorDict = new();
-            Dictionary<int, MaterialProp<float>> idFloatDict = new();
-            Dictionary<int, MaterialProp<int>> idIntDict = new();
-            for (int li = 0; li < layeredProps.Count; li++)
+            HashSet<int> addedPropIds = new();
+
+            // 最初のレイヤーは特別扱い
+            if (layeredProps.Count > 0)
+            {
+                MaterialProps firstLayer = layeredProps[^1];
+                mergedProps = new MaterialProps(firstLayer.Colors, firstLayer.Floats, firstLayer.Ints);
+                addedPropIds.UnionWith(firstLayer.Colors?.Select(colorProp => colorProp.ID) ?? Enumerable.Empty<int>());
+                addedPropIds.UnionWith(firstLayer.Floats?.Select(floatProp => floatProp.ID) ?? Enumerable.Empty<int>());
+                addedPropIds.UnionWith(firstLayer.Ints?.Select(intProp => intProp.ID) ?? Enumerable.Empty<int>());
+            }
+
+            // 残りのレイヤー
+            for (int li = layeredProps.Count - 2; li >= 0; li--)
             {
                 MaterialProps target = layeredProps[li];
                 foreach (MaterialProp<Color> colorProp in target.Colors)
-                    idColorDict[colorProp.ID] = colorProp;
-
+                {
+                    if(!addedPropIds.Contains(colorProp.ID)) mergedProps.Colors.Add(colorProp);
+                }
                 foreach (MaterialProp<float> floatProp in target.Floats)
-                    idFloatDict[floatProp.ID] = floatProp;
-
+                {
+                    if(!addedPropIds.Contains(floatProp.ID)) mergedProps.Floats.Add(floatProp);
+                }
                 foreach (MaterialProp<int> intProp in target.Ints)
-                    idIntDict[intProp.ID] = intProp;
+                {
+                    if(!addedPropIds.Contains(intProp.ID)) mergedProps.Ints.Add(intProp);
+                }
             }
 
-            foreach ((int _, MaterialProp<Color> colorProp) in idColorDict)
-                mergedProps.Colors.Add(colorProp);
-
-            foreach ((int _, MaterialProp<float> floatProp) in idFloatDict)
-                mergedProps.Floats.Add(floatProp);
-
-            foreach ((int _, MaterialProp<int> intProp) in idIntDict)
-                mergedProps.Ints.Add(intProp);
             return mergedProps;
         }
 
