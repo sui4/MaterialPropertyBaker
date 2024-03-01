@@ -264,11 +264,14 @@ namespace sui4.MaterialPropertyBaker
                 }
                 else
                 {
-                    if (t.Value != null)
+                    if (weight > 0.5)
                     {
-                        mpb.SetTexture(prop.ID, t.Value);
+                        if (t.Value != null)
+                        {
+                            mpb.SetTexture(prop.ID, t.Value);
+                        }
+                        usedPropWeightDict.Add(prop.ID, weight);
                     }
-                    usedPropWeightDict.Add(prop.ID, weight);
                 }
             }
         }
