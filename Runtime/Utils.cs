@@ -22,16 +22,20 @@ namespace sui4.MaterialPropertyBaker
                 mpb.SetFloat(f.ID, f.Value);
             foreach (MaterialProp<int> i in props.Ints)
                 mpb.SetInteger(i.ID, i.Value);
+            foreach (MaterialProp<Texture> t in props.Textures)
+                mpb.SetTexture(t.ID, t.Value);
         }
 
         public static void UpdatePropertyBlockFromDict(ref MaterialPropertyBlock mpb, Dictionary<int, Color> cPropDict,
-            Dictionary<int, float> fPropDict, Dictionary<int, int> iPropDict)
+            Dictionary<int, float> fPropDict, Dictionary<int, int> iPropDict, Dictionary<int, Texture> tPropDict)
         {
             foreach ((int shaderID, Color value) in cPropDict) mpb.SetColor(shaderID, value);
 
             foreach ((int shaderID, float value) in fPropDict) mpb.SetFloat(shaderID, value);
             
             foreach ((int shaderID, int value) in iPropDict) mpb.SetInteger(shaderID, value);
+            
+            foreach ((int shaderID, Texture value) in tPropDict) mpb.SetTexture(shaderID, value);
         }
 
         public static string UnderscoresToSpaces(string input)

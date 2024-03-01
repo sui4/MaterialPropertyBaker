@@ -246,6 +246,34 @@ namespace sui4.MaterialPropertyBaker
                     usedPropWeightDict.Add(prop.ID, weight);
                 }
             }
+            
+            foreach (MaterialProp<Texture> t in propsToAdd.Textures)
+            {
+                MaterialProp<Texture> prop = defaultProps.Textures.Find(c => c.ID == t.ID);
+                if (prop == null) continue;
+                if (usedPropWeightDict.TryGetValue(prop.ID, out float storedWeight))
+                {
+                    if (weight > storedWeight)
+                    {
+                        if (t.Value != null)
+                        {
+                            mpb.SetTexture(prop.ID, t.Value);
+                        }
+                        usedPropWeightDict[prop.ID] = weight; 
+                    }
+                }
+                else
+                {
+                    if (weight > 0.5)
+                    {
+                        if (t.Value != null)
+                        {
+                            mpb.SetTexture(prop.ID, t.Value);
+                        }
+                        usedPropWeightDict.Add(prop.ID, weight);
+                    }
+                }
+            }
         }
 
         // globalと個別の両方で同じPropertyの値が設定されていた場合、個別に設定された値を優先する
@@ -271,10 +299,11 @@ namespace sui4.MaterialPropertyBaker
             if (layeredProps.Count > 0)
             {
                 MaterialProps firstLayer = layeredProps[^1];
-                mergedProps = new MaterialProps(firstLayer.Colors, firstLayer.Floats, firstLayer.Ints);
+                mergedProps = new MaterialProps(firstLayer.Colors, firstLayer.Floats, firstLayer.Ints, firstLayer.Textures);
                 addedPropIds.UnionWith(firstLayer.Colors?.Select(colorProp => colorProp.ID) ?? Enumerable.Empty<int>());
                 addedPropIds.UnionWith(firstLayer.Floats?.Select(floatProp => floatProp.ID) ?? Enumerable.Empty<int>());
                 addedPropIds.UnionWith(firstLayer.Ints?.Select(intProp => intProp.ID) ?? Enumerable.Empty<int>());
+                addedPropIds.UnionWith(firstLayer.Textures?.Select(textureProp => textureProp.ID) ?? Enumerable.Empty<int>());
             }
 
             // 残りのレイヤー
@@ -292,6 +321,11 @@ namespace sui4.MaterialPropertyBaker
                 foreach (MaterialProp<int> intProp in target.Ints)
                 {
                     if(!addedPropIds.Contains(intProp.ID)) mergedProps.Ints.Add(intProp);
+                }
+
+                foreach (MaterialProp<Texture> textureProp in target.Textures)
+                {
+                    if(!addedPropIds.Contains(textureProp.ID)) mergedProps.Textures.Add(textureProp);
                 }
             }
 

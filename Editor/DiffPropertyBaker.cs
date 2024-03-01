@@ -140,7 +140,11 @@ namespace sui4.MaterialPropertyBaker
                             EditorGUILayout.IntField(new GUIContent(prop.PropName), prop.TargetIntValue);
                             break;
                         case ShaderPropertyType.Vector:
+                            break;
                         case ShaderPropertyType.Texture:
+                            EditorGUILayout.ObjectField(new GUIContent(prop.PropName), prop.BaseTextureValue, typeof(Texture), allowSceneObjects:false);
+                            EditorGUILayout.ObjectField(new GUIContent(prop.PropName), prop.TargetTextureValue, typeof(Texture), allowSceneObjects:false);
+                            break;
                         default:
                             Debug.LogWarning(
                                 $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
@@ -192,7 +196,10 @@ namespace sui4.MaterialPropertyBaker
                                 targetMatProps.SetInt(prop.PropName, prop.TargetIntValue);
                                 break;
                             case ShaderPropertyType.Vector:
+                                break;
                             case ShaderPropertyType.Texture:
+                                targetMatProps.SetTexture(prop.PropName, prop.TargetTextureValue);
+                                break;
                             default:
                                 Debug.LogWarning(
                                     $"Property type {prop.PropType} is not supported. Skipped. (This should not happen))");
