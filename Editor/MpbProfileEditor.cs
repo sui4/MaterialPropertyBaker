@@ -15,9 +15,11 @@ namespace sui4.MaterialPropertyBaker
         private readonly List<bool> _colorsFoldoutList = new();
         private readonly List<bool> _floatsFoldoutList = new();
         private readonly List<bool> _intsFoldoutList = new();
+        private readonly List<bool> _texturesFoldoutList = new();
         private bool _globalColorsFoldout = true;
         private bool _globalFloatsFoldout = true;
         private bool _globalIntsFoldout = true;
+        private bool _globalTexturesFoldout = true;
 
         private SerializedProperty _globalPropsProp;
         private SerializedProperty _materialPropsListProp;
@@ -36,6 +38,7 @@ namespace sui4.MaterialPropertyBaker
         private static string ColorsFoldoutKeyAt(string targetName, string id) => $"{targetName}_colorsFoldout_{id}";
         private static string FloatsFoldoutKeyAt(string targetName, string id) => $"{targetName}_floatsFoldout_{id}";
         private static string IntsFoldoutKeyAt(string targetName, string id) => $"{targetName}_intsFoldout_{id}";
+        private static string TexturesFoldoutKeyAt(string targetName, string id) => $"{targetName}_texturesFoldout_{id}";
 
         private void Validate()
         {
@@ -49,6 +52,7 @@ namespace sui4.MaterialPropertyBaker
                 _colorsFoldoutList.Add(SessionState.GetBool(ColorsFoldoutKeyAt(targetName, id), true));
                 _floatsFoldoutList.Add(SessionState.GetBool(FloatsFoldoutKeyAt(targetName, id), true));
                 _intsFoldoutList.Add(SessionState.GetBool(IntsFoldoutKeyAt(targetName, id), true));
+                _texturesFoldoutList.Add(SessionState.GetBool(TexturesFoldoutKeyAt(targetName, id), true));
             }
         }
 
@@ -92,7 +96,7 @@ namespace sui4.MaterialPropertyBaker
                         if (_propFoldoutList[i])
                         {
                             EditorGUI.indentLevel++;
-                            MaterialPropsGUI(TargetProfile ,_materialPropsProp, i, _colorsFoldoutList, _floatsFoldoutList, _intsFoldoutList);
+                            MaterialPropsGUI(TargetProfile ,_materialPropsProp, i, _colorsFoldoutList, _floatsFoldoutList, _intsFoldoutList, _texturesFoldoutList);
                             EditorGUI.indentLevel--;
                         }
                     }
@@ -113,6 +117,7 @@ namespace sui4.MaterialPropertyBaker
             SerializedProperty colors = globalPropsProp.FindPropertyRelative("_colors");
             SerializedProperty floats = globalPropsProp.FindPropertyRelative("_floats");
             SerializedProperty ints = globalPropsProp.FindPropertyRelative("_ints");
+            SerializedProperty textures = globalPropsProp.FindPropertyRelative("_textures");
 
             EditorGUILayout.LabelField("Global Properties", EditorStyles.boldLabel);
 
@@ -149,11 +154,21 @@ namespace sui4.MaterialPropertyBaker
             //     PropsGUI(ints, Target.GlobalProps, ShaderPropertyType.Int);
             //     EditorGUI.indentLevel--;
             // }
+            
+            // Textures
+            _globalTexturesFoldout = EditorGUILayout.Foldout(_globalTexturesFoldout, "Textures");
+            SessionState.SetBool(TexturesFoldoutKeyAt(TargetProfile.name, "global"), _globalTexturesFoldout);
+            if (_globalTexturesFoldout)
+            {
+                EditorGUI.indentLevel++;
+                PropsGUI(textures, TargetProfile.GlobalProps, ShaderPropertyType.Texture, targetShader);
+                EditorGUI.indentLevel--;
+            }
 
             EditorGUI.indentLevel--;
         }
 
-        private void MaterialPropsGUI(MpbProfile targetProfile, SerializedProperty materialPropsProp, int index, IList<bool> colorsFoldoutList, IList<bool> floatsFoldoutList, IList<bool> intsFoldoutList)
+        private void MaterialPropsGUI(MpbProfile targetProfile, SerializedProperty materialPropsProp, int index, IList<bool> colorsFoldoutList, IList<bool> floatsFoldoutList, IList<bool> intsFoldoutList, IList<bool> texturesFoldoutList)
         {
             SerializedProperty id = materialPropsProp.FindPropertyRelative("_id");
             SerializedProperty material = materialPropsProp.FindPropertyRelative("_material");
@@ -161,6 +176,7 @@ namespace sui4.MaterialPropertyBaker
             SerializedProperty colors = materialPropsProp.FindPropertyRelative("_colors");
             SerializedProperty floats = materialPropsProp.FindPropertyRelative("_floats");
             SerializedProperty ints = materialPropsProp.FindPropertyRelative("_ints");
+            SerializedProperty textures = materialPropsProp.FindPropertyRelative("_textures");
 
             EditorGUILayout.PropertyField(id, new GUIContent("ID"));
             EditorGUILayout.PropertyField(material);
@@ -200,6 +216,16 @@ namespace sui4.MaterialPropertyBaker
             //     PropsGUI(ints, Target.MaterialPropsList[index], ShaderPropertyType.Int);
             //     EditorGUI.indentLevel--;
             // }
+            
+            // Textures
+            texturesFoldoutList[index] = EditorGUILayout.Foldout(texturesFoldoutList[index], "Textures");
+            SessionState.SetBool(TexturesFoldoutKeyAt(targetProfile.name, key), texturesFoldoutList[index]);
+            if (texturesFoldoutList[index])
+            {
+                EditorGUI.indentLevel++;
+                PropsGUI(textures, targetProfile.MaterialPropsList[index], ShaderPropertyType.Texture, targetShader);
+                EditorGUI.indentLevel--;
+            }
         }
 
         private void PropsGUI(SerializedProperty propsList, MaterialProps matProps, ShaderPropertyType targetPropType,
@@ -333,7 +359,10 @@ namespace sui4.MaterialPropertyBaker
                             EditorGUILayout.PropertyField(valueProp, new GUIContent(label));
                             break;
                         case ShaderPropertyType.Vector:
+                            break;
                         case ShaderPropertyType.Texture:
+                            EditorGUILayout.PropertyField(valueProp, new GUIContent(label));
+                            break;
                         default:
                             break;
                     }
@@ -385,6 +414,10 @@ namespace sui4.MaterialPropertyBaker
                     case ShaderPropertyType.Int when matProps.Ints.All(f => f.Name != propName):
                         AddPropertyToMenu(propName, addPropertyMenu, matProps, propType);
                         break;
+                    
+                    case ShaderPropertyType.Texture when matProps.Textures.All(f => f.Name != propName):
+                        AddPropertyToMenu(propName, addPropertyMenu, matProps, propType);
+                        break;
                 }
             }
 
@@ -433,6 +466,14 @@ namespace sui4.MaterialPropertyBaker
                     : material.GetInteger(propName);
                 var matProp = new MaterialProp<int>(propName, defaultInt);
                 props.Ints.Add(matProp);
+            }
+            else if (propType is ShaderPropertyType.Texture)
+            {
+                Texture defaultTexture = material == null
+                    ? null
+                    : material.GetTexture(propName);
+                var matProp = new MaterialProp<Texture>(propName, defaultTexture);
+                props.Textures.Add(matProp);
             }
 
             EditorUtility.SetDirty(target);

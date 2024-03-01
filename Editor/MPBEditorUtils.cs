@@ -22,9 +22,11 @@ namespace sui4.MaterialPropertyBaker
         public Color BaseColorValue;
         public float BaseFloatValue;
         public int BaseIntValue;
+        public Texture BaseTextureValue;
         public Color TargetColorValue;
         public float TargetFloatValue;
         public int TargetIntValue;
+        public Texture TargetTextureValue;
     }
     public static class MPBEditorUtils
     {
@@ -93,7 +95,19 @@ namespace sui4.MaterialPropertyBaker
 
                         break;
                     case ShaderPropertyType.Texture:
+
+                        break;
                     case ShaderPropertyType.Vector:
+                        Texture baseTexture = baseMat.GetTexture(propName);
+                        Texture targetTexture = targetMat.GetTexture(propName);
+                        if (baseTexture != targetTexture)
+                        {
+                            baseTargetValueHolder.BaseTextureValue = baseTexture;
+                            baseTargetValueHolder.TargetTextureValue = targetTexture;
+                            propHolders.Add(baseTargetValueHolder);
+                        }
+
+                        break;
                     default:
                         // not supported
                         break;
@@ -144,7 +158,14 @@ namespace sui4.MaterialPropertyBaker
 
                         break;
                     case ShaderPropertyType.Texture:
+                        Texture targetTexture = targetMat.GetTexture(propName);
+                        baseTargetValueHolder.TargetTextureValue = targetTexture;
+                        propHolders.Add(baseTargetValueHolder);
+
+                        break;
                     case ShaderPropertyType.Vector:
+
+                        break;
                     default:
                         // not supported
                         break;
